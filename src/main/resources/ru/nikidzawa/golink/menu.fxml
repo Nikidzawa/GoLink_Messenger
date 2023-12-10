@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import io.github.gleidson28.GNAvatarView?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.paint.LinearGradient?>
+<?import javafx.scene.paint.Stop?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1200.0" prefWidth="1200.0" style="-fx-background-color: #001933;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.nikidzawa.golink.GoLink">
+   <left>
+      <BorderPane prefHeight="1201.0" prefWidth="322.0" style="-fx-border-color: black; -fx-border-width: 0 1 0 0 0; -fx-background-color: #001933;" BorderPane.alignment="CENTER">
+         <top>
+            <AnchorPane prefHeight="77.0" prefWidth="322.0" style="-fx-border-color: black; -fx-border-width: 0 0 1 0 0;" BorderPane.alignment="CENTER">
+               <children>
+                  <Text fx:id="profileName" fill="WHITE" layoutX="104.0" layoutY="45.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Nikidzawa" wrappingWidth="138.13671875">
+                     <font>
+                        <Font name="System" size="20.0" />
+                     </font>
+                  </Text>
+                  <StackPane layoutX="14.0" layoutY="6.0" prefHeight="67.0" prefWidth="75.0">
+                     <children>
+                        <GNAvatarView prefHeight="71.0" prefWidth="104.0" stroke="#001933" type="CIRCLE">
+                           <image>
+                              <Image url="@/ava.jpg" />
+                           </image>
+                        </GNAvatarView>
+                        <Circle cache="true" fill="GREEN" radius="9.0" stroke="BLACK" strokeType="INSIDE">
+                           <StackPane.margin>
+                              <Insets left="40.0" top="60.0" />
+                           </StackPane.margin>
+                        </Circle>
+                     </children>
+                  </StackPane>
+                  <Text fill="WHITE" layoutX="104.0" layoutY="61.0" strokeType="OUTSIDE" strokeWidth="0.0" text="В сети" wrappingWidth="118.13671875">
+                     <font>
+                        <Font name="System" size="12.0" />
+                     </font>
+                  </Text>
+                  <ImageView fitHeight="31.0" fitWidth="31.0" layoutX="276.0" layoutY="41.0">
+                     <image>
+                        <Image url="@/free-icon-font-user-gear-9844438.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </AnchorPane>
+         </top>
+         <bottom>
+            <AnchorPane prefHeight="68.0" prefWidth="320.0" style="-fx-border-color: black; -fx-border-width: 1 0 0 0 0;" BorderPane.alignment="CENTER">
+               <children>
+                  <Text fill="WHITE" layoutX="82.0" layoutY="63.0" strokeType="OUTSIDE" strokeWidth="0.0" text="GoLink ver. 1.0 RELEASE" textAlignment="CENTER" wrappingWidth="155.13671875" />
+                  <Text layoutX="107.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="GoLink" wrappingWidth="105.13671875">
+                     <font>
+                        <Font name="System Bold" size="32.0" />
+                     </font>
+                     <fill>
+                        <LinearGradient endX="1.0" endY="1.0">
+                           <stops>
+                              <Stop>
+                                 <color>
+                                    <Color red="1.0" />
+                                 </color>
+                              </Stop>
+                              <Stop offset="0.006711409395973154">
+                                 <color>
+                                    <Color red="1.0" />
+                                 </color>
+                              </Stop>
+                              <Stop offset="1.0">
+                                 <color>
+                                    <Color red="0.17142857611179352" blue="1.0" />
+                                 </color>
+                              </Stop>
+                           </stops>
+                        </LinearGradient>
+                     </fill>
+                  </Text>
+               </children>
+            </AnchorPane>
+         </bottom>
+         <center>
+            <VBox fx:id="chats" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="1047.0" prefWidth="365.0" BorderPane.alignment="CENTER" />
+         </center>
+      </BorderPane>
+   </left>
+   <center>
+      <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <top>
+            <AnchorPane prefHeight="85.0" prefWidth="887.0" style="-fx-border-color: black; -fx-border-width: 0 0 1 0 0;" BorderPane.alignment="CENTER">
+               <children>
+                  <Text fx:id="chatRoomName" fill="WHITE" layoutX="14.0" layoutY="46.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="390.13671875">
+                     <font>
+                        <Font name="System" size="30.0" />
+                     </font>
+                  </Text>
+                  <Text fill="WHITE" layoutX="14.0" layoutY="66.0" strokeType="OUTSIDE" strokeWidth="0.0" text="В сети" wrappingWidth="118.13671875" />
+               </children>
+            </AnchorPane>
+         </top>
+         <bottom>
+            <AnchorPane prefHeight="47.0" prefWidth="887.0" style="-fx-border-color: black; -fx-border-width: 1 0 0 0 0;" BorderPane.alignment="CENTER">
+               <children>
+                  <TextField fx:id="input" layoutX="6.0" layoutY="7.0" prefHeight="33.0" prefWidth="730.0" promptText="Введите сообщение..." style="-fx-background-color: #001933;">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </TextField>
+                  <Button fx:id="send" layoutX="744.0" layoutY="7.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="125.0" style="-fx-background-color: blue;" text="Отправить" textAlignment="CENTER" textFill="WHITE">
+                     <font>
+                        <Font name="Arial Black" size="12.0" />
+                     </font></Button>
+               </children>
+            </AnchorPane>
+         </bottom>
+         <center>
+            <ScrollPane hbarPolicy="NEVER" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #001933;" BorderPane.alignment="CENTER">
+               <content>
+                  <VBox fx:id="chat" prefHeight="1066.0" prefWidth="876.0" style="-fx-background-color: #001933;" />
+               </content>
+            </ScrollPane>
+         </center>
+      </BorderPane>
+   </center>
+</BorderPane>
