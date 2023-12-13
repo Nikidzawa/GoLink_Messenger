@@ -1,9 +1,8 @@
-package ru.nikidzawa.golink;
+package ru.nikidzawa.golink.store.entities;
 
-import com.gluonhq.charm.glisten.control.Message;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import ru.nikidzawa.golink.store.enums.ChatType;
 
 import java.util.ArrayList;
 import java.util.List;

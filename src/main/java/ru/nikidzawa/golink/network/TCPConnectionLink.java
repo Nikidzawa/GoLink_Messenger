@@ -1,4 +1,4 @@
-package ru.nikidzawa.golink;
+package ru.nikidzawa.golink.network;
 
 public interface TCPConnectionLink {
     void onConnectionReady(TCPConnection tcpConnection);

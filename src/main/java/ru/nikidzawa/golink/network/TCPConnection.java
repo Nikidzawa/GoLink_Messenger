@@ -1,4 +1,4 @@
-package ru.nikidzawa.golink;
+package ru.nikidzawa.golink.network;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -11,13 +11,8 @@ public class TCPConnection {
     private final Socket socket;
     private final Thread thread;
     TCPConnectionLink link;
-
     private final BufferedReader in;
     private final BufferedWriter out;
-
-    public TCPConnection (TCPConnectionLink link, String ipAddr, int port) throws IOException {
-        this(new Socket(ipAddr, port), link);
-    }
 
     public TCPConnection (Socket socket, TCPConnectionLink link) throws IOException {
         this.socket = socket;
@@ -30,9 +25,15 @@ public class TCPConnection {
                 link.onConnectionReady(TCPConnection.this);
                 while (!thread.isInterrupted()) {
                     try {
-                        link.onReceiveMessage(TCPConnection.this, in.readLine());
+                        String message = in.readLine();
+                        if (message == null) {
+                            break;
+                        }
+                        link.onReceiveMessage(TCPConnection.this, message);
                     } catch (IOException e) {
                         link.onException(TCPConnection.this, e);
+                        link.onDisconnect(TCPConnection.this);
+                        break;
                     }
                 }
                 link.onDisconnect(TCPConnection.this);

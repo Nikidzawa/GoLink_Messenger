@@ -18,13 +18,23 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import ru.nikidzawa.golink.SystemOfControlServers.SOCSConnection;
+import ru.nikidzawa.golink.GUIPatterns.WindowTitle;
+import ru.nikidzawa.golink.network.TCPConnection;
+import ru.nikidzawa.golink.network.TCPConnectionLink;
+import ru.nikidzawa.golink.services.SystemOfControlServers.SOCSConnection;
+import ru.nikidzawa.golink.store.entities.ChatEntity;
+import ru.nikidzawa.golink.store.entities.MessageEntity;
+import ru.nikidzawa.golink.store.entities.UserEntity;
+import ru.nikidzawa.golink.store.enums.ChatType;
+import ru.nikidzawa.golink.store.repositories.ChatRepository;
+import ru.nikidzawa.golink.store.repositories.MessageRepository;
+import ru.nikidzawa.golink.store.repositories.UserRepository;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URL;
 import java.time.LocalDateTime;
@@ -34,22 +44,35 @@ import java.util.*;
 public class GoLink implements TCPConnectionLink {
 
     @FXML
-    private VBox chats;
-
-    @FXML
-    private Button send;
-
-    @FXML
     private VBox chat;
 
     @FXML
     private Text chatRoomName;
 
     @FXML
+    private VBox chats;
+
+    @FXML
+    private Button closeButton;
+
+    @FXML
     private TextField input;
 
     @FXML
+    private Button minimizeButton;
+
+    @FXML
     private Text profileName;
+
+    @FXML
+    private Button scaleButton;
+
+    @FXML
+    private Button send;
+
+    @FXML
+    private Pane titleBar;
+
     private TCPConnection tcpConnection;
 
     @Autowired
@@ -58,14 +81,29 @@ public class GoLink implements TCPConnectionLink {
     ChatRepository chatRepository;
     @Autowired
     MessageRepository messageRepository;
+    @Autowired
+    SOCSConnection socsConnection;
 
     @Setter
     private UserEntity userEntity;
     private ChatEntity selectedChat;
 
     @FXML
+    @SneakyThrows
     void initialize() {
-        userEntity = userRepository.findById(2L).get();
+        Platform.runLater(() -> {
+            WindowTitle.setBaseCommands(titleBar, minimizeButton, scaleButton, closeButton);
+            input.focusedProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue) {
+                    input.setStyle("-fx-background-color: #001933; -fx-border-color: blue; -fx-text-fill: white; -fx-border-width: 0 0 2 0");
+                } else {
+                    input.setStyle("-fx-background-color: #001933; -fx-border-color: Gray; -fx-text-fill: white; -fx-border-width: 0 0 2 0");
+                }
+            });
+        });
+
+
+        userEntity = userRepository.findById(3L).get();
 
         profileName.setText(userEntity.getName());
         chatRepository.findByParticipantsContaining(userEntity).forEach(chatEnt -> {
@@ -79,29 +117,39 @@ public class GoLink implements TCPConnectionLink {
                     : chatEnt.getName();
             BorderPane contact = newChatBuilder(name);
             chats.getChildren().add(contact);
-            contact.setOnMouseClicked(e -> {
-                if (tcpConnection != null) {
-                    tcpConnection.disconnect();
-                }
-                try {
-                    tcpConnection = new TCPConnection(new Socket("localhost", chatEnt.getPort()), this);
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                }
-                chat.getChildren().clear();
-                chatRoomName.setText(name);
-                printMessages(chatEnt);
-                send.setOnAction(actionEvent -> {
-                    String text = input.getText();
-                    MessageEntity message = new MessageEntity.MessageEntityBuilder()
-                            .message(text).date(LocalDateTime.now()).sender(userEntity).build();
-                    chatEnt.setMessages(message);
-                    messageRepository.saveAndFlush(message);
-                    chatRepository.saveAndFlush(chatEnt);
-                    tcpConnection.sendMessage(text);
-                    chat.getChildren().add(printMyMessage(text));
 
-                });
+
+            contact.setOnMouseClicked(e -> {
+                if (selectedChat != chatEnt) {
+                    input.setVisible(true);
+                    input.setStyle("-fx-background-color: #001933; -fx-border-color: blue; -fx-text-fill: white; -fx-border-width: 0 0 2 0");
+                    send.setVisible(true);
+
+                    selectedChat = chatEnt;
+                    if (tcpConnection != null) {
+                        tcpConnection.disconnect();
+                    }
+                    try {
+                        tcpConnection = new TCPConnection(new Socket("localhost", chatEnt.getPort()), this);
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    chat.getChildren().clear();
+                    chatRoomName.setText(name);
+                    printMessages(chatEnt);
+                    send.setOnAction(actionEvent -> {
+                        String text = input.getText();
+                        if (text != null) {
+                            MessageEntity message = MessageEntity.builder()
+                                    .message(text).date(LocalDateTime.now()).sender(userEntity).build();
+                            chatEnt.setMessages(message);
+                            messageRepository.saveAndFlush(message);
+                            chatRepository.saveAndFlush(chatEnt);
+                            tcpConnection.sendMessage(text);
+                            chat.getChildren().add(printMyMessage(text));
+                        }
+                    });
+                }
             });
         });
     }
@@ -215,7 +263,6 @@ public class GoLink implements TCPConnectionLink {
 
     @Override
     public void onConnectionReady(TCPConnection tcpConnection) {
-
     }
 
     @Override
@@ -230,11 +277,11 @@ public class GoLink implements TCPConnectionLink {
 
     @Override
     public void onDisconnect(TCPConnection tcpConnection) {
-
+        tcpConnection.disconnect();
     }
 
     @Override
     public void onException(TCPConnection tcpConnection, Exception ex) {
-
+        tcpConnection.disconnect();
     }
 }

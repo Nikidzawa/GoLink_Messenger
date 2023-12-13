@@ -1,76 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.paint.LinearGradient?>
 <?import javafx.scene.paint.Stop?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="465.0" prefWidth="638.0" style="-fx-background-color: #001933;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.nikidzawa.golink.Register">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1200.0" prefWidth="1200.0" style="-fx-background-color: #001933;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.nikidzawa.golink.Register">
    <children>
-      <TextField fx:id="name" layoutX="183.0" layoutY="159.0" prefHeight="36.0" prefWidth="270.0" promptText="Имя">
+      <ImageView fitHeight="46.0" fitWidth="58.0" layoutX="232.0" layoutY="606.0" pickOnBounds="true">
+         <image>
+            <Image url="@/phone.png" />
+         </image>
+      </ImageView>
+      <TextField fx:id="phone" layoutX="303.0" layoutY="610.0" prefHeight="36.0" prefWidth="514.0" promptText="Телефон" style="-fx-background-color: #001933; -fx-border-color: #18314D; -fx-border-width: 0 0 2 0; -fx-text-fill: white;">
          <font>
-            <Font name="Arial" size="12.0" />
+            <Font name="Arial" size="17.0" />
          </font>
       </TextField>
-      <TextField fx:id="password" layoutX="183.0" layoutY="294.0" prefHeight="36.0" prefWidth="270.0" promptText="Пароль">
+      <Button fx:id="enter" layoutX="429.0" layoutY="1069.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="261.0" style="-fx-background-color: #18314D;" text="Подтвердить номер" textAlignment="CENTER" textFill="WHITE">
          <font>
-            <Font name="Arial" size="12.0" />
-         </font></TextField>
-      <Text fontSmoothingType="LCD" layoutX="209.0" layoutY="127.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Регистрация" textAlignment="CENTER" wrappingWidth="217.13671875">
-         <font>
-            <Font name="Yu Gothic UI Semibold" size="36.0" />
+            <Font name="Arial" size="22.0" />
          </font>
-         <fill>
-            <LinearGradient endX="1.0" endY="1.0">
-               <stops>
-                  <Stop>
-                     <color>
-                        <Color red="0.2368421107530594" blue="0.7894737124443054" />
-                     </color>
-                  </Stop>
-                  <Stop offset="0.9966442953020134">
-                     <color>
-                        <Color red="1.0" />
-                     </color>
-                  </Stop>
-                  <Stop offset="1.0">
-                     <color>
-                        <Color red="1.0" />
-                     </color>
-                  </Stop>
-               </stops>
-            </LinearGradient>
-         </fill>
-      </Text>
-      <Button fx:id="enter" layoutX="189.0" layoutY="374.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="261.0" style="-fx-background-color: white;" text="Регистрация" textAlignment="CENTER" textFill="#001933">
-         <font>
-            <Font name="Yu Gothic UI Semibold" size="22.0" />
-         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
       </Button>
-      <Text fill="WHITE" layoutX="230.0" layoutY="444.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Уже есть аккаунт?" wrappingWidth="115.13671875">
+      <Text fill="WHITE" layoutX="463.0" layoutY="1144.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Уже есть аккаунт?" wrappingWidth="115.13671875">
          <font>
             <Font size="14.0" />
          </font>
       </Text>
-      <ImageView fitHeight="29.0" fitWidth="35.0" layoutX="134.0" layoutY="231.0" pickOnBounds="true">
-         <image>
-            <Image url="@../../../../../../../../Desktop/free-icon-font-envelope-3916611 (1).png" />
-         </image>
-      </ImageView>
-      <ImageView fitHeight="36.0" fitWidth="35.0" layoutX="134.0" layoutY="295.0" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@../../../../../../../../Desktop/free-icon-font-key-3914475.png" />
-         </image>
-      </ImageView>
-      <Text fontSmoothingType="LCD" layoutX="224.0" layoutY="74.0" strokeType="OUTSIDE" strokeWidth="0.0" text="GoLink" wrappingWidth="188.13671875">
+      <Text fx:id="login" fill="WHITE" layoutX="579.0" layoutY="1145.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Войти" wrappingWidth="42.13671875">
          <font>
-            <Font name="Yu Gothic UI Semibold" size="56.0" />
+            <Font name="System Bold" size="14.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Text>
+      <Text layoutX="426.0" layoutY="241.0" strokeType="OUTSIDE" strokeWidth="0.0" text="GoLink" wrappingWidth="290.13671875">
+         <font>
+            <Font name="System Bold" size="85.0" />
          </font>
          <fill>
             <LinearGradient endX="1.0" endY="1.0">
@@ -94,22 +76,87 @@
             </LinearGradient>
          </fill>
       </Text>
-      <TextField fx:id="phone" layoutX="184.0" layoutY="227.0" prefHeight="36.0" prefWidth="270.0" promptText="Телефон">
+      <Text fontSmoothingType="LCD" layoutX="440.0" layoutY="331.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Регистрация" textAlignment="CENTER" wrappingWidth="261.13671875">
          <font>
-            <Font name="Arial" size="12.0" />
+            <Font name="Arial" size="40.0" />
          </font>
-      </TextField>
-      <ImageView fitHeight="29.0" fitWidth="35.0" layoutX="134.0" layoutY="163.0" pickOnBounds="true">
+         <fill>
+            <LinearGradient endX="1.0" endY="1.0">
+               <stops>
+                  <Stop>
+                     <color>
+                        <Color red="0.2368421107530594" blue="0.7894737124443054" />
+                     </color>
+                  </Stop>
+                  <Stop offset="0.9966442953020134">
+                     <color>
+                        <Color red="1.0" />
+                     </color>
+                  </Stop>
+                  <Stop offset="1.0">
+                     <color>
+                        <Color red="1.0" />
+                     </color>
+                  </Stop>
+               </stops>
+            </LinearGradient>
+         </fill>
+      </Text>
+      <ImageView fitHeight="46.0" fitWidth="58.0" layoutX="232.0" layoutY="772.0" pickOnBounds="true">
          <image>
-            <Image url="@../../../../../../../../Desktop/free-icon-font-user-3917688.png" />
+            <Image url="@/free-icon-font-key-3914475.png" />
          </image>
       </ImageView>
-      <Text fx:id="login" fill="WHITE" layoutX="352.0" layoutY="444.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Войти" wrappingWidth="44.13671875">
+      <VBox fx:id="menuItem" layoutX="712.0" layoutY="52.0" prefHeight="534.0" prefWidth="498.0" />
+      <HBox alignment="TOP_RIGHT" prefHeight="38.0" prefWidth="1200.0" style="-fx-background-color: #18314D;">
+         <children>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="GoLink" wrappingWidth="80.13671875">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+               <fill>
+                  <LinearGradient endX="1.0" endY="1.0">
+                     <stops>
+                        <Stop>
+                           <color>
+                              <Color red="0.2368421107530594" blue="0.7894737124443054" />
+                           </color>
+                        </Stop>
+                        <Stop offset="0.9966442953020134">
+                           <color>
+                              <Color red="1.0" />
+                           </color>
+                        </Stop>
+                        <Stop offset="1.0">
+                           <color>
+                              <Color red="1.0" />
+                           </color>
+                        </Stop>
+                     </stops>
+                  </LinearGradient>
+               </fill>
+               <HBox.margin>
+                  <Insets top="2.0" />
+               </HBox.margin>
+            </Text>
+            <Pane fx:id="titleBar" prefHeight="38.0" prefWidth="976.0" />
+            <Button fx:id="minimizeButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="35.0" prefWidth="45.0" style="-fx-background-color: #18314D;" text="—" textAlignment="CENTER" textFill="SILVER" />
+            <Button fx:id="scaleButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="35.0" prefWidth="45.0" style="-fx-background-color: #18314D;" text="☐" textAlignment="CENTER" textFill="SILVER">
+               <font>
+                  <Font name="Yu Gothic UI Semibold" size="13.0" />
+               </font>
+            </Button>
+            <Button fx:id="closeButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="35.0" prefWidth="45.0" style="-fx-background-color: #18314D;" text="X" textAlignment="CENTER" textFill="SILVER">
+               <font>
+                  <Font name="Arial" size="14.0" />
+               </font>
+            </Button>
+         </children>
+      </HBox>
+      <PasswordField fx:id="password" layoutX="303.0" layoutY="769.0" prefHeight="36.0" prefWidth="514.0" promptText="Пароль" style="-fx-background-color: #001933; -fx-border-color: #18314D; -fx-border-width: 0 0 2 0; -fx-text-fill: white;">
          <font>
-            <Font size="14.0" />
+            <Font name="Arial" size="17.0" />
          </font>
-      </Text>
-      <Text fx:id="phone_error_message" fill="RED" layoutX="183.0" layoutY="280.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Аккаунт с таким телефоном уже существует"  wrappingWidth="270.0" />
-      <Text fx:id="password_error_message" fill="RED" layoutX="183.0" layoutY="349.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Минимальный размер пароля - 6 символов" wrappingWidth="246.13671875" />
+      </PasswordField>
    </children>
 </AnchorPane>

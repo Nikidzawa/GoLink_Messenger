@@ -1,12 +1,15 @@
-package ru.nikidzawa.golink;
+package ru.nikidzawa.golink.network;
 
 import lombok.Getter;
 import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Autowired;
+import ru.nikidzawa.golink.network.TCPConnection;
+import ru.nikidzawa.golink.network.TCPConnectionLink;
+import ru.nikidzawa.golink.services.SystemOfControlServers.SOCSConnection;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 
@@ -20,12 +23,14 @@ public class Server implements TCPConnectionLink {
         serverSocket = new ServerSocket(port);
         PORT = serverSocket.getLocalPort();
     }
+
     public void start () {
         while (true) {
             try {
                 new TCPConnection(serverSocket.accept(), this);
             } catch (IOException ex) {
-                System.out.println("TCP ex " + ex);
+                System.out.println("Подтверждение завершения работы сервера на порту " + PORT + ex);
+                break;
             }
         }
     }
@@ -49,6 +54,7 @@ public class Server implements TCPConnectionLink {
         connections.remove(tcpConnection);
         if (connections.isEmpty()) {
             serverSocket.close();
+            System.out.println("Сервер на порту " + PORT + " прекратил работу");
         }
         System.out.println("Client disconnect " + tcpConnection);
     }

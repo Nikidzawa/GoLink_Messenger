@@ -1,6 +1,6 @@
-package ru.nikidzawa.golink.SystemOfControlServers;
+package ru.nikidzawa.golink.services.SystemOfControlServers;
 
-import ru.nikidzawa.golink.Server;
+import ru.nikidzawa.golink.network.Server;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,8 +9,6 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
-
-
 public class SOCS {
     public static void main(String[] args) {
         new SOCS();
@@ -47,7 +45,7 @@ public class SOCS {
                 System.out.println("CREATE NEW SERVER ON PORT: " + port);
                 servers.put(port, server);
                 out.println(port);
-                server.start();
+                new Thread(server::start);
                 break;
             case "GET_SERVERS_PORTS":
                 for (Integer key : servers.keySet()) {

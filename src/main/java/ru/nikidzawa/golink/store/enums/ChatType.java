@@ -1,4 +1,4 @@
-package ru.nikidzawa.golink;
+package ru.nikidzawa.golink.store.enums;
 
 public enum ChatType {
     DIALOG,

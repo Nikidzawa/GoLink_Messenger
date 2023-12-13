@@ -1,4 +1,4 @@
-package ru.nikidzawa.golink;
+package ru.nikidzawa.golink.store.entities;
 
 
 import jakarta.persistence.*;
@@ -18,6 +18,9 @@ public class UserEntity {
     private Long id;
 
     private String name;
+
+    @Column(unique = true)
+    private String nickname;
 
     private Long phone;
 
