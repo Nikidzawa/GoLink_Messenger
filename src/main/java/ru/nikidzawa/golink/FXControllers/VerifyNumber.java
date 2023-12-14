@@ -21,10 +21,10 @@ import javafx.stage.StageStyle;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import org.springframework.context.ConfigurableApplicationContext;
-import ru.nikidzawa.golink.FXControllers.Register;
-import ru.nikidzawa.golink.FXControllers.SelectAvatar;
 import ru.nikidzawa.golink.GUIPatterns.Message;
 import ru.nikidzawa.golink.GUIPatterns.WindowTitle;
+
+import java.util.Objects;
 
 public class VerifyNumber {
     @Setter
@@ -67,6 +67,7 @@ public class VerifyNumber {
         area.setSpacing(25);
 
         goBack.setOnMouseClicked(mouseEvent -> goBack());
+        final int maxLength = 1;
 
         for (int i = 0; i < 6; i++) {
             TextField textField = new TextField();
@@ -76,6 +77,11 @@ public class VerifyNumber {
             textField.setAlignment(Pos.CENTER);
             textField.setFont(Font.font(20));
             int finalI = i;
+            textField.textProperty().addListener((observable, oldValue, newValue) -> {
+                        if (newValue.length() > maxLength) {
+                            textField.setText(newValue.substring(newValue.length() - 1));
+                        }
+                    });
             textField.addEventHandler(KeyEvent.KEY_RELEASED, event -> handleInput(textField, finalI, event));
             textField.addEventHandler(KeyEvent.KEY_PRESSED, event -> handleBackspace(textField, finalI, event));
             textField.addEventFilter(KeyEvent.KEY_TYPED, event -> {
@@ -100,10 +106,10 @@ public class VerifyNumber {
                     TextField txt = (TextField) area.getChildren().get(i);
                     stringBuilder.append(txt.getText());
                 }
-                if (code.equals(stringBuilder.toString())) {
+                if (code.contentEquals(stringBuilder)) {
                     fxAvatar();
                 } else {
-                    Message.create(new Image(getClass().getResource("/exception.png").toExternalForm()),
+                    Message.create(new Image(Objects.requireNonNull(getClass().getResource("/exception.png")).toExternalForm()),
                             "Ошибка, неверный код", menuItem);
                 }
             }

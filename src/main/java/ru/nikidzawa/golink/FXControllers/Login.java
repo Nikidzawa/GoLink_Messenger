@@ -9,6 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -20,9 +21,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 import ru.nikidzawa.golink.GUIPatterns.Message;
+import ru.nikidzawa.golink.GUIPatterns.PhoneFieldConfig;
 import ru.nikidzawa.golink.GUIPatterns.WindowTitle;
 import ru.nikidzawa.golink.store.entities.UserEntity;
 import ru.nikidzawa.golink.store.repositories.UserRepository;
+
+import java.util.Objects;
 
 @Controller
 public class Login {
@@ -63,6 +67,8 @@ public class Login {
     void initialize() {
         Platform.runLater(() -> WindowTitle.setBaseCommands(titleBar, minimizeButton, scaleButton, closeButton));
         menuItem.setSpacing(15);
+
+        PhoneFieldConfig.setConfig(phone);
 
         enter.setOnAction(e -> {
             UserEntity user = null;
@@ -111,7 +117,7 @@ public class Login {
         stage.show();
     }
     private void exception () {
-            Message.create(new Image(getClass().getResource("/exception.png").toExternalForm()),
+            Message.create(new Image(Objects.requireNonNull(getClass().getResource("/exception.png")).toExternalForm()),
                     " Неверный телефон или пароль. Попробуйте ещё раз   ", menuItem);
     }
 }

@@ -1,8 +1,5 @@
 package ru.nikidzawa.golink.network;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
@@ -41,6 +38,7 @@ public class TCPConnection {
         });
         thread.start();
     }
+
     public synchronized void sendMessage(String string) {
         try {
             if (string != null) {

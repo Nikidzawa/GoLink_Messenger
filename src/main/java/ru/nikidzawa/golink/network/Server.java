@@ -2,10 +2,6 @@ package ru.nikidzawa.golink.network;
 
 import lombok.Getter;
 import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
-import ru.nikidzawa.golink.network.TCPConnection;
-import ru.nikidzawa.golink.network.TCPConnectionLink;
-import ru.nikidzawa.golink.services.SystemOfControlServers.SOCSConnection;
 
 import java.io.IOException;
 import java.net.ServerSocket;

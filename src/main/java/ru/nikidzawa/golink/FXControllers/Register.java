@@ -20,10 +20,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 import ru.nikidzawa.golink.GUIPatterns.Message;
+import ru.nikidzawa.golink.GUIPatterns.PhoneFieldConfig;
 import ru.nikidzawa.golink.GUIPatterns.WindowTitle;
 import ru.nikidzawa.golink.store.entities.UserEntity;
 import ru.nikidzawa.golink.store.repositories.UserRepository;
 
+import java.util.Objects;
 import java.util.Random;
 
 @Controller
@@ -65,6 +67,7 @@ public class Register {
         Platform.runLater(() -> WindowTitle.setBaseCommands(titleBar, minimizeButton, scaleButton, closeButton));
         menuItem.setSpacing(15);
 
+        PhoneFieldConfig.setConfig(phone);
         login.setOnMouseClicked(e -> fxLogin());
 
         enter.setOnAction(e -> {
@@ -135,7 +138,7 @@ public class Register {
     }
 
     private void exception (String message) {
-        Message.create(new Image(getClass().getResource("/exception.png").toExternalForm()),
+        Message.create(new Image(Objects.requireNonNull(getClass().getResource("/exception.png")).toExternalForm()),
                 message, menuItem);
     }
 }

@@ -2,8 +2,6 @@ package ru.nikidzawa.golink.store.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ru.nikidzawa.golink.store.entities.ChatEntity;
-import ru.nikidzawa.golink.store.entities.UserEntity;
 
 import java.time.LocalDateTime;
 
