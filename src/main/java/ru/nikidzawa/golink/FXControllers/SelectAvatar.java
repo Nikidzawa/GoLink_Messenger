@@ -1,4 +1,4 @@
-package ru.nikidzawa.golink;
+package ru.nikidzawa.golink.FXControllers;
 
 import io.github.gleidson28.GNAvatarView;
 import javafx.application.Platform;
@@ -18,6 +18,7 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
+import ru.nikidzawa.golink.FXControllers.GoLink;
 import ru.nikidzawa.golink.GUIPatterns.Message;
 import ru.nikidzawa.golink.GUIPatterns.WindowTitle;
 import ru.nikidzawa.golink.store.entities.UserEntity;
@@ -63,7 +64,6 @@ public class SelectAvatar {
 
     @Autowired
     UserRepository repository;
-    UserEntity userEntity;
     @FXML
     void initialize() {
         Platform.runLater(() -> WindowTitle.setBaseCommands(titleBar, minimizeButton, scaleButton, closeButton));
@@ -80,29 +80,26 @@ public class SelectAvatar {
                 exception("Пользователь с таким никнеймом уже существует");
             }
             else {
-                userEntity = UserEntity.builder()
+                UserEntity userEntity = UserEntity.builder()
                         .name(userName)
                         .nickname(userNickname)
                         .phone(phone)
                         .password(password)
                         .build();
                 repository.save(userEntity);
-                load();
+                load(userEntity);
             }
         });
     }
     @SneakyThrows
-    private void load () {
+    private void load (UserEntity user) {
         enter.getScene().getWindow().hide();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("menu.fxml"));
         loader.setControllerFactory(context::getBean);
         loader.load();
 
-        SelectAvatar selectAvatar = loader.getController();
-        selectAvatar.setPhone(phone);
-        selectAvatar.setPassword(password);
         GoLink goLink = loader.getController();
-        goLink.setUserEntity(userEntity);
+        goLink.setUserEntity(user);
 
         Parent root = loader.getRoot();
         Stage stage = new Stage();

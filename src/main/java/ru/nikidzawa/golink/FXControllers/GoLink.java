@@ -1,4 +1,4 @@
-package ru.nikidzawa.golink;
+package ru.nikidzawa.golink.FXControllers;
 
 import io.github.gleidson28.AvatarType;
 import io.github.gleidson28.GNAvatarView;
@@ -22,6 +22,7 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import ru.nikidzawa.golink.GUIPatterns.WindowTitle;
+import ru.nikidzawa.golink.GUIPatterns.menuItems.MenuItem;
 import ru.nikidzawa.golink.network.TCPConnection;
 import ru.nikidzawa.golink.network.TCPConnectionLink;
 import ru.nikidzawa.golink.services.SystemOfControlServers.SOCSConnection;
@@ -93,19 +94,13 @@ public class GoLink implements TCPConnectionLink {
     void initialize() {
         Platform.runLater(() -> {
             WindowTitle.setBaseCommands(titleBar, minimizeButton, scaleButton, closeButton);
-            input.focusedProperty().addListener((observable, oldValue, newValue) -> {
-                if (newValue) {
-                    input.setStyle("-fx-background-color: #001933; -fx-border-color: blue; -fx-text-fill: white; -fx-border-width: 0 0 2 0");
-                } else {
-                    input.setStyle("-fx-background-color: #001933; -fx-border-color: Gray; -fx-text-fill: white; -fx-border-width: 0 0 2 0");
-                }
-            });
+            MenuItem.makeInput(input);
+            profileName.setText(userEntity.getName());
+            updateChats();
         });
 
-
-        userEntity = userRepository.findById(3L).get();
-
-        profileName.setText(userEntity.getName());
+    }
+    private void updateChats () {
         chatRepository.findByParticipantsContaining(userEntity).forEach(chatEnt -> {
             String name = chatEnt.getType() == ChatType.DIALOG || chatEnt.getType() == ChatType.ANONYMOUS_DIALOG ?
                     chatEnt.getParticipants()

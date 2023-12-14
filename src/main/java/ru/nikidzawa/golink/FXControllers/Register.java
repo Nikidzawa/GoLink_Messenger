@@ -1,4 +1,4 @@
-package ru.nikidzawa.golink;
+package ru.nikidzawa.golink.FXControllers;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -21,7 +21,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 import ru.nikidzawa.golink.GUIPatterns.Message;
 import ru.nikidzawa.golink.GUIPatterns.WindowTitle;
-import ru.nikidzawa.golink.services.ChangeScene;
 import ru.nikidzawa.golink.store.entities.UserEntity;
 import ru.nikidzawa.golink.store.repositories.UserRepository;
 
@@ -66,13 +65,18 @@ public class Register {
         Platform.runLater(() -> WindowTitle.setBaseCommands(titleBar, minimizeButton, scaleButton, closeButton));
         menuItem.setSpacing(15);
 
-        login.setOnMouseClicked(e -> {
-            login.getScene().getWindow().hide();
-            ChangeScene.change(new FXMLLoader(getClass().getResource("login.fxml")));
-        });
+        login.setOnMouseClicked(e -> fxLogin());
 
         enter.setOnAction(e -> {
-            UserEntity user = repository.findByPhone(Long.parseLong(phone.getText()));
+            Long inputNumber = null;
+            try {
+                inputNumber = Long.parseLong(phone.getText());
+            } catch (NumberFormatException ex) {
+                exception("Неверный формат телефона");
+                initialize();
+                phone.clear();
+            }
+            UserEntity user = repository.findByPhone(inputNumber);
 
             if (user != null) {
                 exception("Номер телефона уже зарегистрирован");
@@ -83,22 +87,29 @@ public class Register {
             else if (password.getText().length() > 35) {
                 exception("Придумайте пароль покороче");
             }
-            else loadAuth();
+            else loadAuth(inputNumber);
 
         });
     }
+    @SneakyThrows
+    private void fxLogin () {
+        login.getScene().getWindow().hide();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("login.fxml"));
+        loader.setControllerFactory(context::getBean);
+        Parent root = loader.load();
+
+        Login loginController = loader.getController();
+        loginController.setContext(context);
+
+        Stage stage = new Stage();
+        stage.initStyle(StageStyle.UNDECORATED);
+        stage.setScene(new Scene(root));
+        stage.show();
+    }
 
     @SneakyThrows
-    private void loadAuth() {
+    private void loadAuth(Long inputNumber) {
         String code = generateCode();
-        Long number = null;
-        try {
-            number = Long.parseLong(phone.getText());
-        } catch (NumberFormatException ex) {
-            phone.clear();
-            initialize();
-            exception("Неверный формат телефона");
-        }
         System.out.println(code);
 //        SMSAuthenticate.sendMessage(code, phone.getText());
         enter.getScene().getWindow().hide();
@@ -108,7 +119,7 @@ public class Register {
 
         VerifyNumber verifyNumber = loader.getController();
         verifyNumber.setContext(context);
-        verifyNumber.setPhone(number);
+        verifyNumber.setPhone(inputNumber);
         verifyNumber.setPassword(password.getText());
         verifyNumber.setCode(code);
 

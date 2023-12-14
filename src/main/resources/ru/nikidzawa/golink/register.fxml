@@ -17,18 +17,8 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1200.0" prefWidth="1200.0" style="-fx-background-color: #001933;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.nikidzawa.golink.Register">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1200.0" prefWidth="1200.0" style="-fx-background-color: #001933;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.nikidzawa.golink.FXControllers.Register">
    <children>
-      <ImageView fitHeight="46.0" fitWidth="58.0" layoutX="232.0" layoutY="606.0" pickOnBounds="true">
-         <image>
-            <Image url="@/phone.png" />
-         </image>
-      </ImageView>
-      <TextField fx:id="phone" layoutX="303.0" layoutY="610.0" prefHeight="36.0" prefWidth="514.0" promptText="Телефон" style="-fx-background-color: #001933; -fx-border-color: #18314D; -fx-border-width: 0 0 2 0; -fx-text-fill: white;">
-         <font>
-            <Font name="Arial" size="17.0" />
-         </font>
-      </TextField>
       <Button fx:id="enter" layoutX="429.0" layoutY="1069.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="261.0" style="-fx-background-color: #18314D;" text="Подтвердить номер" textAlignment="CENTER" textFill="WHITE">
          <font>
             <Font name="Arial" size="22.0" />
@@ -49,32 +39,6 @@
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor>
-      </Text>
-      <Text layoutX="426.0" layoutY="241.0" strokeType="OUTSIDE" strokeWidth="0.0" text="GoLink" wrappingWidth="290.13671875">
-         <font>
-            <Font name="System Bold" size="85.0" />
-         </font>
-         <fill>
-            <LinearGradient endX="1.0" endY="1.0">
-               <stops>
-                  <Stop>
-                     <color>
-                        <Color red="0.2368421107530594" blue="0.7894737124443054" />
-                     </color>
-                  </Stop>
-                  <Stop offset="0.9966442953020134">
-                     <color>
-                        <Color red="1.0" />
-                     </color>
-                  </Stop>
-                  <Stop offset="1.0">
-                     <color>
-                        <Color red="1.0" />
-                     </color>
-                  </Stop>
-               </stops>
-            </LinearGradient>
-         </fill>
       </Text>
       <Text fontSmoothingType="LCD" layoutX="440.0" layoutY="331.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Регистрация" textAlignment="CENTER" wrappingWidth="261.13671875">
          <font>
@@ -102,11 +66,6 @@
             </LinearGradient>
          </fill>
       </Text>
-      <ImageView fitHeight="46.0" fitWidth="58.0" layoutX="232.0" layoutY="772.0" pickOnBounds="true">
-         <image>
-            <Image url="@/free-icon-font-key-3914475.png" />
-         </image>
-      </ImageView>
       <VBox fx:id="menuItem" layoutX="712.0" layoutY="52.0" prefHeight="534.0" prefWidth="498.0" />
       <HBox alignment="TOP_RIGHT" prefHeight="38.0" prefWidth="1200.0" style="-fx-background-color: #18314D;">
          <children>
@@ -153,10 +112,51 @@
             </Button>
          </children>
       </HBox>
-      <PasswordField fx:id="password" layoutX="303.0" layoutY="769.0" prefHeight="36.0" prefWidth="514.0" promptText="Пароль" style="-fx-background-color: #001933; -fx-border-color: #18314D; -fx-border-width: 0 0 2 0; -fx-text-fill: white;">
+      <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="250.0" layoutY="618.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@/phone.png" />
+         </image>
+      </ImageView>
+      <TextField fx:id="phone" layoutX="323.0" layoutY="630.0" prefHeight="36.0" prefWidth="514.0" promptText="Телефон" style="-fx-background-color: #001933; -fx-border-color: #18314D; -fx-border-width: 0 0 2 0; -fx-text-fill: white;">
+         <font>
+            <Font name="Arial" size="17.0" />
+         </font>
+      </TextField>
+      <PasswordField fx:id="password" layoutX="323.0" layoutY="789.0" prefHeight="36.0" prefWidth="514.0" promptText="Придумайте пароль" style="-fx-background-color: #001933; -fx-border-color: #18314D; -fx-border-width: 0 0 2 0; -fx-text-fill: white;">
          <font>
             <Font name="Arial" size="17.0" />
          </font>
       </PasswordField>
+      <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="250.0" layoutY="777.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@/free-icon-font-key-3914475.png" />
+         </image>
+      </ImageView>
+      <Text layoutX="429.0" layoutY="240.0" strokeType="OUTSIDE" strokeWidth="0.0" text="GoLink" wrappingWidth="290.13671875">
+         <font>
+            <Font name="System Bold" size="85.0" />
+         </font>
+         <fill>
+            <LinearGradient endX="1.0" endY="1.0">
+               <stops>
+                  <Stop>
+                     <color>
+                        <Color red="0.2368421107530594" blue="0.7894737124443054" />
+                     </color>
+                  </Stop>
+                  <Stop offset="0.9966442953020134">
+                     <color>
+                        <Color red="1.0" />
+                     </color>
+                  </Stop>
+                  <Stop offset="1.0">
+                     <color>
+                        <Color red="1.0" />
+                     </color>
+                  </Stop>
+               </stops>
+            </LinearGradient>
+         </fill>
+      </Text>
    </children>
 </AnchorPane>

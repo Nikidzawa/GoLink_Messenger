@@ -1,4 +1,4 @@
-package ru.nikidzawa.golink;
+package ru.nikidzawa.golink.FXControllers;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -21,9 +21,10 @@ import javafx.stage.StageStyle;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import org.springframework.context.ConfigurableApplicationContext;
+import ru.nikidzawa.golink.FXControllers.Register;
+import ru.nikidzawa.golink.FXControllers.SelectAvatar;
 import ru.nikidzawa.golink.GUIPatterns.Message;
 import ru.nikidzawa.golink.GUIPatterns.WindowTitle;
-import ru.nikidzawa.golink.services.ChangeScene;
 
 public class VerifyNumber {
     @Setter
@@ -65,10 +66,7 @@ public class VerifyNumber {
         menuItem.setSpacing(15);
         area.setSpacing(25);
 
-        goBack.setOnMouseClicked(mouseEvent -> {
-            goBack.getScene().getWindow().hide();
-            ChangeScene.change(new FXMLLoader(getClass().getResource("register.fxml")));
-        });
+        goBack.setOnMouseClicked(mouseEvent -> goBack());
 
         for (int i = 0; i < 6; i++) {
             TextField textField = new TextField();
@@ -78,7 +76,7 @@ public class VerifyNumber {
             textField.setAlignment(Pos.CENTER);
             textField.setFont(Font.font(20));
             int finalI = i;
-            textField.addEventHandler(KeyEvent.KEY_TYPED, event -> handleInput(textField, finalI, event));
+            textField.addEventHandler(KeyEvent.KEY_RELEASED, event -> handleInput(textField, finalI, event));
             textField.addEventHandler(KeyEvent.KEY_PRESSED, event -> handleBackspace(textField, finalI, event));
             textField.addEventFilter(KeyEvent.KEY_TYPED, event -> {
                 if (!event.getCharacter().matches("[0-9]")) {
@@ -89,9 +87,8 @@ public class VerifyNumber {
         }
         area.getChildren().get(0).requestFocus();
     }
-    @SneakyThrows
     private void handleInput(TextField currentTextField, int index, KeyEvent event) {
-        String input = event.getCharacter();
+        String input = event.getText();
         if (input.length() == 1) {
             int nextIndex = index + 1;
             if (nextIndex < ((HBox) currentTextField.getParent()).getChildren().size()) {
@@ -103,28 +100,30 @@ public class VerifyNumber {
                     TextField txt = (TextField) area.getChildren().get(i);
                     stringBuilder.append(txt.getText());
                 }
-                System.out.println("Введенный код: " + stringBuilder.toString());
                 if (code.equals(stringBuilder.toString())) {
-                    area.getScene().getWindow().hide();
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("avatar.fxml"));
-                    loader.setControllerFactory(context::getBean);
-                    loader.load();
-                    SelectAvatar selectAvatar = loader.getController();
-                    selectAvatar.setPhone(phone);
-                    selectAvatar.setPassword(password);
-                    selectAvatar.setContext(context);
-                    Parent root = loader.getRoot();
-                    Stage stage = new Stage();
-                    stage.initStyle(StageStyle.UNDECORATED);
-                    stage.setScene(new Scene(root));
-                    stage.show();
-                }
-                else {
+                    fxAvatar();
+                } else {
                     Message.create(new Image(getClass().getResource("/exception.png").toExternalForm()),
                             "Ошибка, неверный код", menuItem);
                 }
             }
         }
+    }
+    @SneakyThrows
+    private void fxAvatar() {
+        area.getScene().getWindow().hide();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("avatar.fxml"));
+        loader.setControllerFactory(context::getBean);
+        loader.load();
+        SelectAvatar selectAvatar = loader.getController();
+        selectAvatar.setPhone(phone);
+        selectAvatar.setPassword(password);
+        selectAvatar.setContext(context);
+        Parent root = loader.getRoot();
+        Stage stage = new Stage();
+        stage.initStyle(StageStyle.UNDECORATED);
+        stage.setScene(new Scene(root));
+        stage.show();
     }
     private void handleBackspace(TextField currentTextField, int index, KeyEvent event) {
         if (event.getCode() == KeyCode.BACK_SPACE && currentTextField.getCaretPosition() == 0) {
@@ -135,5 +134,20 @@ public class VerifyNumber {
                 prevTextField.requestFocus();
             }
         }
+    }
+    @SneakyThrows
+    private void goBack () {
+        goBack.getScene().getWindow().hide();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/ru/nikidzawa/goLink/register.fxml"));
+        loader.setControllerFactory(context::getBean);
+        Parent root = loader.load();
+
+        Register register = loader.getController();
+        register.setContext(context);
+
+        Stage stage = new Stage();
+        stage.initStyle(StageStyle.UNDECORATED);
+        stage.setScene(new Scene(root));
+        stage.show();
     }
 }

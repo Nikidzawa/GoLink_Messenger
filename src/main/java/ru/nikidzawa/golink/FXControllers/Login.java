@@ -1,40 +1,33 @@
-package ru.nikidzawa.golink;
+package ru.nikidzawa.golink.FXControllers;
 
-import com.pavlobu.emojitextflow.Emoji;
-import com.pavlobu.emojitextflow.EmojiParser;
-import com.pavlobu.emojitextflow.EmojiTextFlow;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import lombok.Setter;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 import ru.nikidzawa.golink.GUIPatterns.Message;
 import ru.nikidzawa.golink.GUIPatterns.WindowTitle;
-import ru.nikidzawa.golink.services.ChangeScene;
 import ru.nikidzawa.golink.store.entities.UserEntity;
 import ru.nikidzawa.golink.store.repositories.UserRepository;
 
-import java.io.IOException;
-import java.util.List;
-
 @Controller
 public class Login {
+    @Setter
+    private ConfigurableApplicationContext context;
 
     @FXML
     private Button closeButton;
@@ -72,34 +65,50 @@ public class Login {
         menuItem.setSpacing(15);
 
         enter.setOnAction(e -> {
+            UserEntity user = null;
             try {
                 long phoneValue = Long.parseLong(phone.getText());
-                UserEntity user = userRepository.findByPhone(phoneValue);
-
-                if (user != null && user.getPassword().equals(password.getText())) {
-                    enter.getScene().getWindow().hide();
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("menu.fxml"));
-                    Parent root = loader.load();
-
-                    GoLink goLink = loader.getController();
-                    goLink.setUserEntity(user);
-
-                    Stage stage = new Stage();
-                    stage.initStyle(StageStyle.UNDECORATED);
-                    stage.setScene(new Scene(root));
-                    stage.show();
-                } else {
-                    exception();
-                }
-            } catch (NumberFormatException | IOException | NullPointerException ex) {
+                user = userRepository.findByPhone(phoneValue);
+            } catch (NumberFormatException ex) {
                 exception();
+                initialize();
             }
+
+            if (user != null && user.getPassword().equals(password.getText())) fxMenu(user);
+            else exception();
         });
 
-        register.setOnMouseClicked(MouseEvent -> {
-            register.getScene().getWindow().hide();
-            ChangeScene.change(new FXMLLoader(getClass().getResource("register.fxml")));
-        });
+        register.setOnMouseClicked(MouseEvent -> fxRegister());
+    }
+    @SneakyThrows
+    private void fxMenu(UserEntity user) {
+        enter.getScene().getWindow().hide();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("menu.fxml"));
+        loader.setControllerFactory(context::getBean);
+        Parent root = loader.load();
+
+        GoLink goLink = loader.getController();
+        goLink.setUserEntity(user);
+
+        Stage stage = new Stage();
+        stage.initStyle(StageStyle.UNDECORATED);
+        stage.setScene(new Scene(root));
+        stage.show();
+    }
+    @SneakyThrows
+    private void fxRegister () {
+        register.getScene().getWindow().hide();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/ru/nikidzawa/goLink/register.fxml"));
+        loader.setControllerFactory(context::getBean);
+        Parent root = loader.load();
+
+        Register registerController = loader.getController();
+        registerController.setContext(context);
+
+        Stage stage = new Stage();
+        stage.initStyle(StageStyle.UNDECORATED);
+        stage.setScene(new Scene(root));
+        stage.show();
     }
     private void exception () {
             Message.create(new Image(getClass().getResource("/exception.png").toExternalForm()),

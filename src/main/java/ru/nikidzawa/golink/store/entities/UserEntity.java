@@ -22,6 +22,7 @@ public class UserEntity {
     @Column(unique = true)
     private String nickname;
 
+    @Column(unique = true)
     private Long phone;
 
     private String password;
