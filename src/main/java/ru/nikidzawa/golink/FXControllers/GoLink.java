@@ -39,6 +39,7 @@ import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URL;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Controller
@@ -82,8 +83,6 @@ public class GoLink implements TCPConnectionLink {
     ChatRepository chatRepository;
     @Autowired
     MessageRepository messageRepository;
-    @Autowired
-    SOCSConnection socsConnection;
 
     @Setter
     private UserEntity userEntity;
@@ -126,8 +125,16 @@ public class GoLink implements TCPConnectionLink {
                     }
                     try {
                         tcpConnection = new TCPConnection(new Socket("localhost", chatEnt.getPort()), this);
-                    } catch (IOException ex) {
-                        throw new RuntimeException(ex);
+                    } catch (IOException | NullPointerException ex) {
+                        int newPort = Integer.parseInt(new SOCSConnection().CREATE_SERVER());
+                        chatEnt.setPort(newPort);
+                        chatRepository.saveAndFlush(chatEnt);
+                        try {
+                            tcpConnection = new TCPConnection(new Socket("localhost", newPort), this);
+
+                        } catch (IOException exc) {
+                            throw new RuntimeException(exc);
+                        }
                     }
                     chat.getChildren().clear();
                     chatRoomName.setText(name);
@@ -141,7 +148,7 @@ public class GoLink implements TCPConnectionLink {
                             messageRepository.saveAndFlush(message);
                             chatRepository.saveAndFlush(chatEnt);
                             tcpConnection.sendMessage(text);
-                            chat.getChildren().add(printMyMessage(text));
+                            chat.getChildren().add(printMyMessage(text, LocalDateTime.now()));
                         }
                     });
                 }
@@ -156,49 +163,62 @@ public class GoLink implements TCPConnectionLink {
                 .toList();
         sortedMessages.forEach(message -> {
             if (message.getSender().getId().equals(userEntity.getId())) {
-                chat.getChildren().add(printMyMessage(message.getMessage()));
+                chat.getChildren().add(printMyMessage(message.getMessage(), message.getDate()));
             }
             else {
-                chat.getChildren().add(printForeignMessage(message.getMessage()));
+                chat.getChildren().add(printForeignMessage(message.getMessage(), message.getDate()));
             }
         });
     }
-    private HBox printForeignMessage (String message) {
+    private HBox printForeignMessage (String message, LocalDateTime localDateTime) {
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER_LEFT);
         hBox.setPadding(new Insets(5, 5, 5, 10));
-
+        BorderPane borderPane = new BorderPane();
+        borderPane.setStyle("-fx-background-color: rgb(233, 233, 235); -fx-background-radius: 20px;");
+        Text date = new Text(localDateTime.format(DateTimeFormatter.ofPattern("HH:mm")));
+        TextFlow dateFlow = new TextFlow(date);
         Text text = new Text(message);
         TextFlow textFlow = new TextFlow(text);
         textFlow.setStyle (
-                "-fx-background-color: rgb(233, 233, 235);" +
-                        "-fx-background-radius: 20px;" +
                         "-fx-font-family: Arial;" +
                         "-fx-font-size: 14px;"
         );
-        textFlow.setPadding(new Insets(5, 10, 5, 10));
-        hBox.getChildren().add(textFlow);
+        textFlow.setPadding(new Insets(5, 10, 3, 10));
+        dateFlow.setPadding(new Insets(0, 10, 5, 10));
 
+        borderPane.setTop(textFlow);
+        dateFlow.setTextAlignment(TextAlignment.LEFT);
+        borderPane.setBottom(dateFlow);
+
+        hBox.getChildren().add(borderPane);
         return hBox;
     }
-    private HBox printMyMessage(String message) {
+    private HBox printMyMessage(String message, LocalDateTime localDateTime) {
         input.clear();
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER_RIGHT);
-        hBox.setPadding(new Insets(5, 5, 5, 10));
-
+        hBox.setPadding(new Insets(5, 5, 3, 10));
+        BorderPane borderPane = new BorderPane();
+        borderPane.setStyle("-fx-background-color: rgb(15, 125, 242); -fx-background-radius: 20px;");
+        Text date = new Text(localDateTime.format(DateTimeFormatter.ofPattern("HH:mm")));
+        TextFlow dateFlow = new TextFlow(date);
         Text text = new Text(message);
         TextFlow textFlow = new TextFlow(text);
         textFlow.setStyle (
                 "-fx-color: rgb(239, 242, 255);" +
-                        "-fx-background-color: rgb(15, 125, 242);" +
-                        "-fx-background-radius: 20px;" +
                         "-fx-font-family: Arial;" + "-fx-font-size: 14px;"
         );
         textFlow.setPadding(new Insets(5, 10, 5, 10));
         text.setFill(Color.color(0.934, 0.925, 0.996));
+        date.setFill(Color.color(0.934, 0.925, 0.996));
 
-        hBox.getChildren().add(textFlow);
+        borderPane.setTop(textFlow);
+        dateFlow.setTextAlignment(TextAlignment.RIGHT);
+        dateFlow.setPadding(new Insets(0, 10, 5, 10));
+        borderPane.setBottom(dateFlow);
+
+        hBox.getChildren().add(borderPane);
         return hBox;
     }
     private BorderPane newChatBuilder (String userName) {
@@ -265,7 +285,7 @@ public class GoLink implements TCPConnectionLink {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                chat.getChildren().add(printForeignMessage(string));
+                chat.getChildren().add(printForeignMessage(string, LocalDateTime.now()));
             }
         });
     }

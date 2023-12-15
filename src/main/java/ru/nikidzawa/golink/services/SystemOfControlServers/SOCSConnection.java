@@ -1,15 +1,13 @@
 package ru.nikidzawa.golink.services.SystemOfControlServers;
 
 import lombok.SneakyThrows;
-import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-@Component
+
 public class SOCSConnection {
 
     private final Socket socket;
@@ -29,7 +27,14 @@ public class SOCSConnection {
         return in.readLine();
     }
     @SneakyThrows
+    public void RELEASE_PORT (int port) {
+        out.println("RELEASE_PORT:" + port);
+        socket.close();
+    }
+
+    @SneakyThrows
     public void GET_SERVERS_PORTS () {
         out.println("GET_SERVERS_PORTS");
+        socket.close();
     }
 }

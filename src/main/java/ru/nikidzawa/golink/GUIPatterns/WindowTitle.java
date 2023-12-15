@@ -39,8 +39,12 @@ public class WindowTitle {
                         t.interrupt();
                     }
                 }
-                ((Stage) window).close();
-                Platform.exit();
+                try {
+                    ((Stage) window).close();
+                    Platform.exit();
+                } catch (Exception ex) {
+                    System.out.println("Клиент закрыт");
+                }
         });
 
         minimizeButton.setOnAction(actionEvent -> {

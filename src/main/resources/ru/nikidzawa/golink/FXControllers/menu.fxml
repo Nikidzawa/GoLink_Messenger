@@ -50,9 +50,9 @@
                         <Font name="System" size="12.0" />
                      </font>
                   </Text>
-                  <ImageView fitHeight="31.0" fitWidth="31.0" layoutX="276.0" layoutY="41.0">
+                  <ImageView fx:id="settings" fitHeight="31.0" fitWidth="31.0" layoutX="276.0" layoutY="41.0">
                      <image>
-                        <Image url="@/free-icon-font-user-gear-9844438.png" />
+                        <Image url="@/settings.png" />
                      </image>
                   </ImageView>
                </children>
@@ -113,12 +113,12 @@
          <bottom>
             <AnchorPane prefHeight="47.0" prefWidth="887.0" style="-fx-border-color: black; -fx-border-width: 1 0 0 0 0;" BorderPane.alignment="CENTER">
                <children>
-                  <TextField visible="false" fx:id="input" layoutX="6.0" layoutY="7.0" prefHeight="33.0" prefWidth="730.0" promptText="Введите сообщение...">
+                  <TextField fx:id="input" layoutX="6.0" layoutY="7.0" prefHeight="33.0" prefWidth="730.0" promptText="Введите сообщение..." visible="false">
                      <font>
                         <Font size="15.0" />
                      </font>
                   </TextField>
-                  <Button visible="false" fx:id="send" layoutX="744.0" layoutY="7.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="125.0" style="-fx-background-color: blue;" text="Отправить" textAlignment="CENTER" textFill="WHITE">
+                  <Button fx:id="send" layoutX="744.0" layoutY="7.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="125.0" style="-fx-background-color: blue;" text="Отправить" textAlignment="CENTER" textFill="WHITE" visible="false">
                      <font>
                         <Font name="Arial Black" size="12.0" />
                      </font></Button>
@@ -126,7 +126,7 @@
             </AnchorPane>
          </bottom>
          <center>
-            <ScrollPane hbarPolicy="NEVER" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #001933;" BorderPane.alignment="CENTER">
+            <ScrollPane hbarPolicy="NEVER" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #001933;" vbarPolicy="NEVER" BorderPane.alignment="CENTER">
                <content>
                   <VBox fx:id="chat" prefHeight="1028.0" prefWidth="876.0" style="-fx-background-color: #001933;" />
                </content>

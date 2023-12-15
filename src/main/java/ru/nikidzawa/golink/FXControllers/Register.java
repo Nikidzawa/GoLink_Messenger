@@ -114,7 +114,7 @@ public class Register {
     private void loadAuth(Long inputNumber) {
         String code = generateCode();
         System.out.println(code);
-//        SMSAuthenticate.sendMessage(code, phone.getText());
+  //      SMSAuthenticate.sendMessage(code, phone.getText());
         enter.getScene().getWindow().hide();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("verify.fxml"));
         Parent root = loader.load();

@@ -16,8 +16,6 @@ public class SOCS {
     public HashMap<Integer, Server> servers = new HashMap<>();
     private int PORT = 8080;
     public SOCS() {
-        new Thread(() -> new Server(8081).start()).start();
-        new Thread(() -> new Server(8082).start()).start();
         System.out.println("SOCS IS ACTIVE\n--------------");
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             while (true) {
@@ -37,20 +35,33 @@ public class SOCS {
     private void handleClient(Socket clientSocket) throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-
-        switch (in.readLine()) {
+        String[] strings = in.readLine().split(":");
+        String command = strings[0];
+        String value;
+        try {
+            value = strings[1];
+        }catch (ArrayIndexOutOfBoundsException ex) {
+            value = null;
+        }
+        switch (command) {
             case "CREATE_SERVER" :
                 Server server = new Server(0);
                 int port = server.getPORT();
                 System.out.println("CREATE NEW SERVER ON PORT: " + port);
                 servers.put(port, server);
+                new Thread(server::start).start();
                 out.println(port);
-                new Thread(server::start);
                 break;
             case "GET_SERVERS_PORTS":
                 for (Integer key : servers.keySet()) {
                     System.out.println(key);
                 }
+                break;
+            case "RELEASE_PORT":
+                int serverPort = Integer.parseInt(value);
+
+                servers.remove(serverPort);
+                System.out.println("Порт " + value + " освобождён");
                 break;
         }
         clientSocket.close();

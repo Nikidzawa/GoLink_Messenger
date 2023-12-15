@@ -13,11 +13,11 @@ public class SMSAuthenticate {
         Twilio.init(ACCOUNT_SID, AUTH_TOKEN);
     }
 
-    public static void sendMessage (String code, String number) {
+    public static void sendMessage (String message, String number) {
         Message.creator(
                 new PhoneNumber(number),
                 new PhoneNumber(TWILIO_NUMBER),
-                code
+                message
         ).create();
     }
 }
