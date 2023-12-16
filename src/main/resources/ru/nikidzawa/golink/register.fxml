@@ -114,7 +114,7 @@
       </HBox>
       <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="250.0" layoutY="618.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@/phone.png" />
+            <Image url="@/img/phone.png" />
          </image>
       </ImageView>
       <TextField fx:id="phone" layoutX="323.0" layoutY="630.0" prefHeight="36.0" prefWidth="514.0" promptText="Телефон" style="-fx-background-color: #001933; -fx-border-color: #18314D; -fx-border-width: 0 0 2 0; -fx-text-fill: white;">
@@ -129,7 +129,7 @@
       </PasswordField>
       <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="250.0" layoutY="777.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@/free-icon-font-key-3914475.png" />
+            <Image url="@/img/free-icon-font-key-3914475.png" />
          </image>
       </ImageView>
       <Text layoutX="429.0" layoutY="240.0" strokeType="OUTSIDE" strokeWidth="0.0" text="GoLink" wrappingWidth="290.13671875">

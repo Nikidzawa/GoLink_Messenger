@@ -109,7 +109,7 @@ public class VerifyNumber {
                 if (code.contentEquals(stringBuilder)) {
                     fxAvatar();
                 } else {
-                    Message.create(new Image(Objects.requireNonNull(getClass().getResource("/exception.png")).toExternalForm()),
+                    Message.create(new Image(Objects.requireNonNull(getClass().getResource("/img/exception.png")).toExternalForm()),
                             "Ошибка, неверный код", menuItem);
                 }
             }

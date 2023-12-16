@@ -3,12 +3,15 @@ package ru.nikidzawa.golink.FXControllers;
 import io.github.gleidson28.AvatarType;
 import io.github.gleidson28.GNAvatarView;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -22,7 +25,7 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import ru.nikidzawa.golink.GUIPatterns.WindowTitle;
-import ru.nikidzawa.golink.GUIPatterns.menuItems.MenuItem;
+import ru.nikidzawa.golink.GUIPatterns.MenuItems;
 import ru.nikidzawa.golink.network.TCPConnection;
 import ru.nikidzawa.golink.network.TCPConnectionLink;
 import ru.nikidzawa.golink.services.SystemOfControlServers.SOCSConnection;
@@ -34,10 +37,13 @@ import ru.nikidzawa.golink.store.repositories.ChatRepository;
 import ru.nikidzawa.golink.store.repositories.MessageRepository;
 import ru.nikidzawa.golink.store.repositories.UserRepository;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -70,7 +76,13 @@ public class GoLink implements TCPConnectionLink {
     private Button scaleButton;
 
     @FXML
+    private TextField searchPanel;
+
+    @FXML
     private Button send;
+
+    @FXML
+    private ImageView settings;
 
     @FXML
     private Pane titleBar;
@@ -93,12 +105,29 @@ public class GoLink implements TCPConnectionLink {
     void initialize() {
         Platform.runLater(() -> {
             WindowTitle.setBaseCommands(titleBar, minimizeButton, scaleButton, closeButton);
-            MenuItem.makeInput(input);
+            MenuItems.makeInput(input);
+            searchPanel.textProperty().addListener(new ChangeListener<String>() {
+                @Override
+                public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                    chats.getChildren().clear();
+                    List<UserEntity> userEntities = userRepository.findByNickname(newValue);
+                    userEntities.forEach(e -> {
+                        BorderPane contact = newChatBuilder(e.getName());
+                        chats.getChildren().add(contact);
+                    });
+                    if (searchPanel.getText().isEmpty()) {
+                        updateChats();
+                    }}
+
+            });
+            MenuItems.makeSearch(searchPanel);
             profileName.setText(userEntity.getName());
+
             updateChats();
         });
 
     }
+
     private void updateChats () {
         chatRepository.findByParticipantsContaining(userEntity).forEach(chatEnt -> {
             String name = chatEnt.getType() == ChatType.DIALOG || chatEnt.getType() == ChatType.ANONYMOUS_DIALOG ?
@@ -123,14 +152,15 @@ public class GoLink implements TCPConnectionLink {
                     if (tcpConnection != null) {
                         tcpConnection.disconnect();
                     }
+                    String userId = userEntity.getId().toString();
                     try {
-                        tcpConnection = new TCPConnection(new Socket("localhost", chatEnt.getPort()), this);
+                        tcpConnection = new TCPConnection(new Socket("localhost", chatEnt.getPort()), this, userId);
                     } catch (IOException | NullPointerException ex) {
                         int newPort = Integer.parseInt(new SOCSConnection().CREATE_SERVER());
                         chatEnt.setPort(newPort);
                         chatRepository.saveAndFlush(chatEnt);
                         try {
-                            tcpConnection = new TCPConnection(new Socket("localhost", newPort), this);
+                            tcpConnection = new TCPConnection(new Socket("localhost", newPort), this, userId);
 
                         } catch (IOException exc) {
                             throw new RuntimeException(exc);
@@ -155,6 +185,7 @@ public class GoLink implements TCPConnectionLink {
             });
         });
     }
+
     private void printMessages (ChatEntity chatEntity) {
         List<MessageEntity> sortedMessages = chatRepository.findById(chatEntity.getId())
                 .get()
@@ -233,7 +264,7 @@ public class GoLink implements TCPConnectionLink {
         StackPane stackImg = new StackPane();
         GNAvatarView avatar = new GNAvatarView();
         try {
-            avatar.setImage(new Image(String.valueOf(new URL(getClass().getResource("/ava.jpg").toExternalForm()))));
+            avatar.setImage(new Image(String.valueOf(new URL(getClass().getResource("/img/ava.jpg").toExternalForm()))));
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
@@ -282,12 +313,14 @@ public class GoLink implements TCPConnectionLink {
 
     @Override
     public void onReceiveMessage(TCPConnection tcpConnection, String string) {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                chat.getChildren().add(printForeignMessage(string, LocalDateTime.now()));
-            }
-        });
+        if (!string.equals(userEntity.getId().toString())) {
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    chat.getChildren().add(printForeignMessage(string, LocalDateTime.now()));
+                }
+            });
+        }
     }
 
     @Override

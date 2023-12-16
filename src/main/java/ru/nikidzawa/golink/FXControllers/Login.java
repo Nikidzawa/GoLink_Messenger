@@ -9,7 +9,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -117,7 +116,7 @@ public class Login {
         stage.show();
     }
     private void exception () {
-            Message.create(new Image(Objects.requireNonNull(getClass().getResource("/exception.png")).toExternalForm()),
+            Message.create(new Image(Objects.requireNonNull(getClass().getResource("/img/exception.png")).toExternalForm()),
                     " Неверный телефон или пароль. Попробуйте ещё раз   ", menuItem);
     }
 }

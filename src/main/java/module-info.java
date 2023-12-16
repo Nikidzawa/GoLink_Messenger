@@ -38,7 +38,6 @@ module ru.nikidzawa.golink {
     requires JavaFXEmojiTextFlow.emojitwo;
     requires libphonenumber;
 
-
     opens ru.nikidzawa.golink to javafx.fxml, spring.core, org.hibernate.orm.core;
     exports ru.nikidzawa.golink;
     exports ru.nikidzawa.golink.services.SystemOfControlServers;
@@ -55,4 +54,5 @@ module ru.nikidzawa.golink {
     opens ru.nikidzawa.golink.services to javafx.fxml, org.hibernate.orm.core, spring.core;
     exports ru.nikidzawa.golink.FXControllers;
     opens ru.nikidzawa.golink.FXControllers to javafx.fxml, org.hibernate.orm.core, spring.core;
+    opens img;
 }

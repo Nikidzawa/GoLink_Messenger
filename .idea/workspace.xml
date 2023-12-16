@@ -4,20 +4,39 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="39e914f0-8438-4975-ae5e-804deeb44919" name="Changes" comment="small refactoring, bugs fix">
-      <change afterPath="$PROJECT_DIR$/src/main/resources/settings.png" afterDir="false" />
+    <list default="true" id="39e914f0-8438-4975-ae5e-804deeb44919" name="Changes" comment="visualize time of message, create dynamic port migration">
+      <change afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/GoMessage/MessageBroker.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/GoMessage/TCPBroker.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/img/settings.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.MD" beforeDir="false" afterPath="$PROJECT_DIR$/README.MD" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/GoLink.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/GoLink.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/Login.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/Login.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/Register.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/Register.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/GUIPatterns/WindowTitle.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/GUIPatterns/WindowTitle.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/SelectAvatar.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/SelectAvatar.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/VerifyNumber.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/VerifyNumber.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/GUIPatterns/menuItems/MenuItem.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/GUIPatterns/MenuItems.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/network/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/network/Server.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/SMSAuthenticate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/SMSAuthenticate.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/network/TCPConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/network/TCPConnection.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/SystemOfControlServers/SOCS.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/SystemOfControlServers/SOCS.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/SystemOfControlServers/SOCSConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/SystemOfControlServers/SOCSConnection.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/free-icon-font-user-gear-9844438.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/store/repositories/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/store/repositories/UserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/ava.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/img/ava.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/exception.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/img/exception.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/free-icon-font-envelope-3916611 (1).png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/img/free-icon-font-envelope-3916611 (1).png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/free-icon-font-key-3914475.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/img/free-icon-font-key-3914475.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/free-icon-font-user-3917688.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/img/free-icon-font-user-3917688.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/i.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/img/i.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/phone.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/img/phone.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/ru/nikidzawa/golink/FXControllers/login.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/ru/nikidzawa/golink/FXControllers/login.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/ru/nikidzawa/golink/FXControllers/menu.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/ru/nikidzawa/golink/FXControllers/menu.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/ru/nikidzawa/golink/register.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/ru/nikidzawa/golink/register.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/settings.png" beforeDir="false" />
     </list>
-    <list id="4cc47031-8ec7-43a8-bbd2-4836398b378c" name="Changes by Nikidzawa" comment="" />
+    <list id="4cc47031-8ec7-43a8-bbd2-4836398b378c" name="Changes by Nikidzawa" comment="">
+      <change beforePath="$PROJECT_DIR$/README.MD" beforeDir="false" afterPath="$PROJECT_DIR$/README.MD" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -34,6 +53,23 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="LineStatusTrackerManager">
+    <file path="$PROJECT_DIR$/src/main/java/module-info.java">
+      <ranges>
+        <range start1="40" end1="41" start2="40" end2="40" changelist="39e914f0-8438-4975-ae5e-804deeb44919" />
+        <range start1="53" end1="53" start2="52" end2="54" changelist="4cc47031-8ec7-43a8-bbd2-4836398b378c" />
+        <range start1="57" end1="57" start2="58" end2="59" changelist="39e914f0-8438-4975-ae5e-804deeb44919" />
+      </ranges>
+    </file>
+    <file path="$PROJECT_DIR$/README.MD">
+      <ranges>
+        <range start1="0" end1="1" start2="0" end2="1" changelist="39e914f0-8438-4975-ae5e-804deeb44919" />
+        <range start1="5" end1="7" start2="5" end2="5" changelist="4cc47031-8ec7-43a8-bbd2-4836398b378c" />
+        <range start1="9" end1="9" start2="7" end2="9" changelist="4cc47031-8ec7-43a8-bbd2-4836398b378c" />
+        <range start1="11" end1="12" start2="11" end2="18" changelist="4cc47031-8ec7-43a8-bbd2-4836398b378c" />
+      </ranges>
+    </file>
+  </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
@@ -46,51 +82,55 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
-    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
-    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
-    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;deletionFromPopupRequiresConfirmation&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Nikidzawa/Desktop/JavaFXEmojiTextFlow_emojitwo-1.0.jar&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.49425286&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "deletionFromPopupRequiresConfirmation": "false",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "C:/Users/Nikidzawa/IdeaProjects/goLink/src/main/resources/ru/nikidzawa/golink/FXControllers",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.49425286",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;postgresql&quot;
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "postgresql"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Nikidzawa\IdeaProjects\goLink\src\main\resources\ru\nikidzawa\golink\FXControllers" />
       <recent name="C:\Users\Nikidzawa\IdeaProjects\goLink\src\main\resources" />
       <recent name="C:\Users\Nikidzawa\IdeaProjects\goLink\src\main\resources\ru\nikidzawa\golink" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\Nikidzawa\IdeaProjects\goLink\src\main\resources" />
-      <recent name="C:\Users\Nikidzawa\IdeaProjects\goLink\src\main\resources\ru\nikidzawa\golink" />
-      <recent name="C:\Users\Nikidzawa\IdeaProjects\goLink\src\main\resources\ru\nikidzawa\golink\FXControllers" />
-      <recent name="C:\Users\Nikidzawa\IdeaProjects\goLink\src\main\resources\ru\nikidzawa\golink\" />
       <recent name="C:\Users\Nikidzawa\IdeaProjects\goLink\src\main\resources\imgs" />
+      <recent name="C:\Users\Nikidzawa\IdeaProjects\goLink\src\main\resources" />
+      <recent name="C:\Users\Nikidzawa\IdeaProjects\goLink\src\main\resources\ru\nikidzawa\golink\FXControllers" />
+      <recent name="C:\Users\Nikidzawa\IdeaProjects\goLink\src\main\resources\ru\nikidzawa\golink" />
+      <recent name="C:\Users\Nikidzawa\IdeaProjects\goLink\src\main\resources\ru\nikidzawa\golink\" />
     </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="ru.nikidzawa.golink" />
       <recent name="ru.nikidzawa.golink.FXControllers" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="ru.nikidzawa.golink.network.ChatRooms" />
     </key>
   </component>
   <component name="RunManager" selected="Spring Boot.Starter">
@@ -153,7 +193,7 @@
       <workItem from="1702529648822" duration="4264000" />
       <workItem from="1702547400716" duration="15486000" />
       <workItem from="1702615569495" duration="7224000" />
-      <workItem from="1702625722788" duration="13747000" />
+      <workItem from="1702625722788" duration="47663000" />
     </task>
     <task id="LOCAL-00001" summary="Create messenger">
       <option name="closed" value="true" />
@@ -179,7 +219,15 @@
       <option name="project" value="LOCAL" />
       <updated>1702573409754</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="visualize time of message, create dynamic port migration">
+      <option name="closed" value="true" />
+      <created>1702664269826</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1702664269826</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -199,7 +247,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Create messenger" />
     <MESSAGE value="small refactoring, bugs fix" />
-    <option name="LAST_COMMIT_MESSAGE" value="small refactoring, bugs fix" />
+    <MESSAGE value="visualize time of message, create dynamic port migration" />
+    <option name="LAST_COMMIT_MESSAGE" value="visualize time of message, create dynamic port migration" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

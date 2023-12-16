@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
+
 public class SOCS {
     public static void main(String[] args) {
         new SOCS();
@@ -66,5 +67,4 @@ public class SOCS {
         }
         clientSocket.close();
     }
-
 }

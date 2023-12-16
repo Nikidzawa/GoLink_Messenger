@@ -138,7 +138,7 @@ public class Register {
     }
 
     private void exception (String message) {
-        Message.create(new Image(Objects.requireNonNull(getClass().getResource("/exception.png")).toExternalForm()),
+        Message.create(new Image(Objects.requireNonNull(getClass().getResource("/img/exception.png")).toExternalForm()),
                 message, menuItem);
     }
 }

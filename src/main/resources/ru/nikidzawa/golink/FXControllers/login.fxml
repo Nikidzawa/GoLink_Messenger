@@ -150,12 +150,12 @@
       </TextField>
       <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="240.0" layoutY="608.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@/phone.png" />
+            <Image url="@/img/phone.png" />
          </image>
       </ImageView>
       <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="240.0" layoutY="767.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@/free-icon-font-key-3914475.png" />
+            <Image url="@/img/free-icon-font-key-3914475.png" />
          </image>
       </ImageView>
    </children>
