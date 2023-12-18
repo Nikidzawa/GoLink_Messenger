@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class Server implements TCPConnectionLink {
+public class Server implements TCPConnectionListener {
     public Map<String, TCPConnection> connections = new HashMap<>();
     @Getter
     private final int PORT;

@@ -24,4 +24,6 @@ public class UserEntity {
     private Long phone;
 
     private String password;
+
+    private boolean connected;
 }

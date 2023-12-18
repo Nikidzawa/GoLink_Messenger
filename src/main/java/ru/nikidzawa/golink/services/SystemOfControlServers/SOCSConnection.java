@@ -37,4 +37,10 @@ public class SOCSConnection {
         out.println("GET_SERVERS_PORTS");
         socket.close();
     }
+
+    @SneakyThrows
+    public String CHECK_USER (int port, String userId) {
+        out.println("CHECK_USER:" + port + ":" + userId);
+        return in.readLine();
+    }
 }

@@ -84,7 +84,7 @@
                         <Font name="System" size="30.0" />
                      </font>
                   </Text>
-                  <Text fx:id="status" fill="WHITE" layoutX="14.0" layoutY="66.0" strokeType="OUTSIDE" strokeWidth="0.0" text="В сети" visible="false" wrappingWidth="118.13671875" />
+                  <Text fx:id="status" fill="WHITE" layoutX="14.0" layoutY="66.0" strokeType="OUTSIDE" strokeWidth="0.0" visible="false" wrappingWidth="118.13671875" />
                </children>
             </AnchorPane>
          </top>

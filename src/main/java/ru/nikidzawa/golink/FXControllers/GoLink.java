@@ -27,29 +27,27 @@ import org.springframework.stereotype.Controller;
 import ru.nikidzawa.golink.GUIPatterns.WindowTitle;
 import ru.nikidzawa.golink.GUIPatterns.MenuItems;
 import ru.nikidzawa.golink.network.TCPConnection;
-import ru.nikidzawa.golink.network.TCPConnectionLink;
+import ru.nikidzawa.golink.network.TCPConnectionListener;
+import ru.nikidzawa.golink.services.GoMessage.GoMessageListener;
+import ru.nikidzawa.golink.services.GoMessage.TCPBroker;
 import ru.nikidzawa.golink.services.SystemOfControlServers.SOCSConnection;
 import ru.nikidzawa.golink.store.entities.ChatEntity;
 import ru.nikidzawa.golink.store.entities.MessageEntity;
 import ru.nikidzawa.golink.store.entities.UserEntity;
-import ru.nikidzawa.golink.store.enums.ChatType;
 import ru.nikidzawa.golink.store.repositories.ChatRepository;
 import ru.nikidzawa.golink.store.repositories.MessageRepository;
 import ru.nikidzawa.golink.store.repositories.UserRepository;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Controller
-public class GoLink implements TCPConnectionLink {
+public class GoLink implements TCPConnectionListener, GoMessageListener {
 
     @FXML
     private VBox chat;
@@ -65,6 +63,9 @@ public class GoLink implements TCPConnectionLink {
 
     @FXML
     private TextField input;
+
+    @FXML
+    private Text status;
 
     @FXML
     private Button minimizeButton;
@@ -88,6 +89,7 @@ public class GoLink implements TCPConnectionLink {
     private Pane titleBar;
 
     private TCPConnection tcpConnection;
+    private TCPBroker tcpBroker;
 
     @Autowired
     UserRepository userRepository;
@@ -104,20 +106,29 @@ public class GoLink implements TCPConnectionLink {
     @SneakyThrows
     void initialize() {
         Platform.runLater(() -> {
-            WindowTitle.setBaseCommands(titleBar, minimizeButton, scaleButton, closeButton);
+            try {
+                tcpBroker = new TCPBroker(new Socket("localhost", 8081), this, userEntity.getId().toString());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            WindowTitle.setBaseCommands(titleBar, minimizeButton, scaleButton, closeButton, tcpBroker, userEntity, userRepository, chatRepository);
+
             MenuItems.makeInput(input);
+            chats.setSpacing(10);
             searchPanel.textProperty().addListener(new ChangeListener<String>() {
                 @Override
                 public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
                     chats.getChildren().clear();
                     List<UserEntity> userEntities = userRepository.findByNickname(newValue);
-                    userEntities.forEach(e -> {
-                        BorderPane contact = newChatBuilder(e.getName());
+                    userEntities.forEach(user -> {
+                        BorderPane contact = newChatBuilder(user.getName());
                         chats.getChildren().add(contact);
                     });
                     if (searchPanel.getText().isEmpty()) {
                         updateChats();
-                    }}
+                    }
+                }
 
             });
             MenuItems.makeSearch(searchPanel);
@@ -128,21 +139,17 @@ public class GoLink implements TCPConnectionLink {
 
     }
 
-    private void updateChats () {
+    private void updateChats() {
+        chats.getChildren().clear();
         chatRepository.findByParticipantsContaining(userEntity).forEach(chatEnt -> {
-            String name = chatEnt.getType() == ChatType.DIALOG || chatEnt.getType() == ChatType.ANONYMOUS_DIALOG ?
-                    chatEnt.getParticipants()
-                            .stream()
-                            .filter(part -> !Objects.equals(part.getId(), userEntity.getId()))
-                            .findFirst()
-                            .get()
-                            .getName()
-                    : chatEnt.getName();
-            BorderPane contact = newChatBuilder(name);
+            UserEntity user = chatEnt.getParticipants().stream()
+                    .filter(userEntity1 -> !Objects.equals(userEntity1.getId(), userEntity.getId())).findFirst().get();
+
+            BorderPane contact = newChatBuilder(user, chatEnt);
             chats.getChildren().add(contact);
 
-
             contact.setOnMouseClicked(e -> {
+                status.setVisible(true);
                 if (selectedChat != chatEnt) {
                     input.setVisible(true);
                     input.setStyle("-fx-background-color: #001933; -fx-border-color: blue; -fx-text-fill: white; -fx-border-width: 0 0 2 0");
@@ -155,23 +162,30 @@ public class GoLink implements TCPConnectionLink {
                     String userId = userEntity.getId().toString();
                     try {
                         tcpConnection = new TCPConnection(new Socket("localhost", chatEnt.getPort()), this, userId);
-                    } catch (IOException | NullPointerException ex) {
+                    } catch (IOException ex) {
                         int newPort = Integer.parseInt(new SOCSConnection().CREATE_SERVER());
                         chatEnt.setPort(newPort);
                         chatRepository.saveAndFlush(chatEnt);
                         try {
                             tcpConnection = new TCPConnection(new Socket("localhost", newPort), this, userId);
-
+                            tcpBroker.sendMessage("UPDATE_CHATS:" + user.getId());
                         } catch (IOException exc) {
                             throw new RuntimeException(exc);
                         }
                     }
                     chat.getChildren().clear();
-                    chatRoomName.setText(name);
+                    chatRoomName.setText(user.getName());
                     printMessages(chatEnt);
                     send.setOnAction(actionEvent -> {
                         String text = input.getText();
                         if (text != null) {
+                            boolean bool = Boolean.parseBoolean(new SOCSConnection().CHECK_USER(chatEnt.getPort(),
+                                    user.getId().toString()));
+                            if (!bool) {
+                                tcpBroker.sendMessage("NOTIFICATION:" + user.getId() + ":" + chatEnt.getId());
+                            } else {
+                                System.out.println("пользователь в сети");
+                            }
                             MessageEntity message = MessageEntity.builder()
                                     .message(text).date(LocalDateTime.now()).sender(userEntity).build();
                             chatEnt.setMessages(message);
@@ -186,7 +200,7 @@ public class GoLink implements TCPConnectionLink {
         });
     }
 
-    private void printMessages (ChatEntity chatEntity) {
+    private void printMessages(ChatEntity chatEntity) {
         List<MessageEntity> sortedMessages = chatRepository.findById(chatEntity.getId())
                 .get()
                 .getMessages()
@@ -195,13 +209,13 @@ public class GoLink implements TCPConnectionLink {
         sortedMessages.forEach(message -> {
             if (message.getSender().getId().equals(userEntity.getId())) {
                 chat.getChildren().add(printMyMessage(message.getMessage(), message.getDate()));
-            }
-            else {
+            } else {
                 chat.getChildren().add(printForeignMessage(message.getMessage(), message.getDate()));
             }
         });
     }
-    private HBox printForeignMessage (String message, LocalDateTime localDateTime) {
+
+    private HBox printForeignMessage(String message, LocalDateTime localDateTime) {
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER_LEFT);
         hBox.setPadding(new Insets(5, 5, 5, 10));
@@ -211,8 +225,8 @@ public class GoLink implements TCPConnectionLink {
         TextFlow dateFlow = new TextFlow(date);
         Text text = new Text(message);
         TextFlow textFlow = new TextFlow(text);
-        textFlow.setStyle (
-                        "-fx-font-family: Arial;" +
+        textFlow.setStyle(
+                "-fx-font-family: Arial;" +
                         "-fx-font-size: 14px;"
         );
         textFlow.setPadding(new Insets(5, 10, 3, 10));
@@ -225,6 +239,7 @@ public class GoLink implements TCPConnectionLink {
         hBox.getChildren().add(borderPane);
         return hBox;
     }
+
     private HBox printMyMessage(String message, LocalDateTime localDateTime) {
         input.clear();
         HBox hBox = new HBox();
@@ -236,7 +251,7 @@ public class GoLink implements TCPConnectionLink {
         TextFlow dateFlow = new TextFlow(date);
         Text text = new Text(message);
         TextFlow textFlow = new TextFlow(text);
-        textFlow.setStyle (
+        textFlow.setStyle(
                 "-fx-color: rgb(239, 242, 255);" +
                         "-fx-font-family: Arial;" + "-fx-font-size: 14px;"
         );
@@ -252,8 +267,8 @@ public class GoLink implements TCPConnectionLink {
         hBox.getChildren().add(borderPane);
         return hBox;
     }
-    private BorderPane newChatBuilder (String userName) {
-        chats.setSpacing(10);
+
+    private BorderPane newChatBuilder(String userName) {
         BorderPane borderPane = new BorderPane();
         borderPane.setOnMouseEntered(mouseEvent -> {
             borderPane.setStyle("-fx-background-color: #34577F;");
@@ -282,33 +297,85 @@ public class GoLink implements TCPConnectionLink {
         nameStack.getChildren().add(name);
         borderPane.setCenter(nameStack);
 
+        return borderPane;
+    }
+
+    private BorderPane newChatBuilder(UserEntity user, ChatEntity chat) {
+        BorderPane borderPane = new BorderPane();
+        borderPane.setOnMouseEntered(mouseEvent -> {
+            borderPane.setStyle("-fx-background-color: #34577F;");
+        });
+        borderPane.setOnMouseExited(mouseEvent -> {
+            borderPane.setStyle("-fx-background-color: #001933;");
+        });
+        StackPane stackImg = new StackPane();
+        GNAvatarView avatar = new GNAvatarView();
+        try {
+            avatar.setImage(new Image(String.valueOf(new URL(getClass().getResource("/img/ava.jpg").toExternalForm()))));
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+        avatar.setType(AvatarType.CIRCLE);
+        avatar.setStroke(Paint.valueOf("#001933"));
+        stackImg.getChildren().add(avatar);
+        stackImg.setPrefHeight(60);
+        stackImg.setPrefWidth(60);
+        if (user.isConnected()) {
+            Circle circle = new Circle();
+            circle.setFill(Paint.valueOf("GREEN"));
+            circle.setRadius(7);
+            circle.setStroke(Paint.valueOf("black"));
+            stackImg.getChildren().add(circle);
+            StackPane.setAlignment(circle, Pos.BOTTOM_RIGHT);
+            StackPane.setMargin(circle, new Insets(0, 7, 0, 0));
+            status.setText("В сети");
+        }
+        else status.setText("Не в сети");
+        borderPane.setLeft(stackImg);
+        StackPane nameStack = new StackPane();
+        Text name = new Text(user.getName());
+        name.setWrappingWidth(170);
+        name.setTextAlignment(TextAlignment.LEFT);
+        name.setFont(Font.font("System", 18));
+        name.setFill(Paint.valueOf("white"));
+        nameStack.getChildren().add(name);
+        borderPane.setCenter(nameStack);
+
         VBox vBox = new VBox();
         vBox.setSpacing(5);
-        Text date = new Text("01.12.2023");
+        Text date = new Text();
+        try {
+            date.setText(chat.getMessages().get(chat.getMessages().size() - 1).getDate().format(DateTimeFormatter.ofPattern("HH:mm")));
+        } catch (IndexOutOfBoundsException ex) {
+            date.setText("");
+        }
         date.setFill(Paint.valueOf("white"));
-        StackPane newMessagesVisualize = new StackPane();
-        Circle circle = new Circle();
-        circle.setRadius(12);
-        circle.setFill(Paint.valueOf("#80c3ff"));
-        circle.setStroke(Paint.valueOf("black"));
-
-        Text newMessageCount = new Text((0 >= 100 ? "99+" : String.valueOf(0)));
-        newMessagesVisualize.getChildren().add(circle);
-        newMessagesVisualize.getChildren().add(newMessageCount);
+        if (0 > 0) {
+            StackPane newMessagesVisualize = new StackPane();
+            Circle circle = new Circle();
+            circle.setRadius(12);
+            circle.setFill(Paint.valueOf("#80c3ff"));
+            circle.setStroke(Paint.valueOf("black"));
+            Text newMessageCount = new Text((0 >= 100 ? "99+" : String.valueOf(0)));
+            newMessagesVisualize.getChildren().add(circle);
+            newMessagesVisualize.getChildren().add(newMessageCount);
+            vBox.getChildren().add(newMessagesVisualize);
+        }
         vBox.getChildren().add(date);
-        vBox.getChildren().add(newMessagesVisualize);
         borderPane.setRight(vBox);
 
 
         return borderPane;
     }
-    private void setTextStyle (Text text) {
+
+    private void setTextStyle(Text text) {
         text.setFont(Font.font("System", 18));
         text.setFill(Paint.valueOf("white"));
     }
 
     @Override
     public void onConnectionReady(TCPConnection tcpConnection) {
+
     }
 
     @Override
@@ -331,5 +398,45 @@ public class GoLink implements TCPConnectionLink {
     @Override
     public void onException(TCPConnection tcpConnection, Exception ex) {
         tcpConnection.disconnect();
+    }
+
+    @Override
+    public void onConnectionReady(TCPBroker tcpBroker) {
+        userEntity.setConnected(true);
+        userRepository.saveAndFlush(userEntity);
+        chatRepository.findByParticipantsContaining(userEntity).forEach(chat1 -> {
+            UserEntity user = chat1.getParticipants().stream().filter(user1 -> !Objects.equals(user1.getId(), userEntity.getId())).findFirst().get();
+            this.tcpBroker.sendMessage("UPDATE_CHATS:" + user.getId());
+        });
+    }
+
+    @Override
+    public void onReceiveMessage(TCPBroker tcpBroker, String string) {
+        String[] strings = string.split(":");
+        String command = strings[0];
+        String value;
+        try {
+            value = strings[1];
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            value = null;
+        }
+        switch (command) {
+            case "update":
+                Platform.runLater(this::updateChats);
+                break;
+            case "NOTIFICATION":
+                System.out.println("получено новое сообщение в чате " + value );
+                break;
+        }
+    }
+
+    @Override
+    public void onDisconnect(TCPBroker tcpBroker) {
+
+    }
+
+
+    @Override
+    public void onException(TCPBroker tcpBroker, Exception ex) {
     }
 }
