@@ -50,6 +50,8 @@ module ru.nikidzawa.golink {
     opens ru.nikidzawa.golink.store.repositories to javafx.fxml, org.hibernate.orm.core, spring.core;
     exports ru.nikidzawa.golink.network;
     opens ru.nikidzawa.golink.network to javafx.fxml, org.hibernate.orm.core, spring.core;
+    exports ru.nikidzawa.golink.services.GoMessage;
+    opens ru.nikidzawa.golink.services.GoMessage to javafx.fxml, org.hibernate.orm.core, spring.core;
     exports ru.nikidzawa.golink.services;
     opens ru.nikidzawa.golink.services to javafx.fxml, org.hibernate.orm.core, spring.core;
     exports ru.nikidzawa.golink.FXControllers;
