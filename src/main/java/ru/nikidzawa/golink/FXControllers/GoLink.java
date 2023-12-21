@@ -121,15 +121,31 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
                 public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
                     chats.getChildren().clear();
                     List<UserEntity> userEntities = userRepository.findByNickname(newValue);
-                    userEntities.forEach(user -> {
-                        BorderPane contact = newChatBuilder(user.getName());
+                    userEntities.forEach(interlocutor -> {
+                        BorderPane contact = newChatBuilder(interlocutor.getName() + interlocutor.getId());
                         chats.getChildren().add(contact);
+                        contact.setOnMouseClicked(mouseEvent -> {
+                            ChatEntity chat1 = chatRepository.findByParticipantsContaining(interlocutor)
+                                    .stream()
+                                    .filter(chatEntity -> chatEntity.getParticipants().stream()
+                                            .anyMatch(userEntity1 -> Objects.equals(userEntity1.getId(), userEntity.getId())))
+                                    .findFirst()
+                                    .orElseGet(() -> {
+                                        ChatEntity newChat = ChatEntity.builder()
+                                                .port(Integer.parseInt(new SOCSConnection().CREATE_SERVER()))
+                                                .participants(List.of(userEntity, interlocutor))
+                                                .build();
+                                        chatRepository.saveAndFlush(newChat);
+                                        openChat(newChat, interlocutor);
+                                        return newChat;
+                                    });
+                            openChat(chat1, interlocutor);
+                        });
                     });
                     if (searchPanel.getText().isEmpty()) {
                         updateChats();
                     }
                 }
-
             });
             MenuItems.makeSearch(searchPanel);
             profileName.setText(userEntity.getName());
@@ -142,62 +158,62 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
     private void updateChats() {
         chats.getChildren().clear();
         chatRepository.findByParticipantsContaining(userEntity).forEach(chatEnt -> {
-            UserEntity user = chatEnt.getParticipants().stream()
+            UserEntity interlocutor = chatEnt.getParticipants().stream()
                     .filter(userEntity1 -> !Objects.equals(userEntity1.getId(), userEntity.getId())).findFirst().get();
 
-            BorderPane contact = newChatBuilder(user, chatEnt);
+            BorderPane contact = newChatBuilder(interlocutor, chatEnt);
             chats.getChildren().add(contact);
-
-            contact.setOnMouseClicked(e -> {
-                status.setVisible(true);
-                if (selectedChat != chatEnt) {
-                    input.setVisible(true);
-                    input.setStyle("-fx-background-color: #001933; -fx-border-color: blue; -fx-text-fill: white; -fx-border-width: 0 0 2 0");
-                    send.setVisible(true);
-
-                    selectedChat = chatEnt;
-                    if (tcpConnection != null) {
-                        tcpConnection.disconnect();
-                    }
-                    String userId = userEntity.getId().toString();
-                    try {
-                        tcpConnection = new TCPConnection(new Socket("localhost", chatEnt.getPort()), this, userId);
-                    } catch (IOException ex) {
-                        int newPort = Integer.parseInt(new SOCSConnection().CREATE_SERVER());
-                        chatEnt.setPort(newPort);
-                        chatRepository.saveAndFlush(chatEnt);
-                        try {
-                            tcpConnection = new TCPConnection(new Socket("localhost", newPort), this, userId);
-                            tcpBroker.sendMessage("UPDATE_CHATS:" + user.getId());
-                        } catch (IOException exc) {
-                            throw new RuntimeException(exc);
-                        }
-                    }
-                    chat.getChildren().clear();
-                    chatRoomName.setText(user.getName());
-                    printMessages(chatEnt);
-                    send.setOnAction(actionEvent -> {
-                        String text = input.getText();
-                        if (text != null) {
-                            boolean bool = Boolean.parseBoolean(new SOCSConnection().CHECK_USER(chatEnt.getPort(),
-                                    user.getId().toString()));
-                            if (!bool) {
-                                tcpBroker.sendMessage("NOTIFICATION:" + user.getId() + ":" + chatEnt.getId());
-                            } else {
-                                System.out.println("пользователь в сети");
-                            }
-                            MessageEntity message = MessageEntity.builder()
-                                    .message(text).date(LocalDateTime.now()).sender(userEntity).build();
-                            chatEnt.setMessages(message);
-                            messageRepository.saveAndFlush(message);
-                            chatRepository.saveAndFlush(chatEnt);
-                            tcpConnection.sendMessage(text);
-                            chat.getChildren().add(printMyMessage(text, LocalDateTime.now()));
-                        }
-                    });
-                }
-            });
+            contact.setOnMouseClicked(e -> openChat(chatEnt, interlocutor));
         });
+    }
+    private void openChat (ChatEntity chatEnt, UserEntity interlocutor) {
+            status.setVisible(true);
+            if (selectedChat != chatEnt) {
+                input.setVisible(true);
+                input.setStyle("-fx-background-color: #001933; -fx-border-color: blue; -fx-text-fill: white; -fx-border-width: 0 0 2 0");
+                send.setVisible(true);
+
+                selectedChat = chatEnt;
+                if (tcpConnection != null) {
+                    tcpConnection.disconnect();
+                }
+                String userId = userEntity.getId().toString();
+                try {
+                    tcpConnection = new TCPConnection(new Socket("localhost", chatEnt.getPort()), this, userId);
+                } catch (IOException ex) {
+                    int newPort = Integer.parseInt(new SOCSConnection().CREATE_SERVER());
+                    chatEnt.setPort(newPort);
+                    chatRepository.saveAndFlush(chatEnt);
+                    try {
+                        tcpConnection = new TCPConnection(new Socket("localhost", newPort), this, userId);
+                        tcpBroker.sendMessage("UPDATE_CHATS:" + interlocutor.getId());
+                    } catch (IOException exc) {
+                        throw new RuntimeException(exc);
+                    }
+                }
+                chat.getChildren().clear();
+                chatRoomName.setText(interlocutor.getName());
+                printMessages(chatEnt);
+                send.setOnAction(actionEvent -> {
+                    String text = input.getText();
+                    if (text != null) {
+                        boolean bool = Boolean.parseBoolean(new SOCSConnection().CHECK_USER(chatEnt.getPort(),
+                                interlocutor.getId().toString()));
+                        if (!bool) {
+                            tcpBroker.sendMessage("NOTIFICATION:" + interlocutor.getId() + ":" + chatEnt.getId());
+                        } else {
+                            System.out.println("пользователь в сети");
+                        }
+                        MessageEntity message = MessageEntity.builder()
+                                .message(text).date(LocalDateTime.now()).sender(userEntity).build();
+                        chatEnt.setMessages(message);
+                        messageRepository.saveAndFlush(message);
+                        chatRepository.saveAndFlush(chatEnt);
+                        tcpConnection.sendMessage(text);
+                        chat.getChildren().add(printMyMessage(text, LocalDateTime.now()));
+                    }
+                });
+            }
     }
 
     private void printMessages(ChatEntity chatEntity) {

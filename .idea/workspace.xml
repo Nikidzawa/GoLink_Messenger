@@ -5,25 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="39e914f0-8438-4975-ae5e-804deeb44919" name="Changes" comment="create broker messages - GoMessage, create notifications and online or offline status">
-      <change afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/GoMessage/GoMessageListener.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/img/GoLinkStructure.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/img/img.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/GoLink.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/GoLink.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/GUIPatterns/WindowTitle.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/GUIPatterns/WindowTitle.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/network/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/network/Server.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/network/TCPConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/network/TCPConnection.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/network/TCPConnectionLink.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/network/TCPConnectionListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/GoMessage/MessageBroker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/GoMessage/MessageBroker.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/GoMessage/TCPBroker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/GoMessage/TCPBroker.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/SystemOfControlServers/SOCS.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/SystemOfControlServers/SOCS.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/SystemOfControlServers/SOCSConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/SystemOfControlServers/SOCSConnection.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/store/entities/UserEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/store/entities/UserEntity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/ru/nikidzawa/golink/FXControllers/menu.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/ru/nikidzawa/golink/FXControllers/menu.fxml" afterDir="false" />
-    </list>
-    <list id="4cc47031-8ec7-43a8-bbd2-4836398b378c" name="Changes by Nikidzawa" comment="">
       <change beforePath="$PROJECT_DIR$/README.MD" beforeDir="false" afterPath="$PROJECT_DIR$/README.MD" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/GoLink.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/GoLink.java" afterDir="false" />
     </list>
+    <list id="4cc47031-8ec7-43a8-bbd2-4836398b378c" name="Changes by Nikidzawa" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -54,6 +42,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Application.SOCS.executor": "Run",
     "RequestMappingsPanelOrder0": "0",
     "RequestMappingsPanelOrder1": "1",
     "RequestMappingsPanelWidth0": "75",
@@ -61,12 +50,13 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Spring Boot.Starter.executor": "Run",
     "WebServerToolWindowFactoryState": "false",
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "database.data.extractors.current.export.id": "Comma-separated (CSV)_id",
     "deletionFromPopupRequiresConfirmation": "false",
     "extract.method.default.visibility": "private",
-    "git-widget-placeholder": "master",
+    "git-widget-placeholder": "abce527c",
     "last_opened_file_path": "C:/Users/Nikidzawa/IdeaProjects/goLink/src/main/resources/ru/nikidzawa/golink/FXControllers",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
