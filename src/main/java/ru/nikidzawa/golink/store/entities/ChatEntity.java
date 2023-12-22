@@ -2,7 +2,6 @@ package ru.nikidzawa.golink.store.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ru.nikidzawa.golink.store.enums.ChatType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,10 +17,6 @@ public class ChatEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
-
-    private ChatType type;
-
     private int port;
 
     @ManyToMany (fetch = FetchType.EAGER)
@@ -32,7 +27,7 @@ public class ChatEntity {
     )
     private List<UserEntity> participants;
 
-    @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "chat", cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     private List<MessageEntity> messages;
 
     public void setMessages (MessageEntity message) {

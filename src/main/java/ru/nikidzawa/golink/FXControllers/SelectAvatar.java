@@ -24,6 +24,7 @@ import ru.nikidzawa.golink.store.entities.UserEntity;
 import ru.nikidzawa.golink.store.repositories.UserRepository;
 
 import java.util.Objects;
+import java.util.Optional;
 
 @Controller
 public class SelectAvatar {
@@ -73,11 +74,11 @@ public class SelectAvatar {
         enter.setOnAction(actionEvent -> {
             String userName = name.getText();
             String userNickname = nickname.getText();
-            UserEntity user = repository.findByNickname(userNickname).get(0);
+            Optional <UserEntity> user = repository.findByNickname(userNickname);
             if (userName.length() > 25) {
                 exception("Ограничение на длину имени составляет 25 символов");
             }
-            else if (user != null) {
+            else if (user.isPresent()) {
                 exception("Пользователь с таким никнеймом уже существует");
             }
             else {

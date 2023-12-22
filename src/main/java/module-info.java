@@ -36,6 +36,7 @@ module ru.nikidzawa.golink {
     requires jul.to.slf4j;
     requires JavaFXEmojiTextFlow.emojitwo;
     requires libphonenumber;
+    requires spring.orm;
 
     opens ru.nikidzawa.golink to javafx.fxml, spring.core, org.hibernate.orm.core;
     exports ru.nikidzawa.golink;
@@ -43,8 +44,6 @@ module ru.nikidzawa.golink {
     opens ru.nikidzawa.golink.services.SystemOfControlServers to javafx.fxml, org.hibernate.orm.core, spring.core;
     exports ru.nikidzawa.golink.store.entities;
     opens ru.nikidzawa.golink.store.entities to javafx.fxml, org.hibernate.orm.core, spring.core;
-    exports ru.nikidzawa.golink.store.enums;
-    opens ru.nikidzawa.golink.store.enums to javafx.fxml, org.hibernate.orm.core, spring.core;
     exports ru.nikidzawa.golink.store.repositories;
     opens ru.nikidzawa.golink.store.repositories to javafx.fxml, org.hibernate.orm.core, spring.core;
     exports ru.nikidzawa.golink.network;
@@ -56,4 +55,6 @@ module ru.nikidzawa.golink {
     exports ru.nikidzawa.golink.FXControllers;
     opens ru.nikidzawa.golink.FXControllers to javafx.fxml, org.hibernate.orm.core, spring.core;
     opens img;
+    exports ru.nikidzawa.golink.FXControllers.helpers;
+    opens ru.nikidzawa.golink.FXControllers.helpers to javafx.fxml, org.hibernate.orm.core, spring.core;
 }

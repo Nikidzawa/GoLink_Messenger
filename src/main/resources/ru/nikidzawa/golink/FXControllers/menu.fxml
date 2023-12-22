@@ -88,21 +88,6 @@
                </children>
             </AnchorPane>
          </top>
-         <bottom>
-            <AnchorPane prefHeight="47.0" prefWidth="887.0" style="-fx-border-color: black; -fx-border-width: 0 0 0 1 0;" BorderPane.alignment="CENTER">
-               <children>
-                  <TextField fx:id="input" layoutX="6.0" layoutY="7.0" prefHeight="33.0" prefWidth="730.0" promptText="Введите сообщение..." visible="false">
-                     <font>
-                        <Font size="15.0" />
-                     </font>
-                  </TextField>
-                  <Button fx:id="send" layoutX="744.0" layoutY="7.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="125.0" style="-fx-background-color: blue;" text="Отправить" textAlignment="CENTER" textFill="WHITE" visible="false">
-                     <font>
-                        <Font name="Arial Black" size="12.0" />
-                     </font></Button>
-               </children>
-            </AnchorPane>
-         </bottom>
          <center>
             <ScrollPane hbarPolicy="NEVER" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #001933; -fx-border-color: black;" vbarPolicy="NEVER" BorderPane.alignment="CENTER">
                <content>
@@ -118,6 +103,24 @@
                </content>
             </ScrollPane>
          </center>
+         <bottom>
+            <BorderPane fx:id="sendZone" prefHeight="45.0" prefWidth="878.0" style="-fx-border-color: black; -fx-border-width: 0 0  0 1 0;" BorderPane.alignment="CENTER">
+               <right>
+                  <Button fx:id="send" mnemonicParsing="false" prefHeight="33.0" prefWidth="125.0" style="-fx-background-color: blue;" text="Отправить" textAlignment="CENTER" textFill="WHITE" visible="false" BorderPane.alignment="CENTER">
+                     <font>
+                        <Font name="Arial Black" size="12.0" />
+                     </font>
+                  </Button>
+               </right>
+               <center>
+                  <TextField fx:id="input" prefHeight="40.0" prefWidth="753.0" promptText="Введите сообщение..." visible="false" BorderPane.alignment="CENTER">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </TextField>
+               </center>
+            </BorderPane>
+         </bottom>
       </BorderPane>
    </center>
    <top>
