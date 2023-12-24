@@ -60,6 +60,10 @@ public class MessageBroker implements GoMessageListener{
                 break;
             case "NOTIFICATION" :
                 connections.get(userId).sendMessage("NOTIFICATION:" + value);
+                break;
+            case "UPDATE_MESSAGES" :
+                connections.get(userId).sendMessage("UPDATE_MESSAGES");
+                break;
         }
     }
 

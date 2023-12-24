@@ -114,7 +114,7 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
 
     private MessageStage messageStage;
     private boolean editable = false;
-
+    private UserEntity interlocutor;
     @FXML
     @SneakyThrows
     void initialize() {
@@ -184,6 +184,7 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
     private void openChat (ChatEntity chatEnt, UserEntity interlocutor) {
             status.setVisible(true);
             if (selectedChat != chatEnt) {
+                this.interlocutor = interlocutor;
                 input.setVisible(true);
                 input.setStyle("-fx-background-color: #001933; -fx-border-color: blue; -fx-text-fill: white; -fx-border-width: 0 0 2 0");
                 send.setVisible(true);
@@ -217,12 +218,11 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
                     if (editable) {return;}
                     String text = input.getText();
                     if (text != null) {
-                        boolean bool = Boolean.parseBoolean(new SOCSConnection().CHECK_USER(chatEnt.getPort(),
-                                interlocutor.getId().toString()));
-                        if (!bool) {
-                            tcpBroker.sendMessage("NOTIFICATION:" + interlocutor.getId() + ":" + chatEnt.getId());
-                        } else {
+                        if (Boolean.parseBoolean(new SOCSConnection().CHECK_USER(chatEnt.getPort(),
+                                interlocutor.getId().toString()))) {
                             System.out.println("пользователь в сети");
+                        } else {
+                            tcpBroker.sendMessage("NOTIFICATION:" + interlocutor.getId() + ":" + chatEnt.getId());
                         }
                         MessageEntity message = MessageEntity.builder()
                                 .message(text).date(LocalDateTime.now()).sender(userEntity).build();
@@ -232,17 +232,9 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
                             chatEnt.setMessages(message);
                             messageRepository.saveAndFlush(message);
                             chatRepository.saveAndFlush(chatEnt);
-                        } catch (JpaObjectRetrievalFailureException ex) {
-                            ChatEntity chatEntity = chatRepository.findById(chatEnt.getId()).get();
-                            chatEnt.getMessages().forEach(message1 -> {
-                                if (message1 != null) {
-                                    chatEntity.setMessages(message1);
-                                }
-                            });
-                            chatRepository.saveAndFlush(chatEntity);
-                        }
+                        } catch (JpaObjectRetrievalFailureException ex) {}
                         tcpConnection.sendMessage(text);
-                        chat.getChildren().add(printMyMessage(text, LocalDateTime.now()));
+                        chat.getChildren().add(printMyMessage(message, chatEnt, LocalDateTime.now()));
                     }
                 });
             }
@@ -256,21 +248,9 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
                 .toList();
         sortedMessages.forEach(message -> {
             if (message.getSender().getId().equals(userEntity.getId())) {
-                HBox hBox = printMyMessage(message.getMessage(), message.getDate());
-                hBox.setOnMouseClicked(mouseEvent -> {
-                    if (mouseEvent.getButton() == MouseButton.SECONDARY) {
-                        openMessageWindow(message, mouseEvent, chatEntity, hBox);
-                    }
-                });
-                chat.getChildren().add(hBox);
+                chat.getChildren().add(printMyMessage(message, chatEntity, message.getDate()));
             } else {
-                HBox hBox = printForeignMessage(message.getMessage(), message.getDate());
-                hBox.setOnMouseClicked(mouseEvent -> {
-                    if (mouseEvent.getButton() == MouseButton.SECONDARY) {
-                        openMessageWindow(message, mouseEvent, chatEntity, hBox);
-                    }
-                });
-                chat.getChildren().add(hBox);
+                chat.getChildren().add(printForeignMessage(message.getMessage(), message.getDate()));
             }
         });
     }
@@ -379,6 +359,9 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
                 messageRepository.delete(message);
                 chatEntity.getMessages().clear();
                 messageRepository.flush();
+                if (Boolean.parseBoolean(new SOCSConnection().CHECK_USER(chatEntity.getPort(), interlocutor.getId().toString()))) {
+                    tcpBroker.sendMessage("UPDATE_MESSAGES:" + interlocutor.getId());
+                }
             }).thenRun(() -> {
                 Platform.runLater(() -> {
                     chat.getChildren().remove(hBox);
@@ -444,7 +427,7 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
         return hBox;
     }
 
-    private HBox printMyMessage(String message, LocalDateTime localDateTime) {
+    private HBox printMyMessage(MessageEntity message, ChatEntity chat, LocalDateTime localDateTime) {
         input.clear();
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER_RIGHT);
@@ -453,7 +436,7 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
         borderPane.setStyle("-fx-background-color: rgb(15, 125, 242); -fx-background-radius: 20px;");
         Text date = new Text(localDateTime.format(DateTimeFormatter.ofPattern("HH:mm")));
         TextFlow dateFlow = new TextFlow(date);
-        Text text = new Text(message);
+        Text text = new Text(message.getMessage());
         TextFlow textFlow = new TextFlow(text);
         textFlow.setStyle(
                 "-fx-color: rgb(239, 242, 255);" +
@@ -467,7 +450,11 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
         dateFlow.setTextAlignment(TextAlignment.RIGHT);
         dateFlow.setPadding(new Insets(0, 10, 5, 10));
         borderPane.setBottom(dateFlow);
-
+        hBox.setOnMouseClicked(mouseEvent -> {
+            if (mouseEvent.getButton() == MouseButton.SECONDARY) {
+                openMessageWindow(message, mouseEvent, chat, hBox);
+            }
+        });
         hBox.getChildren().add(borderPane);
         return hBox;
     }
@@ -576,7 +563,7 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
         return borderPane;
     }
 
-    private void editMessage (MessageEntity message, ImageView editImg, ChatEntity chat) {
+    private void editMessage (MessageEntity message, ImageView editImg, ChatEntity chat)  {
         editable = true;
         BorderPane editInterfaceBackground = new BorderPane();
         editImg.setFitWidth(30);
@@ -610,13 +597,9 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
                 try {
                     chatRepository.saveAndFlush(chat);
                 } catch (JpaObjectRetrievalFailureException exception) {
-                    ChatEntity chatEntity = chatRepository.findById(chat.getId()).get();
-                    chat.getMessages().forEach(message1 -> {
-                        if (message1 != null) {
-                            chatEntity.setMessages(message1);
-                        }
-                    });
-                    chatRepository.saveAndFlush(chatEntity);
+                }
+                if (Boolean.parseBoolean(new SOCSConnection().CHECK_USER(chat.getPort(), interlocutor.getId().toString()))) {
+                    tcpBroker.sendMessage("UPDATE_MESSAGES:" + interlocutor.getId());
                 }
                 editable = false;
                 sendZone.setTop(null);
@@ -627,8 +610,10 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
     }
 
     private void updateMessages (ChatEntity chat) {
-        this.chat.getChildren().clear();
-        printMessages(chat);
+        Platform.runLater(() -> {
+            this.chat.getChildren().clear();
+            printMessages(chat);
+        });
     }
 
     private void setTextStyle(Text text) {
@@ -688,16 +673,16 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
             case "NOTIFICATION":
                 System.out.println("получено новое сообщение в чате " + value );
                 break;
+            case "UPDATE_MESSAGES":
+                updateMessages(selectedChat);
+                break;
         }
     }
 
     @Override
-    public void onDisconnect(TCPBroker tcpBroker) {
-
-    }
+    public void onDisconnect(TCPBroker tcpBroker) {}
 
 
     @Override
-    public void onException(TCPBroker tcpBroker, Exception ex) {
-    }
+    public void onException(TCPBroker tcpBroker, Exception ex) {}
 }
