@@ -51,7 +51,7 @@ public class WindowTitle {
                     userRepository.saveAndFlush(userEntity);
                     chatRepository.findByParticipantsContaining(userEntity).forEach(chat1 -> {
                         UserEntity user = chat1.getParticipants().stream().filter(user1 -> !Objects.equals(user1.getId(), userEntity.getId())).findFirst().get();
-                        tcpBroker.sendMessage("UPDATE_CHATS:" + user.getId());
+                        tcpBroker.sendMessage("UPDATE_CHAT_ROOMS:" + user.getId());
                         tcpBroker.disconnect();
                     });
                 try {

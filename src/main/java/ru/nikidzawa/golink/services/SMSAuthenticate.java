@@ -14,7 +14,7 @@ public class SMSAuthenticate {
     }
 
     public static void sendMessage (String message, String number) {
-        Message.creator(
+        Message.creator (
                 new PhoneNumber(number),
                 new PhoneNumber(TWILIO_NUMBER),
                 message

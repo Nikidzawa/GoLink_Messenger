@@ -2,6 +2,7 @@ package ru.nikidzawa.golink.store.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.time.LocalDateTime;
 

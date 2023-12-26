@@ -31,6 +31,7 @@ import javafx.stage.StageStyle;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
 import org.springframework.stereotype.Controller;
 import ru.nikidzawa.golink.FXControllers.helpers.MessageStage;
@@ -151,7 +152,7 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
                                                 .build();
                                         chatRepository.saveAndFlush(newChat);
                                         openChat(newChat, interlocutor);
-                                        tcpBroker.sendMessage("UPDATE_CHATS:" + interlocutor.getId());
+                                        tcpBroker.sendMessage("UPDATE_CHAT_ROOMS:" + interlocutor.getId());
                                         return newChat;
                                     });
                             openChat(chat1, interlocutor);
@@ -206,7 +207,7 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
                     }
                     try {
                         tcpConnection = new TCPConnection(new Socket("localhost", newPort), this, userId);
-                        tcpBroker.sendMessage("UPDATE_CHATS:" + interlocutor.getId());
+                        tcpBroker.sendMessage("UPDATE_CHAT_ROOMS:" + interlocutor.getId());
                     } catch (IOException exc) {
                         throw new RuntimeException(exc);
                     }
@@ -228,7 +229,9 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
                                 .message(text).date(LocalDateTime.now()).sender(userEntity).build();
 
                         try {
-                            chatEnt.getMessages().clear();
+                            try {
+                                chatEnt.getMessages().clear();
+                            } catch (NullPointerException ex) {}
                             chatEnt.setMessages(message);
                             messageRepository.saveAndFlush(message);
                             chatRepository.saveAndFlush(chatEnt);
@@ -652,7 +655,7 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
         userRepository.saveAndFlush(userEntity);
         chatRepository.findByParticipantsContaining(userEntity).forEach(chat1 -> {
             UserEntity user = chat1.getParticipants().stream().filter(user1 -> !Objects.equals(user1.getId(), userEntity.getId())).findFirst().get();
-            this.tcpBroker.sendMessage("UPDATE_CHATS:" + user.getId());
+            this.tcpBroker.sendMessage("UPDATE_CHAT_ROOMS:" + user.getId());
         });
     }
 
@@ -667,14 +670,14 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
             value = null;
         }
         switch (command) {
-            case "update":
+            case "UPDATE_CHAT_ROOMS":
                 Platform.runLater(this::updateChats);
-                break;
-            case "NOTIFICATION":
-                System.out.println("получено новое сообщение в чате " + value );
                 break;
             case "UPDATE_MESSAGES":
                 updateMessages(selectedChat);
+                break;
+            case "NOTIFICATION":
+                System.out.println("получено новое сообщение в чате " + value);
                 break;
         }
     }

@@ -51,18 +51,20 @@ public class MessageBroker implements GoMessageListener{
             value = null;
         }
         switch (command) {
-            case "UPDATE_CHATS" :
+            case "UPDATE_CHAT_ROOMS" :
                 try {
-                    connections.get(userId).sendMessage("update");
+                    connections.get(userId).sendMessage("UPDATE_CHAT_ROOMS");
                 } catch (NullPointerException ex) {
                     System.out.println("Пользователи не найдены");
                 }
                 break;
-            case "NOTIFICATION" :
-                connections.get(userId).sendMessage("NOTIFICATION:" + value);
-                break;
+
             case "UPDATE_MESSAGES" :
                 connections.get(userId).sendMessage("UPDATE_MESSAGES");
+                break;
+
+            case "NOTIFICATION" :
+                connections.get(userId).sendMessage("NOTIFICATION:" + value);
                 break;
         }
     }
