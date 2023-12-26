@@ -89,7 +89,7 @@
             </AnchorPane>
          </top>
          <center>
-            <ScrollPane hbarPolicy="NEVER" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #001933; -fx-border-color: black;" vbarPolicy="NEVER" BorderPane.alignment="CENTER">
+            <ScrollPane fx:id="scrollPane" hbarPolicy="NEVER" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #001933; -fx-border-color: black;" vbarPolicy="NEVER" BorderPane.alignment="CENTER">
                <content>
                   <VBox fx:id="chat" prefHeight="1028.0" prefWidth="876.0" style="-fx-background-color: #001933;">
                      <children>
@@ -117,8 +117,21 @@
                      <font>
                         <Font size="15.0" />
                      </font>
+                     <BorderPane.margin>
+                        <Insets left="5.0" />
+                     </BorderPane.margin>
                   </TextField>
                </center>
+               <left>
+                  <ImageView fx:id="img" fitHeight="32.0" fitWidth="34.0" pickOnBounds="true" preserveRatio="true" visible="false" BorderPane.alignment="CENTER">
+                     <image>
+                        <Image url="@/img/img.png" />
+                     </image>
+                     <BorderPane.margin>
+                        <Insets left="5.0" />
+                     </BorderPane.margin>
+                  </ImageView>
+               </left>
             </BorderPane>
          </bottom>
       </BorderPane>

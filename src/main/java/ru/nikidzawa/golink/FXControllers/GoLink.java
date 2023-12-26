@@ -2,6 +2,7 @@ package ru.nikidzawa.golink.FXControllers;
 
 import io.github.gleidson28.AvatarType;
 import io.github.gleidson28.GNAvatarView;
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -10,6 +11,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -26,12 +28,13 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import javafx.scene.transform.Translate;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Duration;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
 import org.springframework.stereotype.Controller;
 import ru.nikidzawa.golink.FXControllers.helpers.MessageStage;
@@ -45,10 +48,13 @@ import ru.nikidzawa.golink.services.SystemOfControlServers.SOCSConnection;
 import ru.nikidzawa.golink.store.entities.*;
 import ru.nikidzawa.golink.store.repositories.*;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URL;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -94,10 +100,16 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
     private ImageView settings;
 
     @FXML
+    private ScrollPane scrollPane;
+
+    @FXML
     private Text status;
 
     @FXML
     private Pane titleBar;
+
+    @FXML
+    private ImageView img;
 
     private TCPConnection tcpConnection;
     private TCPBroker tcpBroker;
@@ -126,6 +138,27 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
                 throw new RuntimeException(e);
             }
             WindowTitle.setBaseCommands(titleBar, minimizeButton, scaleButton, closeButton, tcpBroker, userEntity, userRepository, chatRepository);
+            
+            img.setOnMouseClicked(mouseEvent -> {
+                Platform.runLater(() -> {
+                    FileChooser fileChooser = new FileChooser();
+                    fileChooser.getExtensionFilters().addAll(
+                            new FileChooser.ExtensionFilter("Изображения", "*.jpg", "*.png")
+                    );
+                    File selectedFile = fileChooser.showOpenDialog(img.getScene().getWindow());
+
+                    if (selectedFile != null) {
+                        try {
+                            byte[] imageBytes = Files.readAllBytes(selectedFile.toPath());
+                            tcpConnection.sendPhoto(imageBytes);
+                            chat.getChildren().add(printMyPhoto((new Image(new ByteArrayInputStream(imageBytes))), LocalDateTime.now()));
+                            Platform.runLater(() -> scrollPane.setVvalue(1));
+                        } catch (IOException ex) {
+                            System.out.println("ошибка при попытке прочитать и отправить файл " + ex);
+                        }
+                    }
+                });
+            });
 
             MenuItems.makeInput(input);
             chats.setSpacing(10);
@@ -183,9 +216,10 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
     }
 
     private void openChat (ChatEntity chatEnt, UserEntity interlocutor) {
-            status.setVisible(true);
             if (selectedChat != chatEnt) {
                 this.interlocutor = interlocutor;
+                status.setVisible(true);
+                img.setVisible(true);
                 input.setVisible(true);
                 input.setStyle("-fx-background-color: #001933; -fx-border-color: blue; -fx-text-fill: white; -fx-border-width: 0 0 2 0");
                 send.setVisible(true);
@@ -238,6 +272,7 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
                         } catch (JpaObjectRetrievalFailureException ex) {}
                         tcpConnection.sendMessage(text);
                         chat.getChildren().add(printMyMessage(message, chatEnt, LocalDateTime.now()));
+                        Platform.runLater(() -> scrollPane.setVvalue(1));
                     }
                 });
             }
@@ -409,10 +444,7 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER_LEFT);
         hBox.setPadding(new Insets(5, 5, 5, 10));
-        BorderPane borderPane = new BorderPane();
-        borderPane.setStyle("-fx-background-color: rgb(233, 233, 235); -fx-background-radius: 20px;");
-        Text date = new Text(localDateTime.format(DateTimeFormatter.ofPattern("HH:mm")));
-        TextFlow dateFlow = new TextFlow(date);
+        BorderPane borderPane = foreignBasicMessagePattern(localDateTime);
         Text text = new Text(message);
         TextFlow textFlow = new TextFlow(text);
         textFlow.setStyle(
@@ -420,13 +452,103 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
                         "-fx-font-size: 14px;"
         );
         textFlow.setPadding(new Insets(5, 10, 3, 10));
-        dateFlow.setPadding(new Insets(0, 10, 5, 10));
 
         borderPane.setTop(textFlow);
+        hBox.getChildren().add(borderPane);
+        return hBox;
+    }
+
+    private BorderPane foreignBasicMessagePattern(LocalDateTime localDateTime) {
+        BorderPane borderPane = new BorderPane();
+        borderPane.setStyle("-fx-background-color: rgb(233, 233, 235); -fx-background-radius: 20px;");
+        Text date = new Text(localDateTime.format(DateTimeFormatter.ofPattern("HH:mm")));
+        date.setFill(Color.color(0, 0, 0));
+        TextFlow dateFlow = new TextFlow(date);
+        dateFlow.setPadding(new Insets(0, 10, 5, 10));
         dateFlow.setTextAlignment(TextAlignment.LEFT);
         borderPane.setBottom(dateFlow);
+        return borderPane;
+    }
 
+    private BorderPane myBasicMessagePattern(LocalDateTime localDateTime) {
+        BorderPane borderPane = new BorderPane();
+        borderPane.setStyle("-fx-background-color: rgb(15, 125, 242); -fx-background-radius: 20px;");
+        Text date = new Text(localDateTime.format(DateTimeFormatter.ofPattern("HH:mm")));
+        date.setFill(Color.color(0.934, 0.925, 0.996));
+        TextFlow dateFlow = new TextFlow(date);
+        dateFlow.setPadding(new Insets(0, 10, 5, 10));
+        dateFlow.setTextAlignment(TextAlignment.RIGHT);
+        borderPane.setBottom(dateFlow);
+        return borderPane;
+    }
+
+    private HBox printForeignPhoto (Image image, LocalDateTime localDateTime) {
+        HBox hBox = new HBox();
+        hBox.setAlignment(Pos.CENTER_LEFT);
+        hBox.setPadding(new Insets(5, 5, 5, 10));
+        BorderPane borderPane = foreignBasicMessagePattern(localDateTime);
+        ImageView imageView = new ImageView();
+        double width = image.getWidth();
+        double height = image.getHeight();
+        if (width > 750) {
+            imageView.setFitWidth(750);
+        } else {
+            imageView.setFitWidth(width);
+        }
+        if (height > 500) {
+            imageView.setFitHeight(500);
+        }
+        else {
+            imageView.setFitHeight(height);
+        }
+        imageView.setImage(image);
+        borderPane.setTop(imageView);
         hBox.getChildren().add(borderPane);
+        imageView.setOnMouseClicked(mouseEvent -> {
+            Stage imageScene = new Stage();
+            ImageView enlargedImageView = new ImageView(image);
+            enlargedImageView.setFitWidth(width);
+            enlargedImageView.setFitHeight(height);
+            enlargedImageView.setPreserveRatio(true);
+            Scene scene = new Scene(new Pane(enlargedImageView));
+            imageScene.setScene(scene);
+            imageScene.show();
+        });
+        return hBox;
+    }
+
+    private HBox printMyPhoto (Image image, LocalDateTime localDateTime) {
+        HBox hBox = new HBox();
+        hBox.setAlignment(Pos.CENTER_RIGHT);
+        hBox.setPadding(new Insets(5, 5, 5, 10));
+        BorderPane borderPane = myBasicMessagePattern(localDateTime);
+        ImageView imageView = new ImageView();
+        double width = image.getWidth();
+        double height = image.getHeight();
+        if (width > 750) {
+            imageView.setFitWidth(750);
+        } else {
+            imageView.setFitWidth(width);
+        }
+        if (height > 500) {
+            imageView.setFitHeight(500);
+        }
+        else {
+            imageView.setFitHeight(height);
+        }
+        imageView.setImage(image);
+        borderPane.setTop(imageView);
+        hBox.getChildren().add(borderPane);
+        imageView.setOnMouseClicked(mouseEvent -> {
+            Stage imageScene = new Stage();
+            ImageView enlargedImageView = new ImageView(image);
+            enlargedImageView.setFitWidth(width);
+            enlargedImageView.setFitHeight(height);
+            enlargedImageView.setPreserveRatio(true);
+            Scene scene = new Scene(new Pane(enlargedImageView));
+            imageScene.setScene(scene);
+            imageScene.show();
+        });
         return hBox;
     }
 
@@ -435,10 +557,7 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER_RIGHT);
         hBox.setPadding(new Insets(5, 5, 3, 10));
-        BorderPane borderPane = new BorderPane();
-        borderPane.setStyle("-fx-background-color: rgb(15, 125, 242); -fx-background-radius: 20px;");
-        Text date = new Text(localDateTime.format(DateTimeFormatter.ofPattern("HH:mm")));
-        TextFlow dateFlow = new TextFlow(date);
+        BorderPane borderPane = myBasicMessagePattern(localDateTime);
         Text text = new Text(message.getMessage());
         TextFlow textFlow = new TextFlow(text);
         textFlow.setStyle(
@@ -447,12 +566,8 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
         );
         textFlow.setPadding(new Insets(5, 10, 5, 10));
         text.setFill(Color.color(0.934, 0.925, 0.996));
-        date.setFill(Color.color(0.934, 0.925, 0.996));
 
         borderPane.setTop(textFlow);
-        dateFlow.setTextAlignment(TextAlignment.RIGHT);
-        dateFlow.setPadding(new Insets(0, 10, 5, 10));
-        borderPane.setBottom(dateFlow);
         hBox.setOnMouseClicked(mouseEvent -> {
             if (mouseEvent.getButton() == MouseButton.SECONDARY) {
                 openMessageWindow(message, mouseEvent, chat, hBox);
@@ -630,13 +745,29 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
     @Override
     public void onReceiveMessage(TCPConnection tcpConnection, String string) {
         if (!string.equals(userEntity.getId().toString())) {
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
+            Platform.runLater(() -> {
+                if (Math.abs(scrollPane.getVvalue() - 1.0) < 0.0001) {
                     chat.getChildren().add(printForeignMessage(string, LocalDateTime.now()));
+                    PauseTransition pauseTransition = new PauseTransition(Duration.millis(20));
+                    pauseTransition.setOnFinished(event -> scrollPane.setVvalue(1));
+                    pauseTransition.play();
                 }
+                else chat.getChildren().add(printForeignMessage(string, LocalDateTime.now()));
             });
         }
+    }
+
+    @Override
+    public void onReceiveImage(TCPConnection tcpConnection, byte[] image) {
+        Platform.runLater(() -> {
+            if (scrollPane.getVvalue() >= 0.95) {
+                chat.getChildren().add(printForeignPhoto(new Image(new ByteArrayInputStream(image)), LocalDateTime.now()));
+                PauseTransition pauseTransition = new PauseTransition(Duration.millis(20));
+                pauseTransition.setOnFinished(event -> scrollPane.setVvalue(1));
+                pauseTransition.play();
+            }
+            else chat.getChildren().add(printForeignPhoto(new Image(new ByteArrayInputStream(image)), LocalDateTime.now()));
+        });
     }
 
     @Override
@@ -670,15 +801,9 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
             value = null;
         }
         switch (command) {
-            case "UPDATE_CHAT_ROOMS":
-                Platform.runLater(this::updateChats);
-                break;
-            case "UPDATE_MESSAGES":
-                updateMessages(selectedChat);
-                break;
-            case "NOTIFICATION":
-                System.out.println("получено новое сообщение в чате " + value);
-                break;
+            case "UPDATE_CHAT_ROOMS" -> Platform.runLater(this::updateChats);
+            case "UPDATE_MESSAGES" -> updateMessages(selectedChat);
+            case "NOTIFICATION" -> System.out.println("получено новое сообщение в чате " + value);
         }
     }
 

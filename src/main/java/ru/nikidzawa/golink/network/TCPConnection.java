@@ -4,34 +4,57 @@ import lombok.SneakyThrows;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 
 public class TCPConnection {
     private final Socket socket;
-    private final Thread thread;
+    private Thread thread;
     private final TCPConnectionListener listener;
-    private final BufferedReader in;
-    private final BufferedWriter out;
+    private final DataOutputStream ous;
+    private final DataInputStream ois;
     @Getter
     private final String userId;
+    @SneakyThrows
+    public TCPConnection (Socket socket, TCPConnectionListener listener, String userId, DataInputStream ois) {
+        this.ois = ois;
+        this.socket = socket;
+        ous = new DataOutputStream(socket.getOutputStream());
+        this.listener = listener;
+        this.userId = userId;
+        start();
+    }
 
     @SneakyThrows
     public TCPConnection(Socket socket, TCPConnectionListener listener, String userId) {
         this.socket = socket;
         this.listener = listener;
         this.userId = userId;
-        in = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
-        out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
-        sendMessage(userId);
+        ous = new DataOutputStream(socket.getOutputStream());
+        ois = new DataInputStream(socket.getInputStream());
+        setUserId();
+        start();
+    }
+    @SneakyThrows
+    private void setUserId () {
+        ous.writeUTF(userId);
+        ous.flush();
+    }
+
+    private void  start () {
         thread = new Thread(() -> {
             listener.onConnectionReady(TCPConnection.this);
             while (!Thread.interrupted()) {
                 try {
-                    String message = in.readLine();
-                    if (message == null) {break;}
-                    listener.onReceiveMessage(TCPConnection.this, message);
-                } catch (IOException e) {
-                    listener.onDisconnect(TCPConnection.this);
+                    switch (ois.readInt()) {
+                        case 30 -> listener.onReceiveMessage(TCPConnection.this, ois.readUTF());
+                        case 60 -> {
+                            int length = ois.readInt();
+                            byte[] photoBytes = new byte[length];
+                            ois.readFully(photoBytes);
+                            listener.onReceiveImage(TCPConnection.this, photoBytes);
+                        }
+                    }
+                } catch (IOException ex) {
+                    listener.onException(TCPConnection.this, ex);
                     break;
                 }
             }
@@ -43,13 +66,22 @@ public class TCPConnection {
     public synchronized void sendMessage(String string) {
         try {
             if (string != null) {
-                out.write(string + "\n");
-                out.flush();
+                ous.writeInt(30);
+                ous.writeUTF(string);
+                ous.flush();
             }
         } catch (IOException e) {
             listener.onException(this, e);
             disconnect();
         }
+    }
+
+    @SneakyThrows
+    public synchronized void sendPhoto (byte[] bytes) {
+        ous.writeInt(60);
+        ous.writeInt(bytes.length);
+        ous.write(bytes);
+        ous.flush();
     }
 
     public synchronized void disconnect() {
