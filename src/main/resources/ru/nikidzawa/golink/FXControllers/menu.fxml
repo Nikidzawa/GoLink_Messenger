@@ -34,11 +34,7 @@
                   </Text>
                   <StackPane layoutX="14.0" layoutY="6.0" prefHeight="67.0" prefWidth="75.0">
                      <children>
-                        <GNAvatarView prefHeight="71.0" prefWidth="104.0" stroke="#001933" type="CIRCLE">
-                           <image>
-                              <Image url="@/img/ava.jpg" />
-                           </image>
-                        </GNAvatarView>
+                        <GNAvatarView fx:id="myAvatar" prefHeight="71.0" prefWidth="104.0" stroke="#001933" type="CIRCLE" />
                         <Circle cache="true" fill="GREEN" radius="9.0" stroke="BLACK" strokeType="INSIDE">
                            <StackPane.margin>
                               <Insets left="40.0" top="60.0" />

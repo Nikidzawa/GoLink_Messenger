@@ -20,3 +20,7 @@ Database: PostgreSQL
 Небольшая визуализация структуры проекта
 
 ![GoLinkStructure.png](src%2Fmain%2Fresources%2Fimg%2FGoLinkStructure.png)
+
+Ну и вот как на данном этапе выглядит мессенджер
+
+![screen.png](src%2Fmain%2Fresources%2Fimg%2Fscreen.png)

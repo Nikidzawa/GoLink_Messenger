@@ -30,6 +30,9 @@ public class ChatEntity {
     @OneToMany(mappedBy = "chat", cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     private List<MessageEntity> messages;
 
+    @OneToMany(mappedBy = "chat", cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    private List<ImageEntity> images;
+
     public void setMessages (MessageEntity message) {
         if (messages == null) {
             messages = new ArrayList<>();

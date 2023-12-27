@@ -1,6 +1,5 @@
 package ru.nikidzawa.golink.store.entities;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,4 +25,7 @@ public class UserEntity {
     private String password;
 
     private boolean connected;
+
+    @OneToOne
+    private ImageEntity avatar;
 }

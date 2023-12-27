@@ -5,7 +5,6 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.stage.Window;
-import ru.nikidzawa.golink.network.TCPConnection;
 import ru.nikidzawa.golink.services.GoMessage.TCPBroker;
 import ru.nikidzawa.golink.store.entities.UserEntity;
 import ru.nikidzawa.golink.store.repositories.ChatRepository;
@@ -49,11 +48,11 @@ public class WindowTitle {
             Platform.runLater(() -> {
                     userEntity.setConnected(false);
                     userRepository.saveAndFlush(userEntity);
-                    chatRepository.findByParticipantsContaining(userEntity).forEach(chat1 -> {
-                        UserEntity user = chat1.getParticipants().stream().filter(user1 -> !Objects.equals(user1.getId(), userEntity.getId())).findFirst().get();
-                        tcpBroker.sendMessage("UPDATE_CHAT_ROOMS:" + user.getId());
-                        tcpBroker.disconnect();
-                    });
+                    chatRepository.findByParticipantsContaining(userEntity).forEach(chat -> {
+                    chat.getParticipants().stream()
+                            .filter(user -> !Objects.equals(user.getId(), userEntity.getId()))
+                            .forEach(user -> tcpBroker.sendMessage("UPDATE_CHAT_ROOMS:" + user.getId()));
+                });
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {

@@ -9,6 +9,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
@@ -51,14 +52,13 @@ import ru.nikidzawa.golink.store.repositories.*;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.Socket;
-import java.net.URL;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 
 @Controller
 public class GoLink implements TCPConnectionListener, GoMessageListener {
@@ -111,6 +111,9 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
     @FXML
     private ImageView img;
 
+    @FXML
+    private GNAvatarView myAvatar;
+
     private TCPConnection tcpConnection;
     private TCPBroker tcpBroker;
 
@@ -120,6 +123,8 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
     ChatRepository chatRepository;
     @Autowired
     MessageRepository messageRepository;
+    @Autowired
+    ImageRepository imageRepository;
 
     @Setter
     private UserEntity userEntity;
@@ -138,12 +143,12 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
                 throw new RuntimeException(e);
             }
             WindowTitle.setBaseCommands(titleBar, minimizeButton, scaleButton, closeButton, tcpBroker, userEntity, userRepository, chatRepository);
-            
+            myAvatar.setImage((new Image(new ByteArrayInputStream(userEntity.getAvatar().getMetadata()))));
             img.setOnMouseClicked(mouseEvent -> {
                 Platform.runLater(() -> {
                     FileChooser fileChooser = new FileChooser();
                     fileChooser.getExtensionFilters().addAll(
-                            new FileChooser.ExtensionFilter("Изображения", "*.jpg", "*.png")
+                            new FileChooser.ExtensionFilter("Изображения", "*.jpg", "*.png", "*jpeg")
                     );
                     File selectedFile = fileChooser.showOpenDialog(img.getScene().getWindow());
 
@@ -152,7 +157,14 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
                             byte[] imageBytes = Files.readAllBytes(selectedFile.toPath());
                             tcpConnection.sendPhoto(imageBytes);
                             chat.getChildren().add(printMyPhoto((new Image(new ByteArrayInputStream(imageBytes))), LocalDateTime.now()));
-                            Platform.runLater(() -> scrollPane.setVvalue(1));
+                            scrolling();
+                            ImageEntity imageEntity = ImageEntity.builder()
+                                    .metadata(imageBytes)
+                                    .date(LocalDateTime.now())
+                                    .sender(userEntity)
+                                    .chat(selectedChat)
+                                    .build();
+                            imageRepository.saveAndFlush(imageEntity);
                         } catch (IOException ex) {
                             System.out.println("ошибка при попытке прочитать и отправить файл " + ex);
                         }
@@ -169,7 +181,7 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
                     Optional<UserEntity> user = userRepository.findByNickname(newValue);
                     if (user.isPresent()) {
                         UserEntity interlocutor = user.get();
-                        BorderPane contact = newChatBuilder(interlocutor.getName() + interlocutor.getId());
+                        BorderPane contact = newChatBuilder(interlocutor);
                         chats.getChildren().add(contact);
                         contact.setOnMouseClicked(mouseEvent -> {
                             searchPanel.clear();
@@ -191,9 +203,7 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
                             openChat(chat1, interlocutor);
                         });
                     }
-                    if (searchPanel.getText().isEmpty()) {
-                        updateChats();
-                    }
+                    if (searchPanel.getText().isEmpty()) updateChats();
                 }
             });
             MenuItems.makeSearch(searchPanel);
@@ -249,6 +259,7 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
                 chat.getChildren().clear();
                 chatRoomName.setText(interlocutor.getName());
                 printMessages(chatEnt);
+                scrolling();
                 send.setOnAction(actionEvent -> {
                     if (editable) {return;}
                     String text = input.getText();
@@ -272,23 +283,46 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
                         } catch (JpaObjectRetrievalFailureException ex) {}
                         tcpConnection.sendMessage(text);
                         chat.getChildren().add(printMyMessage(message, chatEnt, LocalDateTime.now()));
-                        Platform.runLater(() -> scrollPane.setVvalue(1));
+                        scrolling();
                     }
                 });
             }
     }
 
     private void printMessages(ChatEntity chatEntity) {
-        List<MessageEntity> sortedMessages = chatRepository.findById(chatEntity.getId())
-                .get()
-                .getMessages()
-                .stream().sorted(Comparator.comparing(MessageEntity::getDate))
+        ChatEntity selectedChat = chatRepository.findById(chatEntity.getId()).orElseThrow();
+
+        List<Object> sortedMessages = Stream.concat(
+                        selectedChat.getMessages().stream(),
+                        selectedChat.getImages().stream()
+                )
+                .sorted(Comparator.comparing(obj -> {
+                    if (obj instanceof MessageEntity) {
+                        return ((MessageEntity) obj).getDate();
+                    } else if (obj instanceof ImageEntity) {
+                        return ((ImageEntity) obj).getDate();
+                    }
+                    return null;
+                }))
                 .toList();
+
         sortedMessages.forEach(message -> {
-            if (message.getSender().getId().equals(userEntity.getId())) {
-                chat.getChildren().add(printMyMessage(message, chatEntity, message.getDate()));
-            } else {
-                chat.getChildren().add(printForeignMessage(message.getMessage(), message.getDate()));
+            boolean isMyMessage = false;
+
+            if (message instanceof MessageEntity) {
+                isMyMessage = ((MessageEntity) message).getSender().getId().equals(userEntity.getId());
+            } else if (message instanceof ImageEntity) {
+                isMyMessage = ((ImageEntity) message).getSender().getId().equals(userEntity.getId());
+            }
+
+            if (message instanceof MessageEntity) {
+                chat.getChildren().add(isMyMessage
+                        ? printMyMessage((MessageEntity) message, chatEntity, ((MessageEntity) message).getDate())
+                        : printForeignMessage(((MessageEntity) message).getMessage(), ((MessageEntity) message).getDate()));
+            } else if (message instanceof ImageEntity) {
+                chat.getChildren().add(isMyMessage
+                        ? printMyPhoto(new Image(new ByteArrayInputStream(((ImageEntity) message).getMetadata())), ((ImageEntity) message).getDate())
+                        : printForeignPhoto(new Image(new ByteArrayInputStream(((ImageEntity) message).getMetadata())), ((ImageEntity) message).getDate()));
             }
         });
     }
@@ -577,7 +611,7 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
         return hBox;
     }
 
-    private BorderPane newChatBuilder(String userName) {
+    private BorderPane newChatBuilder(UserEntity user) {
         BorderPane borderPane = new BorderPane();
         borderPane.setOnMouseEntered(mouseEvent -> {
             borderPane.setStyle("-fx-background-color: #34577F;");
@@ -587,11 +621,7 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
         });
         StackPane stackImg = new StackPane();
         GNAvatarView avatar = new GNAvatarView();
-        try {
-            avatar.setImage(new Image(String.valueOf(new URL(getClass().getResource("/img/ava.jpg").toExternalForm()))));
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
+        avatar.setImage(new Image(new ByteArrayInputStream(user.getAvatar().getMetadata())));
         avatar.setType(AvatarType.CIRCLE);
         avatar.setStroke(Paint.valueOf("#001933"));
         stackImg.getChildren().add(avatar);
@@ -599,7 +629,7 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
         stackImg.setPrefWidth(60);
         borderPane.setLeft(stackImg);
         StackPane nameStack = new StackPane();
-        Text name = new Text(userName);
+        Text name = new Text(user.getName());
         name.setWrappingWidth(170);
         name.setTextAlignment(TextAlignment.LEFT);
         setTextStyle(name);
@@ -611,19 +641,9 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
 
     private BorderPane newChatBuilder(UserEntity user, ChatEntity chat) {
         BorderPane borderPane = new BorderPane();
-        borderPane.setOnMouseEntered(mouseEvent -> {
-            borderPane.setStyle("-fx-background-color: #34577F;");
-        });
-        borderPane.setOnMouseExited(mouseEvent -> {
-            borderPane.setStyle("-fx-background-color: #001933;");
-        });
         StackPane stackImg = new StackPane();
         GNAvatarView avatar = new GNAvatarView();
-        try {
-            avatar.setImage(new Image(String.valueOf(new URL(getClass().getResource("/img/ava.jpg").toExternalForm()))));
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
+        avatar.setImage(new Image(new ByteArrayInputStream(user.getAvatar().getMetadata())));
         avatar.setType(AvatarType.CIRCLE);
         avatar.setStroke(Paint.valueOf("#001933"));
         stackImg.getChildren().add(avatar);
@@ -641,20 +661,26 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
         }
         else status.setText("Не в сети");
         borderPane.setLeft(stackImg);
-        StackPane nameStack = new StackPane();
+
+        BorderPane nameAndLastMessage = new BorderPane();
         Text name = new Text(user.getName());
-        name.setWrappingWidth(170);
         name.setTextAlignment(TextAlignment.LEFT);
         name.setFont(Font.font("System", 18));
         name.setFill(Paint.valueOf("white"));
-        nameStack.getChildren().add(name);
-        borderPane.setCenter(nameStack);
+        nameAndLastMessage.setTop(name);
+        List<MessageEntity> messages = chat.getMessages();
+        TextField lastMessage = new TextField(messages.isEmpty() ? "Чат пуст" : messages.get(messages.size() - 1).getMessage());
+        lastMessage.setStyle("-fx-background-color: #001933; -fx-text-fill: white");
+        lastMessage.setEditable(false);
+        nameAndLastMessage.setLeft(lastMessage);
+        nameAndLastMessage.setPadding(new Insets(0, 0, 0, 10));
+        borderPane.setCenter(nameAndLastMessage);
 
         VBox vBox = new VBox();
         vBox.setSpacing(5);
         Text date = new Text();
         try {
-            date.setText(chat.getMessages().get(chat.getMessages().size() - 1).getDate().format(DateTimeFormatter.ofPattern("HH:mm")));
+            date.setText(chat.getMessages().get(messages.size() - 1).getDate().format(DateTimeFormatter.ofPattern("HH:mm")));
         } catch (IndexOutOfBoundsException ex) {
             date.setText("");
         }
@@ -678,6 +704,16 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
 
         borderPane.setRight(vBox);
 
+        borderPane.setCursor(Cursor.HAND);
+        lastMessage.setCursor(Cursor.HAND);
+        borderPane.setOnMouseEntered(mouseEvent -> {
+            borderPane.setStyle("-fx-background-color: #34577F;");
+            lastMessage.setStyle("-fx-background-color: #34577F; -fx-text-fill: white");
+        });
+        borderPane.setOnMouseExited(mouseEvent -> {
+            borderPane.setStyle("-fx-background-color: #001933;");
+            lastMessage.setStyle("-fx-background-color: #001933; -fx-text-fill: white");
+        });
         return borderPane;
     }
 
@@ -724,6 +760,11 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
                 updateMessages(chat);
             }
         });
+        cancel.setOnMouseClicked(mouseEvent -> {
+            editable = false;
+            sendZone.setTop(null);
+            updateMessages(chat);
+        });
         sendZone.setTop(editInterfaceBackground);
     }
 
@@ -739,6 +780,12 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
         text.setFill(Paint.valueOf("white"));
     }
 
+    private void scrolling () {
+        PauseTransition pauseTransition = new PauseTransition(Duration.millis(30));
+        pauseTransition.setOnFinished(event -> scrollPane.setVvalue(1));
+        pauseTransition.play();
+    }
+
     @Override
     public void onConnectionReady(TCPConnection tcpConnection) {}
 
@@ -746,11 +793,9 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
     public void onReceiveMessage(TCPConnection tcpConnection, String string) {
         if (!string.equals(userEntity.getId().toString())) {
             Platform.runLater(() -> {
-                if (Math.abs(scrollPane.getVvalue() - 1.0) < 0.0001) {
+                if (scrollPane.getVvalue() >= 0.95) {
                     chat.getChildren().add(printForeignMessage(string, LocalDateTime.now()));
-                    PauseTransition pauseTransition = new PauseTransition(Duration.millis(20));
-                    pauseTransition.setOnFinished(event -> scrollPane.setVvalue(1));
-                    pauseTransition.play();
+                    scrolling();
                 }
                 else chat.getChildren().add(printForeignMessage(string, LocalDateTime.now()));
             });
@@ -762,9 +807,7 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
         Platform.runLater(() -> {
             if (scrollPane.getVvalue() >= 0.95) {
                 chat.getChildren().add(printForeignPhoto(new Image(new ByteArrayInputStream(image)), LocalDateTime.now()));
-                PauseTransition pauseTransition = new PauseTransition(Duration.millis(20));
-                pauseTransition.setOnFinished(event -> scrollPane.setVvalue(1));
-                pauseTransition.play();
+                scrolling();
             }
             else chat.getChildren().add(printForeignPhoto(new Image(new ByteArrayInputStream(image)), LocalDateTime.now()));
         });
@@ -784,9 +827,10 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
     public void onConnectionReady(TCPBroker tcpBroker) {
         userEntity.setConnected(true);
         userRepository.saveAndFlush(userEntity);
-        chatRepository.findByParticipantsContaining(userEntity).forEach(chat1 -> {
-            UserEntity user = chat1.getParticipants().stream().filter(user1 -> !Objects.equals(user1.getId(), userEntity.getId())).findFirst().get();
-            this.tcpBroker.sendMessage("UPDATE_CHAT_ROOMS:" + user.getId());
+        chatRepository.findByParticipantsContaining(userEntity).forEach(chat -> {
+            chat.getParticipants().stream()
+                    .filter(user -> !Objects.equals(user.getId(), userEntity.getId()))
+                    .forEach(user -> tcpBroker.sendMessage("UPDATE_CHAT_ROOMS:" + user.getId()));
         });
     }
 

@@ -23,6 +23,7 @@ import ru.nikidzawa.golink.GUIPatterns.Message;
 import ru.nikidzawa.golink.GUIPatterns.PhoneFieldConfig;
 import ru.nikidzawa.golink.GUIPatterns.WindowTitle;
 import ru.nikidzawa.golink.store.entities.UserEntity;
+import ru.nikidzawa.golink.store.repositories.ImageRepository;
 import ru.nikidzawa.golink.store.repositories.UserRepository;
 
 import java.util.Objects;
@@ -61,7 +62,8 @@ public class Register {
     private Pane titleBar;
 
     @Autowired
-    UserRepository repository;
+    UserRepository userRepository;
+
     @FXML
     void initialize() {
         Platform.runLater(() -> WindowTitle.setBaseCommands(titleBar, minimizeButton, scaleButton, closeButton));
@@ -79,17 +81,11 @@ public class Register {
                 initialize();
                 phone.clear();
             }
-            UserEntity user = repository.findByPhone(inputNumber);
+            UserEntity user = userRepository.findByPhone(inputNumber);
 
-            if (user != null) {
-                exception("Номер телефона уже зарегистрирован");
-            }
-            else if (password.getText().length() < 6) {
-                exception("Минимальный размер пароля должен составлять 6 символов");
-            }
-            else if (password.getText().length() > 35) {
-                exception("Придумайте пароль покороче");
-            }
+            if (user != null) exception("Номер телефона уже зарегистрирован");
+            else if (password.getText().length() < 6) exception("Минимальный размер пароля должен составлять 6 символов");
+            else if (password.getText().length() > 35) exception("Придумайте пароль покороче");
             else loadAuth(inputNumber);
 
         });

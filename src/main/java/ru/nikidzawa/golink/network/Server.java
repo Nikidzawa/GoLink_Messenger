@@ -66,11 +66,11 @@ public class Server implements TCPConnectionListener {
     public void sendMessage(TCPConnection tcpConnection, String message) {
         System.out.println(connections.size());
         String userId = tcpConnection.getUserId();
-        String messageWithUserId = userId + ": " + message;
+//        String messageWithUserId = userId + ": " + message;
 
         for (Map.Entry<String, TCPConnection> entry : connections.entrySet()) {
             if (!entry.getKey().equals(userId)) {
-                entry.getValue().sendMessage(messageWithUserId);
+                entry.getValue().sendMessage(message);
             }
         }
     }
