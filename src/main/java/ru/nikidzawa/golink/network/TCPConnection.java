@@ -54,7 +54,6 @@ public class TCPConnection {
                         }
                     }
                 } catch (IOException ex) {
-                    listener.onException(TCPConnection.this, ex);
                     break;
                 }
             }
@@ -71,7 +70,6 @@ public class TCPConnection {
                 ous.flush();
             }
         } catch (IOException e) {
-            listener.onException(this, e);
             disconnect();
         }
     }
@@ -84,12 +82,9 @@ public class TCPConnection {
         ous.flush();
     }
 
+    @SneakyThrows
     public synchronized void disconnect() {
         thread.interrupt();
-        try {
-            socket.close();
-        } catch (IOException e) {
-            listener.onException(this, e);
-        }
+        socket.close();
     }
 }

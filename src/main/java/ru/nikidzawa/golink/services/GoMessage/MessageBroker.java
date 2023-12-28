@@ -26,7 +26,7 @@ public class MessageBroker implements GoMessageListener{
                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
                 String userId = in.readLine();
 
-                new TCPBroker(socket, this, userId);
+                new TCPBroker(socket, this, userId, in);
             } catch (IOException ex) {
                 System.out.println("Сервер на порту " + PORT + " прекратил свою работу");
                 break;
@@ -51,31 +51,21 @@ public class MessageBroker implements GoMessageListener{
             value = null;
         }
         switch (command) {
-            case "UPDATE_CHAT_ROOMS" :
+            case "UPDATE_CHAT_ROOMS" -> {
                 try {
                     connections.get(userId).sendMessage("UPDATE_CHAT_ROOMS");
                 } catch (NullPointerException ex) {
-                    System.out.println("Пользователи не найдены");
+                    System.out.println("Пользователь не в сети");
                 }
-                break;
-
-            case "UPDATE_MESSAGES" :
-                connections.get(userId).sendMessage("UPDATE_MESSAGES");
-                break;
-
-            case "NOTIFICATION" :
-                connections.get(userId).sendMessage("NOTIFICATION:" + value);
-                break;
+            }
+            case "UPDATE_MESSAGES" -> connections.get(userId).sendMessage("UPDATE_MESSAGES");
+            case "NOTIFICATION" -> connections.get(userId).sendMessage("NOTIFICATION:" + value);
+            case "CHECK_USER_STATUS" -> tcpBroker.sendMessage("STATUS:" + connections.containsKey(userId));
         }
     }
 
     @Override
     public void onDisconnect(TCPBroker tcpBroker) {
-
-    }
-
-    @Override
-    public void onException(TCPBroker tcpBroker, Exception ex) {
-
+        connections.remove(tcpBroker.getUserId());
     }
 }

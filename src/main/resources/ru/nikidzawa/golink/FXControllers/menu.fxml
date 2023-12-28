@@ -47,7 +47,7 @@
                         <Font name="System" size="12.0" />
                      </font>
                   </Text>
-                  <ImageView fx:id="settings" fitHeight="23.0" fitWidth="26.0" layoutX="284.0" layoutY="49.0">
+                  <ImageView fx:id="settingsButton" fitHeight="23.0" fitWidth="26.0" layoutX="284.0" layoutY="49.0">
                      <image>
                         <Image url="@/img/settings.png" />
                      </image>
@@ -59,7 +59,7 @@
             </AnchorPane>
          </top>
          <bottom>
-            <VBox fx:id="chats" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="1031.0" prefWidth="321.0" BorderPane.alignment="CENTER" />
+            <VBox fx:id="chats" spacing="10" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="1031.0" prefWidth="321.0" BorderPane.alignment="CENTER" />
          </bottom>
          <center>
             <AnchorPane prefHeight="56.0" prefWidth="321.0" BorderPane.alignment="CENTER">
@@ -119,7 +119,7 @@
                   </TextField>
                </center>
                <left>
-                  <ImageView fx:id="img" fitHeight="32.0" fitWidth="34.0" pickOnBounds="true" preserveRatio="true" visible="false" BorderPane.alignment="CENTER">
+                  <ImageView fx:id="sendImageButton" fitHeight="32.0" fitWidth="34.0" pickOnBounds="true" preserveRatio="true" visible="false" BorderPane.alignment="CENTER">
                      <image>
                         <Image url="@/img/img.png" />
                      </image>

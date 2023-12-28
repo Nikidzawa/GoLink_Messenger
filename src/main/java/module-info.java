@@ -38,8 +38,10 @@ module ru.nikidzawa.golink {
     requires libphonenumber;
     requires spring.orm;
 
+
     opens ru.nikidzawa.golink to javafx.fxml, spring.core, org.hibernate.orm.core;
     exports ru.nikidzawa.golink;
+    exports ru.nikidzawa.golink.FXControllers.helpers;
     exports ru.nikidzawa.golink.services.SystemOfControlServers;
     opens ru.nikidzawa.golink.services.SystemOfControlServers to javafx.fxml, org.hibernate.orm.core, spring.core;
     exports ru.nikidzawa.golink.store.entities;
@@ -55,6 +57,5 @@ module ru.nikidzawa.golink {
     exports ru.nikidzawa.golink.FXControllers;
     opens ru.nikidzawa.golink.FXControllers to javafx.fxml, org.hibernate.orm.core, spring.core;
     opens img;
-    exports ru.nikidzawa.golink.FXControllers.helpers;
     opens ru.nikidzawa.golink.FXControllers.helpers to javafx.fxml, org.hibernate.orm.core, spring.core;
 }

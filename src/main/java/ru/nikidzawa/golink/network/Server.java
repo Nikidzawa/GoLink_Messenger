@@ -13,7 +13,7 @@ import java.util.Map;
 
 
 public class Server implements TCPConnectionListener {
-    public Map<String, TCPConnection> connections = new HashMap<>();
+    public HashMap <String, TCPConnection> connections = new HashMap<>();
     @Getter
     private final int PORT;
     public ServerSocket serverSocket;
@@ -56,11 +56,6 @@ public class Server implements TCPConnectionListener {
             serverSocket.close();
             new SOCSConnection().RELEASE_PORT(PORT);
         }
-    }
-
-    @Override
-    public synchronized void onException(TCPConnection tcpConnection, Exception ex) {
-        System.out.println("TCP ex " + ex);
     }
 
     public void sendMessage(TCPConnection tcpConnection, String message) {

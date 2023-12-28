@@ -19,8 +19,7 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
-import ru.nikidzawa.golink.GUIPatterns.Message;
-import ru.nikidzawa.golink.GUIPatterns.WindowTitle;
+import ru.nikidzawa.golink.FXControllers.helpers.GUIPatterns;
 import ru.nikidzawa.golink.store.entities.ImageEntity;
 import ru.nikidzawa.golink.store.entities.UserEntity;
 import ru.nikidzawa.golink.store.repositories.ImageRepository;
@@ -77,10 +76,12 @@ public class SelectAvatar {
 
     @Autowired
     ImageRepository imageRepository;
+    @Autowired
+    GUIPatterns GUIPatterns;
 
     @FXML
     void initialize() {
-        Platform.runLater(() -> WindowTitle.setBaseCommands(titleBar, minimizeButton, scaleButton, closeButton));
+        Platform.runLater(() -> GUIPatterns.setBaseWindowTitleCommands(titleBar, minimizeButton, scaleButton, closeButton));
         menuItem.setSpacing(15);
 
         image.setOnMouseClicked(mouseEvent -> selectImage());
@@ -151,7 +152,7 @@ public class SelectAvatar {
         stage.show();
     }
     private void exception (String message) {
-        Message.create(new Image(Objects.requireNonNull(getClass().getResource("/img/exception.png")).toExternalForm()),
+        GUIPatterns.createExceptionMessage(new Image(Objects.requireNonNull(getClass().getResource("/img/exception.png")).toExternalForm()),
                 message, menuItem);
     }
 }

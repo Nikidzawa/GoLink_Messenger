@@ -19,11 +19,8 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
-import ru.nikidzawa.golink.GUIPatterns.Message;
-import ru.nikidzawa.golink.GUIPatterns.PhoneFieldConfig;
-import ru.nikidzawa.golink.GUIPatterns.WindowTitle;
+import ru.nikidzawa.golink.FXControllers.helpers.GUIPatterns;
 import ru.nikidzawa.golink.store.entities.UserEntity;
-import ru.nikidzawa.golink.store.repositories.ImageRepository;
 import ru.nikidzawa.golink.store.repositories.UserRepository;
 
 import java.util.Objects;
@@ -64,12 +61,15 @@ public class Register {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    GUIPatterns GUIPatterns;
+
     @FXML
     void initialize() {
-        Platform.runLater(() -> WindowTitle.setBaseCommands(titleBar, minimizeButton, scaleButton, closeButton));
+        Platform.runLater(() -> GUIPatterns.setBaseWindowTitleCommands(titleBar, minimizeButton, scaleButton, closeButton));
         menuItem.setSpacing(15);
 
-        PhoneFieldConfig.setConfig(phone);
+        GUIPatterns.setConfig(phone);
         login.setOnMouseClicked(e -> fxLogin());
 
         enter.setOnAction(e -> {
@@ -113,8 +113,8 @@ public class Register {
   //      SMSAuthenticate.sendMessage(code, phone.getText());
         enter.getScene().getWindow().hide();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("verify.fxml"));
-        Parent root = loader.load();
         loader.setControllerFactory(context::getBean);
+        Parent root = loader.load();
 
         VerifyNumber verifyNumber = loader.getController();
         verifyNumber.setContext(context);
@@ -134,7 +134,7 @@ public class Register {
     }
 
     private void exception (String message) {
-        Message.create(new Image(Objects.requireNonNull(getClass().getResource("/img/exception.png")).toExternalForm()),
+        GUIPatterns.createExceptionMessage(new Image(Objects.requireNonNull(getClass().getResource("/img/exception.png")).toExternalForm()),
                 message, menuItem);
     }
 }

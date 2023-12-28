@@ -13,7 +13,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 import ru.nikidzawa.golink.FXControllers.Register;
 
 @SpringBootApplication
-@EntityScan(basePackages = "ru.nikidzawa.golink")
 public class Starter extends Application {
     private Parent rootNode;
     private ConfigurableApplicationContext context;

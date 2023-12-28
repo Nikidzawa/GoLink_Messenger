@@ -1,5 +1,6 @@
 package ru.nikidzawa.golink.FXControllers;
 
+import jakarta.annotation.PostConstruct;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -20,12 +21,16 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import lombok.Setter;
 import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
-import ru.nikidzawa.golink.GUIPatterns.Message;
-import ru.nikidzawa.golink.GUIPatterns.WindowTitle;
+import org.springframework.stereotype.Controller;
+import ru.nikidzawa.golink.FXControllers.helpers.GUIPatterns;
+import ru.nikidzawa.golink.store.entities.UserEntity;
+import ru.nikidzawa.golink.store.repositories.UserRepository;
 
 import java.util.Objects;
 
+@Controller
 public class VerifyNumber {
     @Setter
     private ConfigurableApplicationContext context;
@@ -60,9 +65,15 @@ public class VerifyNumber {
     @FXML
     private Pane titleBar;
 
+    @Autowired
+    GUIPatterns GUIPatterns;
+
+    @Autowired
+    UserRepository userRepository;
+
     @FXML
     void initialize() {
-        Platform.runLater(() -> WindowTitle.setBaseCommands(titleBar, minimizeButton, scaleButton, closeButton));
+        Platform.runLater(() -> GUIPatterns.setBaseWindowTitleCommands(titleBar, minimizeButton, scaleButton, closeButton));
         menuItem.setSpacing(15);
         area.setSpacing(25);
 
@@ -109,7 +120,7 @@ public class VerifyNumber {
                 if (code.contentEquals(stringBuilder)) {
                     fxAvatar();
                 } else {
-                    Message.create(new Image(Objects.requireNonNull(getClass().getResource("/img/exception.png")).toExternalForm()),
+                    GUIPatterns.createExceptionMessage(new Image(Objects.requireNonNull(getClass().getResource("/img/exception.png")).toExternalForm()),
                             "Ошибка, неверный код", menuItem);
                 }
             }
