@@ -58,8 +58,20 @@ public class MessageBroker implements GoMessageListener{
                     System.out.println("Пользователь не в сети");
                 }
             }
-            case "UPDATE_MESSAGES" -> connections.get(userId).sendMessage("UPDATE_MESSAGES");
-            case "NOTIFICATION" -> connections.get(userId).sendMessage("NOTIFICATION:" + value);
+            case "UPDATE_MESSAGES" -> {
+                try {
+                    connections.get(userId).sendMessage("UPDATE_MESSAGES");
+                } catch (NullPointerException ex) {
+                    System.out.println("Пользователь не в сети");
+                }
+            }
+            case "NOTIFICATION" -> {
+                try {
+                    connections.get(userId).sendMessage("NOTIFICATION:" + value);
+                } catch (NullPointerException ex) {
+                    System.out.println("Пользователь не в сети");
+                }
+            }
             case "CHECK_USER_STATUS" -> tcpBroker.sendMessage("STATUS:" + connections.containsKey(userId));
         }
     }

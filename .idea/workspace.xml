@@ -4,27 +4,22 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="39e914f0-8438-4975-ae5e-804deeb44919" name="Changes" comment="save images in database, create avatars, update readme">
+    <list default="true" id="39e914f0-8438-4975-ae5e-804deeb44919" name="Changes" comment="Refactoring: separated gui from code logic">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.MD" beforeDir="false" afterPath="$PROJECT_DIR$/README.MD" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/GoLink.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/GoLink.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/Login.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/Login.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/Register.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/Register.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/SelectAvatar.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/SelectAvatar.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/VerifyNumber.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/VerifyNumber.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/GUIPatterns/MenuItems.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/GUIPatterns/Message.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/GUIPatterns/PhoneFieldConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/GUIPatterns/WindowTitle.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/helpers/GUIPatterns.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/Starter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/Starter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/network/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/network/Server.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/network/TCPConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/network/TCPConnection.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/network/TCPConnectionListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/network/TCPConnectionListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/GoMessage/GoMessageListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/GoMessage/GoMessageListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/helpers/GUIPatterns.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/helpers/GUIPatterns.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/GoMessage/MessageBroker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/GoMessage/MessageBroker.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/GoMessage/TCPBroker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/GoMessage/TCPBroker.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/ru/nikidzawa/golink/FXControllers/menu.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/ru/nikidzawa/golink/FXControllers/menu.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/SMSAuthenticate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/SMSAuthenticate.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/store/entities/UserEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/store/entities/UserEntity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/store/repositories/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/store/repositories/UserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/ru/nikidzawa/golink/FXControllers/avatar.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/ru/nikidzawa/golink/FXControllers/avatar.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/ru/nikidzawa/golink/FXControllers/login.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/ru/nikidzawa/golink/FXControllers/login.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/ru/nikidzawa/golink/FXControllers/verify.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/ru/nikidzawa/golink/FXControllers/verify.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/ru/nikidzawa/golink/register.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/ru/nikidzawa/golink/register.fxml" afterDir="false" />
     </list>
     <list id="4cc47031-8ec7-43a8-bbd2-4836398b378c" name="Changes by Nikidzawa" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -71,7 +66,7 @@
     "database.data.extractors.current.export.id": "Comma-separated (CSV)_id",
     "deletionFromPopupRequiresConfirmation": "false",
     "extract.method.default.visibility": "private",
-    "git-widget-placeholder": "1f133182",
+    "git-widget-placeholder": "141af272",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/Nikidzawa/IdeaProjects/goLink/src/main/resources/ru/nikidzawa/golink/FXControllers",
     "node.js.detected.package.eslint": "true",
@@ -177,7 +172,7 @@
       <workItem from="1703591607744" duration="9834000" />
       <workItem from="1703611188452" duration="2324000" />
       <workItem from="1703616196934" duration="368000" />
-      <workItem from="1703672410779" duration="49479000" />
+      <workItem from="1703672410779" duration="71621000" />
     </task>
     <task id="LOCAL-00001" summary="Create messenger">
       <option name="closed" value="true" />
@@ -267,7 +262,15 @@
       <option name="project" value="LOCAL" />
       <updated>1703698820770</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="Refactoring: separated gui from code logic">
+      <option name="closed" value="true" />
+      <created>1703789858796</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1703789858796</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -295,7 +298,8 @@
     <MESSAGE value="bugs fix" />
     <MESSAGE value="bugs fix, send and receive images, dynamic change scroll position" />
     <MESSAGE value="save images in database, create avatars, update readme" />
-    <option name="LAST_COMMIT_MESSAGE" value="save images in database, create avatars, update readme" />
+    <MESSAGE value="Refactoring: separated gui from code logic" />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactoring: separated gui from code logic" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

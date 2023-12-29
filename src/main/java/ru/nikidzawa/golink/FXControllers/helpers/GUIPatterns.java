@@ -25,6 +25,8 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 import ru.nikidzawa.golink.FXControllers.GoLink;
 import ru.nikidzawa.golink.network.TCPConnection;
@@ -45,30 +47,21 @@ import java.util.*;
 public class GUIPatterns {
     private double xOffset = 0;
     private double yOffset = 0;
-    private TCPConnection tcpConnection;
     private MessageStage messageStage;
 
-    public void setBaseWindowTitleCommands(Pane titleBar, Button minimizeButton, Button scaleButton, Button closeButton ) {
-        setWindowTitleButtons(titleBar, minimizeButton, scaleButton, closeButton);
-        closeButton.setOnAction(actionEvent -> Platform.exit());
-    }
-
-    public void setBaseWindowTitleCommands(Pane titleBar, Button minimizeButton, Button scaleButton, Button closeButton, TCPBroker tcpBroker, UserEntity userEntity, UserRepository userRepository, ChatRepository chatRepository) {
+    public void setBaseWindowTitleCommands(Pane titleBar, Button minimizeButton, Button scaleButton, Button closeButton, ConfigurableApplicationContext context) {
         setWindowTitleButtons(titleBar, minimizeButton, scaleButton, closeButton);
         closeButton.setOnAction(actionEvent -> {
-            Platform.runLater(() -> {
-                    userEntity.setConnected(false);
-                    userRepository.saveAndFlush(userEntity);
-                    chatRepository.findByParticipantsContaining(userEntity).forEach(chat -> chat.getParticipants().stream()
-                            .filter(user -> !Objects.equals(user.getId(), userEntity.getId()))
-                            .forEach(user -> tcpBroker.sendMessage("UPDATE_CHAT_ROOMS:" + user.getId())));
-                    if (tcpConnection != null) {
-                        tcpConnection.disconnect();
-                    }
-                    tcpBroker.disconnect();
-                    Platform.exit();
-            });
+            if (context != null) {
+                context.close();
+            }
+            Platform.exit();
         });
+    }
+
+    public void setBaseWindowTitleCommands(Pane titleBar, Button minimizeButton, Button scaleButton, Button closeButton, TCPBroker tcpBroker) {
+        setWindowTitleButtons(titleBar, minimizeButton, scaleButton, closeButton);
+        closeButton.setOnAction(actionEvent -> tcpBroker.disconnect());
     }
 
     private void setWindowTitleButtons(Pane titleBar, Button minimizeButton, Button scaleButton, Button closeButton) {
@@ -286,7 +279,6 @@ public class GUIPatterns {
         delete.setPrefWidth(143);
         delete.setPrefHeight(31);
         Button buttonDelete = new Button("Удалить");
-        buttonDelete.setDisable(true);
         delete.setOnMouseEntered(mouseEvent1 -> {
             delete.setStyle("-fx-background-color: silver");
             buttonDelete.setStyle("-fx-background-color: silver; -fx-text-fill: white");
@@ -299,11 +291,9 @@ public class GUIPatterns {
         buttonDelete.setPrefHeight(31);
         buttonDelete.setStyle("-fx-background-color:  #18314D; -fx-text-fill: white");
         ImageView deleteImage = new ImageView(new Image(Objects.requireNonNull(GoLink.class.getResourceAsStream("/img/deleteTXT.png"))));
-        deleteImage.setDisable(true);
         deleteImage.setFitWidth(20);
         deleteImage.setFitHeight(20);
         AnchorPane deletePane = new AnchorPane();
-        deletePane.setDisable(true);
         deletePane.setPrefWidth(5);
         deletePane.setPrefHeight(31);
         delete.setLeft(deletePane);
@@ -317,7 +307,6 @@ public class GUIPatterns {
         copy.setPrefWidth(143);
         copy.setPrefHeight(31);
         Button buttonCopy = new Button("Копировать");
-        buttonCopy.setDisable(true);
         copy.setOnMouseEntered(mouseEvent1 -> {
             copy.setStyle("-fx-background-color: silver");
             buttonCopy.setStyle("-fx-background-color: silver; -fx-text-fill: white");
@@ -330,11 +319,9 @@ public class GUIPatterns {
         buttonCopy.setPrefHeight(31);
         buttonCopy.setStyle("-fx-background-color:  #18314D; -fx-text-fill: white");
         ImageView imageView = new ImageView(new Image(Objects.requireNonNull(GoLink.class.getResourceAsStream("/img/copyTXT.png"))));
-        imageView.setDisable(true);
         imageView.setFitWidth(20);
         imageView.setFitHeight(20);
         AnchorPane copyPane = new AnchorPane();
-        copyPane.setDisable(true);
         copyPane.setPrefWidth(5);
         copyPane.setPrefHeight(31);
         copy.setLeft(copyPane);
@@ -348,10 +335,11 @@ public class GUIPatterns {
         edit.setPrefWidth(143);
         edit.setPrefHeight(31);
         Button buttonEdit = new Button("Изменить");
-        buttonEdit.setDisable(true);
+
+        buttonEdit.setTextFill(Color.WHITE);
         edit.setOnMouseEntered(mouseEvent1 -> {
             edit.setStyle("-fx-background-color: silver");
-            buttonEdit.setStyle("-fx-background-color: silver; -fx-text-fill: white");
+            buttonEdit.setStyle("-fx-background-color: silver;");
         });
         edit.setOnMouseExited(mouseEvent1 -> {
             edit.setStyle("-fx-background-color: #18314D");
@@ -361,11 +349,11 @@ public class GUIPatterns {
         buttonEdit.setPrefHeight(31);
         buttonEdit.setStyle("-fx-background-color:  #18314D; -fx-text-fill: white");
         ImageView editImage = new ImageView(new Image(Objects.requireNonNull(GoLink.class.getResourceAsStream("/img/editTXT.png"))));
-        editImage.setDisable(true);
+
         editImage.setFitWidth(20);
         editImage.setFitHeight(20);
         AnchorPane editPane = new AnchorPane();
-        editPane.setDisable(true);
+
         editPane.setPrefWidth(5);
         editPane.setPrefHeight(31);
         edit.setLeft(editPane);
@@ -530,7 +518,7 @@ public class GUIPatterns {
         return hBox;
     }
 
-    public BorderPane getBackgroundEditInterface (MessageEntity message)  {
+    public BorderPane getBackgroundEditMessageInterface(String messageText)  {
         BorderPane editInterfaceBackground = new BorderPane();
         ImageView editImage = new ImageView(new Image(Objects.requireNonNull(GoLink.class.getResourceAsStream("/img/editTXT.png"))));
         editImage.setFitWidth(30);
@@ -542,7 +530,7 @@ public class GUIPatterns {
         redact.setFill(Paint.valueOf("WHITE"));
         redact.prefWidth(766);
         redact.prefHeight(22);
-        TextField editableText = new TextField(message.getMessage());
+        TextField editableText = new TextField(messageText);
         editableText.setPrefWidth(806);
         editableText.setPrefHeight(29);
         editableText.setEditable(false);

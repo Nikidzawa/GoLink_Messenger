@@ -13,6 +13,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
@@ -40,12 +41,10 @@ import java.net.Socket;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 @Controller
 public class GoLink implements TCPConnectionListener, GoMessageListener {
-
     @FXML
     private VBox chat;
 
@@ -115,21 +114,24 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
     @Setter
     private UserEntity userEntity;
     private ChatEntity selectedChat;
+    MessageEntity message;
+    HBox messageBackground;
     private boolean editable = false;
+    List<ChatEntity> myContacts = new ArrayList<>();
     @FXML
     @SneakyThrows
     void initialize() {
         Platform.runLater(() -> {
             try {
                 tcpBroker = new TCPBroker(new Socket("localhost", 8081), this, userEntity.getId().toString());
-            } catch (IOException e) {
+            } catch (IOException ex) {
                 Platform.exit();
             }
-            GUIPatterns.setBaseWindowTitleCommands(titleBar, minimizeButton, scaleButton, closeButton, tcpBroker, userEntity, userRepository, chatRepository);
+            GUIPatterns.setBaseWindowTitleCommands(titleBar, minimizeButton, scaleButton, closeButton, tcpBroker);
             myAvatar.setImage((new Image(new ByteArrayInputStream(userEntity.getAvatar().getMetadata()))));
 
             sendImageButton.setOnMouseClicked(mouseEvent -> selectImageConfig());
-            send.setOnMouseClicked(mouseEvent -> selectSendConfig());
+            send.setOnAction(actionEvent -> sendMessageConfiguration());
             GUIPatterns.makeInput(input);
             GUIPatterns.makeSearch(searchPanel);
             setSearchConfig();
@@ -137,19 +139,20 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
             updateChats();
         });
     }
-    private void selectSendConfig() {
-    }
 
     private void updateChats() {
         chats.getChildren().clear();
-        chatRepository.findByParticipantsContaining(userEntity).forEach(chatEnt -> {
-            UserEntity interlocutor = chatEnt.getParticipants().stream()
-                    .filter(userEntity1 -> !Objects.equals(userEntity1.getId(), userEntity.getId())).findFirst().get();
+        myContacts = userEntity.getChats();
+        if (!myContacts.isEmpty()) {
+            userEntity.getChats().forEach(chatEnt -> {
+                UserEntity interlocutor = chatEnt.getParticipants().stream()
+                        .filter(userEntity1 -> !Objects.equals(userEntity1.getId(), userEntity.getId())).findFirst().get();
 
-            BorderPane contact = GUIPatterns.newChatBuilder(userEntity, interlocutor, chatEnt);
-            chats.getChildren().add(contact);
-            contact.setOnMouseClicked(e -> openChat(chatEnt, interlocutor));
-        });
+                BorderPane contact = GUIPatterns.newChatBuilder(userEntity, interlocutor, chatEnt);
+                chats.getChildren().add(contact);
+                contact.setOnMouseClicked(e -> openChat(chatEnt, interlocutor));
+            });
+        }
     }
 
     private void openChat (ChatEntity chatEnt, UserEntity interlocutor) {
@@ -184,39 +187,53 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
                         throw new RuntimeException(exc);
                     }
                 }
-                GUIPatterns.setTcpConnection(tcpConnection);
                 chat.getChildren().clear();
                 chatRoomName.setText(interlocutor.getName());
                 printMessages(chatEnt);
                 scrolling();
-                send.setOnAction(actionEvent -> {
-                    if (editable) {return;}
-                    String text = input.getText();
-                    if (text != null) {
-                        if (Boolean.parseBoolean(new SOCSConnection().CHECK_USER(chatEnt.getPort(),
-                                interlocutor.getId().toString()))) {
-                            System.out.println("пользователь в сети");
-                        } else {
-                            tcpBroker.sendMessage("NOTIFICATION:" + interlocutor.getId() + ":" + chatEnt.getId());
-                        }
-                        MessageEntity message = MessageEntity.builder()
-                                .message(text).date(LocalDateTime.now()).sender(userEntity).build();
+            }
+    }
 
-                        try {
-                            try {
-                                chatEnt.getMessages().clear();
-                            } catch (NullPointerException ex) {}
-                            chatEnt.setMessages(message);
-                            messageRepository.saveAndFlush(message);
-                            chatRepository.saveAndFlush(chatEnt);
-                        } catch (JpaObjectRetrievalFailureException ex) {}
-                        tcpConnection.sendMessage(text);
-                        chat.getChildren().add(GUIPatterns.printMyMessage(message, LocalDateTime.now()));
-                        input.clear();
-                        scrolling();
+    private void sendMessageConfiguration() {
+        String text = input.getText();
+        if (!text.isEmpty()) {
+            if (editable) {
+                message.setMessage(text);
+                input.clear();
+
+                int number = chat.getChildren().indexOf(messageBackground);
+                chat.getChildren().remove(messageBackground);
+                HBox myMessage = GUIPatterns.printMyMessage(message, (message.getDate()));
+                myMessage.setOnMouseClicked(clickOnMessage -> {
+                    if (clickOnMessage.getButton() == MouseButton.SECONDARY) {
+                        setMessageFunctions(message, myMessage, clickOnMessage);
                     }
                 });
+                chat.getChildren().add(number, myMessage);
+                messageRepository.saveAndFlush(message);
+
+                if (Boolean.parseBoolean(new SOCSConnection().CHECK_USER(selectedChat.getPort(), interlocutor.getId().toString()))) {
+                    tcpBroker.sendMessage("UPDATE_MESSAGES:" + interlocutor.getId());
+                }
+                editable = false;
+                sendZone.setTop(null);
+            } else {
+                MessageEntity message = MessageEntity.builder()
+                        .message(text).date(LocalDateTime.now()).sender(userEntity).chat(selectedChat).build();
+                messageRepository.saveAndFlush(message);
+                tcpConnection.sendMessage(text);
+                HBox myMessage = GUIPatterns.printMyMessage(message, LocalDateTime.now());
+                myMessage.setOnMouseClicked(clickOnMessage -> {
+                    if (clickOnMessage.getButton() == MouseButton.SECONDARY) {
+                        setMessageFunctions(message, myMessage, clickOnMessage);
+                    }
+                });
+                chat.getChildren().add(myMessage);
+                input.clear();
+                sendNotification();
+                scrolling();
             }
+        }
     }
 
     public void printMessages(ChatEntity chatEntity) {
@@ -233,12 +250,10 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
                         return ((ImageEntity) obj).getDate();
                     }
                     return null;
-                }))
-                .toList();
+                })).toList();
 
         sortedMessages.forEach(message -> {
             boolean isMyMessage;
-
             if (message instanceof MessageEntity) {
                 isMyMessage = ((MessageEntity) message).getSender().getId().equals(userEntity.getId());
             } else {
@@ -248,7 +263,11 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
             if (message instanceof MessageEntity messageEntity) {
                 if (isMyMessage) {
                     HBox myMessage = GUIPatterns.printMyMessage(messageEntity, (messageEntity.getDate()));
-                    myMessage.setOnMouseClicked(clickOnMessage -> setEditeConfiguration(messageEntity, myMessage, clickOnMessage));
+                    myMessage.setOnMouseClicked(clickOnMessage -> {
+                        if (clickOnMessage.getButton() == MouseButton.SECONDARY) {
+                            setMessageFunctions(messageEntity, myMessage, clickOnMessage);
+                        }
+                    });
                     chat.getChildren().add(myMessage);
                 } else {
                     chat.getChildren().add(GUIPatterns.printForeignMessage(messageEntity.getMessage(), (messageEntity.getDate())));
@@ -261,81 +280,67 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
             }
         });
     }
-    private void setEditeConfiguration(MessageEntity message, HBox myMessage, MouseEvent clickOnMessage) {
+
+    private void setMessageFunctions(MessageEntity message, HBox myMessage, MouseEvent clickOnMessage) {
         Stage messageStage = new Stage();
+        this.message = message;
+        this.messageBackground = myMessage;
+        String messageText = message.getMessage();
 
-        BorderPane copy = GUIPatterns.copyMessageButton();
-        copy.setOnMouseClicked(mouseEvent -> {
-            copyMessageFunction(message);
+        BorderPane copyButton = GUIPatterns.copyMessageButton();
+        copyButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+            copyMessageFunction(messageText);
             messageStage.close();
         });
 
-        BorderPane edit = GUIPatterns.editeMessageButton();
-        edit.setOnMouseClicked(editEvent -> {
-            editMessageFunction(message);
+        BorderPane editButton = GUIPatterns.editeMessageButton();
+        editButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+            editMessageFunction(messageText);
             messageStage.close();
         });
 
-        BorderPane delete = GUIPatterns.deleteMessageButton();
-        delete.setOnMouseClicked(deleteEvent -> {
-            deleteMessageFunction(message, myMessage);
+        BorderPane deleteButton = GUIPatterns.deleteMessageButton();
+        deleteButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+            deleteMessageFunction(message);
             messageStage.close();
         });
 
-        GUIPatterns.openMessageWindow(message, clickOnMessage, messageStage, copy, edit, delete);
+        GUIPatterns.openMessageWindow(message, clickOnMessage, messageStage, copyButton, editButton, deleteButton);
     }
 
-    private void copyMessageFunction (MessageEntity message) {
-        String text = message.getMessage();
+    private void copyMessageFunction (String messageText) {
         Clipboard clipboard = Clipboard.getSystemClipboard();
         ClipboardContent content = new ClipboardContent();
-        content.putString(text);
+        content.putString(messageText);
         clipboard.setContent(content);
     }
-    private void deleteMessageFunction (MessageEntity message, HBox myMessage) {
-        CompletableFuture.runAsync(() -> {
-            messageRepository.delete(message);
-            selectedChat.getMessages().clear();
-            messageRepository.flush();
-            if (Boolean.parseBoolean(new SOCSConnection().CHECK_USER(selectedChat.getPort(), interlocutor.getId().toString()))) {
-                tcpBroker.sendMessage("UPDATE_MESSAGES:" + interlocutor.getId());
-            }
-        }).thenRun(() -> {
-            Platform.runLater(() -> {
-                chat.getChildren().remove(myMessage);
-            });
-        });
+    private void deleteMessageFunction (MessageEntity message) {
+        messageRepository.delete(message);
+        if (Boolean.parseBoolean(new SOCSConnection().CHECK_USER(selectedChat.getPort(), interlocutor.getId().toString()))) {
+            tcpBroker.sendMessage("UPDATE_MESSAGES:" + interlocutor.getId());
+        }
+        Platform.runLater(() -> chat.getChildren().remove(messageBackground));
     }
-    private void editMessageFunction (MessageEntity message) {
+    private void editMessageFunction (String messageText) {
         editable = true;
         ImageView cancelButton = GUIPatterns.getCancelButton();
-        BorderPane backgroundEditeInterface = GUIPatterns.getBackgroundEditInterface(message);
+        BorderPane backgroundEditeInterface = GUIPatterns.getBackgroundEditMessageInterface(messageText);
         backgroundEditeInterface.setRight(cancelButton);
         sendZone.setTop(backgroundEditeInterface);
-
-        send.setOnMouseClicked(mouseEvent -> {
-            if (editable) {
-                message.setMessage(input.getText());
-                input.clear();
-                messageRepository.saveAndFlush(message);
-                try {
-                    chatRepository.saveAndFlush(selectedChat);
-                } catch (JpaObjectRetrievalFailureException exception) {
-
-                }
-                if (Boolean.parseBoolean(new SOCSConnection().CHECK_USER(selectedChat.getPort(), interlocutor.getId().toString()))) {
-                    tcpBroker.sendMessage("UPDATE_MESSAGES:" + interlocutor.getId());
-                }
-                editable = false;
-                sendZone.setTop(null);
-                updateMessages(selectedChat);
-            }
-        });
         cancelButton.setOnMouseClicked(mouseEvent -> {
             editable = false;
             sendZone.setTop(null);
             updateMessages(selectedChat);
         });
+    }
+
+    private void sendNotification () {
+        if (Boolean.parseBoolean(new SOCSConnection().CHECK_USER(selectedChat.getPort(),
+                interlocutor.getId().toString()))) {
+            System.out.println("пользователь в сети");
+        } else {
+            tcpBroker.sendMessage("NOTIFICATION:" + interlocutor.getId() + ":" + selectedChat.getId());
+        }
     }
 
     private void selectImageConfig() {
@@ -443,9 +448,7 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
     }
 
     @Override
-    public void onDisconnect(TCPConnection tcpConnection) {
-        tcpConnection.disconnect();
-    }
+    public void onDisconnect(TCPConnection tcpConnection) {}
 
     @Override
     public void onConnectionReady(TCPBroker tcpBroker) {
@@ -477,5 +480,20 @@ public class GoLink implements TCPConnectionListener, GoMessageListener {
     }
 
     @Override
-    public void onDisconnect(TCPBroker tcpBroker) {tcpBroker.disconnect();}
+    public void onDisconnect(TCPBroker tcpBroker) {
+        userEntity.setConnected(false);
+        userRepository.saveAndFlush(userEntity);
+        Platform.runLater(() -> {
+            if (!myContacts.isEmpty()) {
+                myContacts.forEach(chat -> chat.getParticipants().stream()
+                        .filter(user -> !Objects.equals(user.getId(), userEntity.getId()))
+                        .forEach(user -> tcpBroker.sendMessage("UPDATE_CHAT_ROOMS:" + user.getId())));
+            }
+            if (tcpConnection != null) {
+                tcpConnection.disconnect();
+            }
+            tcpBroker.disconnect();
+            Platform.exit();
+        });
+    }
 }

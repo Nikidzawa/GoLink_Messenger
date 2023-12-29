@@ -66,7 +66,7 @@
             </LinearGradient>
          </fill>
       </Text>
-      <VBox fx:id="menuItem" layoutX="712.0" layoutY="52.0" prefHeight="534.0" prefWidth="498.0" />
+      <VBox spacing="15" fx:id="menuItem" layoutX="712.0" layoutY="52.0" prefHeight="534.0" prefWidth="498.0" />
       <HBox alignment="TOP_RIGHT" prefHeight="38.0" prefWidth="1200.0" style="-fx-background-color: #18314D;">
          <children>
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="GoLink" wrappingWidth="80.13671875">

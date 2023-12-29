@@ -3,6 +3,8 @@ package ru.nikidzawa.golink.store.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -28,4 +30,7 @@ public class UserEntity {
 
     @OneToOne
     private ImageEntity avatar;
+
+    @ManyToMany(mappedBy = "participants", fetch = FetchType.EAGER)
+    private List<ChatEntity> chats;
 }

@@ -73,9 +73,7 @@ public class VerifyNumber {
 
     @FXML
     void initialize() {
-        Platform.runLater(() -> GUIPatterns.setBaseWindowTitleCommands(titleBar, minimizeButton, scaleButton, closeButton));
-        menuItem.setSpacing(15);
-        area.setSpacing(25);
+        Platform.runLater(() -> GUIPatterns.setBaseWindowTitleCommands(titleBar, minimizeButton, scaleButton, closeButton, context));
 
         goBack.setOnMouseClicked(mouseEvent -> goBack());
         final int maxLength = 1;

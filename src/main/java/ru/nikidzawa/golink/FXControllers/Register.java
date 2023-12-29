@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 import ru.nikidzawa.golink.FXControllers.helpers.GUIPatterns;
+import ru.nikidzawa.golink.services.SMSAuthenticate;
 import ru.nikidzawa.golink.store.entities.UserEntity;
 import ru.nikidzawa.golink.store.repositories.UserRepository;
 
@@ -64,10 +65,12 @@ public class Register {
     @Autowired
     GUIPatterns GUIPatterns;
 
+    @Autowired
+    SMSAuthenticate smsAuthenticate;
+
     @FXML
     void initialize() {
-        Platform.runLater(() -> GUIPatterns.setBaseWindowTitleCommands(titleBar, minimizeButton, scaleButton, closeButton));
-        menuItem.setSpacing(15);
+        Platform.runLater(() -> GUIPatterns.setBaseWindowTitleCommands(titleBar, minimizeButton, scaleButton, closeButton, context));
 
         GUIPatterns.setConfig(phone);
         login.setOnMouseClicked(e -> fxLogin());
@@ -110,7 +113,7 @@ public class Register {
     private void loadAuth(Long inputNumber) {
         String code = generateCode();
         System.out.println(code);
-  //      SMSAuthenticate.sendMessage(code, phone.getText());
+//        smsAuthenticate.sendMessage(code, phone.getText());
         enter.getScene().getWindow().hide();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("verify.fxml"));
         loader.setControllerFactory(context::getBean);

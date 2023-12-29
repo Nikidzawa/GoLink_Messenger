@@ -65,8 +65,7 @@ public class Login {
 
     @FXML
     void initialize() {
-        Platform.runLater(() -> GUIPatterns.setBaseWindowTitleCommands(titleBar, minimizeButton, scaleButton, closeButton));
-        menuItem.setSpacing(15);
+        Platform.runLater(() -> GUIPatterns.setBaseWindowTitleCommands(titleBar, minimizeButton, scaleButton, closeButton, context));
 
         GUIPatterns.setConfig(phone);
 
