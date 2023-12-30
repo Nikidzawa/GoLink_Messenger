@@ -31,6 +31,6 @@ public class UserEntity {
     @OneToOne
     private ImageEntity avatar;
 
-    @ManyToMany(mappedBy = "participants", fetch = FetchType.EAGER)
-    private List<ChatEntity> chats;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<PersonalChat> userChats;
 }

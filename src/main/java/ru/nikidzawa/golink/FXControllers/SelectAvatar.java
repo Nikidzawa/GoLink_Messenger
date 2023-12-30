@@ -111,7 +111,7 @@ public class SelectAvatar {
     private void registration () {
         String userName = name.getText();
         String userNickname = nickname.getText();
-        Optional<UserEntity> user = userRepository.findByNickname(userNickname);
+        Optional<UserEntity> user = userRepository.findFirstByNickname(userNickname);
         if (userName.length() > 25) exception("Ограничение на длину имени составляет 25 символов");
         else if (user.isPresent()) exception("Пользователь с таким никнеймом уже существует");
         else if (imageMetadata == null) exception("Выберите фото");

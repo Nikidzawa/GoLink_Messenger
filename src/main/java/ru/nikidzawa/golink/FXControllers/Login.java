@@ -73,7 +73,7 @@ public class Login {
             UserEntity user = null;
             try {
                 long phoneValue = Long.parseLong(phone.getText());
-                user = userRepository.findByPhone(phoneValue);
+                user = userRepository.findFirstByPhone(phoneValue);
             } catch (NumberFormatException ex) {
                 exception();
                 initialize();

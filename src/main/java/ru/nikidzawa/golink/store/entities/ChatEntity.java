@@ -3,7 +3,6 @@ package ru.nikidzawa.golink.store.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -19,25 +18,12 @@ public class ChatEntity {
 
     private int port;
 
-    @ManyToMany (fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "chat_participants",
-            joinColumns = @JoinColumn(name = "chat_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    private List<UserEntity> participants;
-
     @OneToMany(mappedBy = "chat", cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     private List<MessageEntity> messages;
 
     @OneToMany(mappedBy = "chat", cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     private List<ImageEntity> images;
 
-    public void setMessages (MessageEntity message) {
-        if (messages == null) {
-            messages = new ArrayList<>();
-        }
-        messages.add(message);
-        message.setChat(this);
-    }
+    @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<PersonalChat> personalChats;
 }

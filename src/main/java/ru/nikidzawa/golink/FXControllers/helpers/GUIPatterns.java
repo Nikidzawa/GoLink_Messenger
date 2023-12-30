@@ -33,6 +33,7 @@ import ru.nikidzawa.golink.network.TCPConnection;
 import ru.nikidzawa.golink.services.GoMessage.TCPBroker;
 import ru.nikidzawa.golink.store.entities.ChatEntity;
 import ru.nikidzawa.golink.store.entities.MessageEntity;
+import ru.nikidzawa.golink.store.entities.PersonalChat;
 import ru.nikidzawa.golink.store.entities.UserEntity;
 import ru.nikidzawa.golink.store.repositories.ChatRepository;
 import ru.nikidzawa.golink.store.repositories.UserRepository;
@@ -59,9 +60,9 @@ public class GUIPatterns {
         });
     }
 
-    public void setBaseWindowTitleCommands(Pane titleBar, Button minimizeButton, Button scaleButton, Button closeButton, TCPBroker tcpBroker) {
+    public void setBaseWindowTitleCommands(Pane titleBar, Button minimizeButton, Button scaleButton, Button closeButton, ExitListener listener) {
         setWindowTitleButtons(titleBar, minimizeButton, scaleButton, closeButton);
-        closeButton.setOnAction(actionEvent -> tcpBroker.disconnect());
+        closeButton.setOnAction(actionEvent -> listener.onExit());
     }
 
     private void setWindowTitleButtons(Pane titleBar, Button minimizeButton, Button scaleButton, Button closeButton) {
@@ -166,7 +167,7 @@ public class GUIPatterns {
         });
     }
 
-    public BorderPane newChatBuilder(UserEntity myAccount, UserEntity interlocutor, ChatEntity chat) {
+    public BorderPane newChatBuilder(UserEntity myAccount, UserEntity interlocutor, ChatEntity chat, PersonalChat personalChat) {
         BorderPane borderPane = new BorderPane();
         borderPane.setCursor(Cursor.HAND);
         StackPane stackImg = new StackPane();
@@ -215,21 +216,23 @@ public class GUIPatterns {
             }
 
             date.setFill(Paint.valueOf("white"));
-            if (0 > 0) {
+            vBox.getChildren().add(date);
+            Translate translate = new Translate();
+            translate.setX(-7);
+            vBox.getTransforms().add(translate);
+
+            byte newMessages = personalChat.getNewMessagesCount();
+            if (newMessages > 0) {
                 StackPane newMessagesVisualize = new StackPane();
                 Circle circle = new Circle();
                 circle.setRadius(12);
                 circle.setFill(Paint.valueOf("#80c3ff"));
                 circle.setStroke(Paint.valueOf("black"));
-                Text newMessageCount = new Text((0 >= 100 ? "99+" : String.valueOf(0)));
+                Text newMessageCount = new Text(newMessages >= 100 ? "99+" : String.valueOf(newMessages));
                 newMessagesVisualize.getChildren().add(circle);
                 newMessagesVisualize.getChildren().add(newMessageCount);
                 vBox.getChildren().add(newMessagesVisualize);
             }
-            vBox.getChildren().add(date);
-            Translate translate = new Translate();
-            translate.setX(-7);
-            vBox.getTransforms().add(translate);
 
             borderPane.setRight(vBox);
         } else { lastMessageInfo.setText("Чат пуст"); }

@@ -84,7 +84,7 @@ public class Register {
                 initialize();
                 phone.clear();
             }
-            UserEntity user = userRepository.findByPhone(inputNumber);
+            UserEntity user = userRepository.findFirstByPhone(inputNumber);
 
             if (user != null) exception("Номер телефона уже зарегистрирован");
             else if (password.getText().length() < 6) exception("Минимальный размер пароля должен составлять 6 символов");
