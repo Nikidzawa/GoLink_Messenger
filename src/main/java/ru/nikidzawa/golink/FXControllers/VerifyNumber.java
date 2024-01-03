@@ -100,7 +100,6 @@ public class VerifyNumber {
             });
             area.getChildren().add(textField);
         }
-        area.getChildren().get(0).requestFocus();
     }
     private void handleInput(TextField currentTextField, int index, KeyEvent event) {
         String input = event.getText();

@@ -39,7 +39,7 @@ public class TCPConnection {
         ous.flush();
     }
 
-    private void  start () {
+    private void start () {
         thread = new Thread(() -> {
             listener.onConnectionReady(TCPConnection.this);
             while (!Thread.interrupted()) {

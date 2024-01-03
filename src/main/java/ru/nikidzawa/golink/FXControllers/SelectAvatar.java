@@ -9,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
@@ -85,11 +86,28 @@ public class SelectAvatar {
 
         image.setOnMouseClicked(mouseEvent -> selectImage());
 
+        name.setOnKeyPressed(keyEvent -> {
+            if (keyEvent.getCode() == KeyCode.ENTER) {
+                if (nickname.getText().isEmpty()) {
+                    nickname.requestFocus();
+                } else registration();
+            }
+        });
+
+        nickname.setOnKeyPressed(keyEvent -> {
+            if (keyEvent.getCode() == KeyCode.ENTER) {
+                if (name.getText().isEmpty()) {
+                    name.requestFocus();
+                }
+                else if (imageMetadata == null) selectImage();
+                else registration();
+            }
+        });
+
         enter.setOnAction(actionEvent -> registration());
     }
 
     private void selectImage () {
-
         Platform.runLater(() -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.getExtensionFilters().addAll(
@@ -111,10 +129,9 @@ public class SelectAvatar {
     private void registration () {
         String userName = name.getText();
         String userNickname = nickname.getText();
-        Optional<UserEntity> user = userRepository.findFirstByNickname(userNickname);
         if (userName.length() > 25) exception("Ограничение на длину имени составляет 25 символов");
-        else if (user.isPresent()) exception("Пользователь с таким никнеймом уже существует");
         else if (imageMetadata == null) exception("Выберите фото");
+        else if (userRepository.findFirstByNickname(userNickname).isPresent()) exception("Пользователь с таким никнеймом уже существует");
         else {
             UserEntity userEntity = UserEntity.builder()
                     .name(userName)
@@ -140,14 +157,16 @@ public class SelectAvatar {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("menu.fxml"));
         loader.setControllerFactory(context::getBean);
         loader.load();
+        Parent root = loader.getRoot();
+        Scene scene = new Scene(root);
 
         GoLink goLink = loader.getController();
         goLink.setUserEntity(user);
+        goLink.setScene(scene);
 
-        Parent root = loader.getRoot();
         Stage stage = new Stage();
         stage.initStyle(StageStyle.UNDECORATED);
-        stage.setScene(new Scene(root));
+        stage.setScene(scene);
         stage.show();
     }
     private void exception (String message) {

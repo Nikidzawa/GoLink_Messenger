@@ -552,6 +552,19 @@ public class GUIPatterns {
         return cancel;
     }
 
+    public void setEmptyChatConfiguration (VBox chat) {
+        chat.getChildren().clear();
+        AnchorPane anchorPane = new AnchorPane();
+        anchorPane.setPrefWidth(876);
+        anchorPane.setPrefHeight(382);
+        TextField textField = new TextField("Выбиррите, кому хотели бы написать");
+        textField.setFont(Font.font(17));
+        textField.setAlignment(Pos.CENTER);
+        textField.setStyle("-fx-text-fill: white; -fx-background-color: #001933");
+        chat.getChildren().add(anchorPane);
+        chat.getChildren().add(textField);
+    }
+
     private boolean checkMessageWindowStatusBeforeOpen(Long messageId, Stage stage) {
         if (messageStage == null) {
             messageStage = new MessageStage();

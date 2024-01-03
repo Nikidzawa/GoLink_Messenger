@@ -4,15 +4,13 @@ import io.github.gleidson28.GNAvatarView;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
@@ -20,7 +18,6 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import lombok.Setter;
 import lombok.SneakyThrows;
-import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
 import org.springframework.stereotype.Controller;
@@ -115,6 +112,8 @@ public class GoLink implements TCPConnectionListener, GoMessageListener, ExitLis
     private UserEntity interlocutor;
     @Setter
     private UserEntity userEntity;
+    @Setter
+    private Scene scene;
     private ChatEntity selectedChat;
     MessageEntity message;
     HBox messageBackground;
@@ -134,6 +133,24 @@ public class GoLink implements TCPConnectionListener, GoMessageListener, ExitLis
 
             sendImageButton.setOnMouseClicked(mouseEvent -> selectImageConfig());
             send.setOnAction(actionEvent -> sendMessageConfiguration());
+            scene.setOnKeyPressed(keyEvent -> {
+                if (selectedChat != null && keyEvent.getCode() == KeyCode.ENTER) {
+                    sendMessageConfiguration();
+                }
+                if (keyEvent.getCode() == KeyCode.ESCAPE && tcpConnection != null) {
+                    tcpConnection.disconnect();
+                    tcpConnection = null;
+                    selectedChat = null;
+                    GUIPatterns.setEmptyChatConfiguration(chat);
+                    status.setVisible(false);
+                    sendImageButton.setVisible(false);
+                    send.setVisible(false);
+                    input.setVisible(false);
+                    editable = false;
+                    chatRoomName.setText("");
+                }
+            });
+
             GUIPatterns.makeInput(input);
 
             GUIPatterns.makeSearch(searchPanel);
@@ -166,7 +183,7 @@ public class GoLink implements TCPConnectionListener, GoMessageListener, ExitLis
             if (personalChats != null && !personalChats.isEmpty()) {
                 personalChats.forEach(personalChat -> {
                     UserEntity interlocutor = personalChat.getInterlocutor();
-                    BorderPane contact = GUIPatterns.newChatBuilder(userEntity, interlocutor, personalChat.getChat(), personalChat);
+                    BorderPane contact = GUIPatterns.newChatBuilder(userEntity, interlocutor, personalChat.getChat() , personalChat);
                     chats.getChildren().add(contact);
                     contact.setOnMouseClicked(e -> openChat(personalChat.getChat(), personalChat, interlocutor));
                 });
@@ -186,6 +203,7 @@ public class GoLink implements TCPConnectionListener, GoMessageListener, ExitLis
                 input.setVisible(true);
                 input.setStyle("-fx-background-color: #001933; -fx-border-color: blue; -fx-text-fill: white; -fx-border-width: 0 0 2 0");
                 send.setVisible(true);
+                chatRoomName.setText(interlocutor.getName());
 
                 selectedChat = chat;
                 if (tcpConnection != null) {
@@ -210,7 +228,6 @@ public class GoLink implements TCPConnectionListener, GoMessageListener, ExitLis
                     }
                 }
                 this.chat.getChildren().clear();
-                chatRoomName.setText(interlocutor.getName());
                 printMessages(chat);
                 scrolling();
             }
@@ -260,7 +277,6 @@ public class GoLink implements TCPConnectionListener, GoMessageListener, ExitLis
 
     public void printMessages(ChatEntity chatEntity) {
         ChatEntity selectedChat = chatRepository.findById(chatEntity.getId()).orElseThrow();
-
         List<Object> sortedMessages = Stream.concat(
                         selectedChat.getMessages().stream(),
                         selectedChat.getImages().stream()

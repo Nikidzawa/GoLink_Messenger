@@ -9,6 +9,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -69,21 +71,33 @@ public class Login {
 
         GUIPatterns.setConfig(phone);
 
-        enter.setOnAction(e -> {
-            UserEntity user = null;
-            try {
-                long phoneValue = Long.parseLong(phone.getText());
-                user = userRepository.findFirstByPhone(phoneValue);
-            } catch (NumberFormatException ex) {
-                exception();
-                initialize();
-            }
+        enter.setOnAction(e -> enterEvent());
 
-            if (user != null && user.getPassword().equals(password.getText())) fxMenu(user);
-            else exception();
+        password.setOnKeyPressed(keyEvent -> {
+            if (keyEvent.getCode() == KeyCode.ENTER) enterEvent();
+        });
+        phone.setOnKeyPressed(keyEvent -> {
+            if (keyEvent.getCode() == KeyCode.ENTER)
+                if (password.getText().isEmpty()) {
+                    password.requestFocus();
+                } else enterEvent();
         });
 
         register.setOnMouseClicked(MouseEvent -> fxRegister());
+    }
+
+    private void enterEvent() {
+        UserEntity user;
+        try {
+            long phoneValue = Long.parseLong(phone.getText());
+            user = userRepository.findFirstByPhone(phoneValue);
+        } catch (NumberFormatException ex) {
+            exception();
+            return;
+        }
+
+        if (user != null && user.getPassword().equals(password.getText())) fxMenu(user);
+        else exception();
     }
 
     @SneakyThrows
@@ -92,13 +106,15 @@ public class Login {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("menu.fxml"));
         loader.setControllerFactory(context::getBean);
         Parent root = loader.load();
+        Scene scene = new Scene(root);
 
         GoLink goLink = loader.getController();
         goLink.setUserEntity(user);
+        goLink.setScene(scene);
 
         Stage stage = new Stage();
         stage.initStyle(StageStyle.UNDECORATED);
-        stage.setScene(new Scene(root));
+        stage.setScene(scene);
         stage.show();
     }
     @SneakyThrows

@@ -9,6 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -75,24 +76,35 @@ public class Register {
         GUIPatterns.setConfig(phone);
         login.setOnMouseClicked(e -> fxLogin());
 
-        enter.setOnAction(e -> {
-            Long inputNumber = null;
-            try {
-                inputNumber = Long.parseLong(phone.getText());
-            } catch (NumberFormatException ex) {
-                exception("Неверный формат телефона");
-                initialize();
-                phone.clear();
-            }
-            UserEntity user = userRepository.findFirstByPhone(inputNumber);
-
-            if (user != null) exception("Номер телефона уже зарегистрирован");
-            else if (password.getText().length() < 6) exception("Минимальный размер пароля должен составлять 6 символов");
-            else if (password.getText().length() > 35) exception("Придумайте пароль покороче");
-            else loadAuth(inputNumber);
-
+        password.setOnKeyPressed(keyEvent -> {
+            if (keyEvent.getCode() == KeyCode.ENTER) enterEvent();
         });
+        phone.setOnKeyPressed(keyEvent -> {
+            if (keyEvent.getCode() == KeyCode.ENTER)
+                if (password.getText().isEmpty()) {
+                    password.requestFocus();
+                } else enterEvent();
+        });
+
+        enter.setOnAction(e -> enterEvent());
     }
+
+    private void enterEvent() {
+        Long inputNumber = null;
+        try {
+            inputNumber = Long.parseLong(phone.getText());
+        } catch (NumberFormatException ex) {
+            exception("Неверный формат телефона");
+            phone.clear();
+            return;
+        }
+
+        if (password.getText().length() < 6) exception("Минимальный размер пароля должен составлять 6 символов");
+        else if (password.getText().length() > 35) exception("Придумайте пароль покороче");
+        else if (userRepository.findFirstByPhone(inputNumber) != null) exception("Номер телефона уже зарегистрирован");
+        else loadAuth(inputNumber);
+    }
+
     @SneakyThrows
     private void fxLogin () {
         login.getScene().getWindow().hide();
