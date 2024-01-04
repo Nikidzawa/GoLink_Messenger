@@ -538,7 +538,7 @@ public class GUIPatterns {
         AnchorPane anchorPane = new AnchorPane();
         anchorPane.setPrefWidth(876);
         anchorPane.setPrefHeight(382);
-        TextField textField = new TextField("Выбиррите, кому хотели бы написать");
+        TextField textField = new TextField("Выберите, кому хотели бы написать");
         textField.setFont(Font.font(17));
         textField.setAlignment(Pos.CENTER);
         textField.setStyle("-fx-text-fill: white; -fx-background-color: #001933");

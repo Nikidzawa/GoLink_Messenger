@@ -90,7 +90,7 @@
                   <VBox fx:id="chat" prefHeight="1028.0" prefWidth="876.0" style="-fx-background-color: #001933;">
                      <children>
                         <AnchorPane prefHeight="382.0" prefWidth="876.0" />
-                        <TextField alignment="CENTER" editable="false" prefHeight="32.0" prefWidth="855.0" style="-fx-text-fill: white; -fx-background-color: #001933;" text="Выбирите, кому хотели бы написать">
+                        <TextField alignment="CENTER" editable="false" prefHeight="32.0" prefWidth="855.0" style="-fx-text-fill: white; -fx-background-color: #001933;" text="Выберите, кому хотели бы написать">
                            <font>
                               <Font size="17.0" />
                            </font>
