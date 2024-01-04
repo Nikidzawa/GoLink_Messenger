@@ -50,29 +50,15 @@ public class MessageBroker implements GoMessageListener{
         } catch (ArrayIndexOutOfBoundsException ex) {
             value = null;
         }
-        switch (command) {
-            case "UPDATE_CHAT_ROOMS" -> {
-                try {
-                    connections.get(userId).sendMessage("UPDATE_CHAT_ROOMS");
-                } catch (NullPointerException ex) {
-                    System.out.println("Пользователь не в сети");
-                }
+        try {
+            switch (command) {
+                case "UPDATE_CHAT_ROOMS" -> connections.get(userId).sendMessage("UPDATE_CHAT_ROOMS");
+                case "UPDATE_MESSAGES" -> connections.get(userId).sendMessage("UPDATE_MESSAGES");
+                case "NOTIFICATION" -> connections.get(userId).sendMessage("NOTIFICATION:" + value);
+                case "CHECK_USER_STATUS" -> tcpBroker.sendMessage("STATUS:" + connections.containsKey(userId));
             }
-            case "UPDATE_MESSAGES" -> {
-                try {
-                    connections.get(userId).sendMessage("UPDATE_MESSAGES");
-                } catch (NullPointerException ex) {
-                    System.out.println("Пользователь не в сети");
-                }
-            }
-            case "NOTIFICATION" -> {
-                try {
-                    connections.get(userId).sendMessage("NOTIFICATION:" + value);
-                } catch (NullPointerException ex) {
-                    System.out.println("Пользователь не в сети");
-                }
-            }
-            case "CHECK_USER_STATUS" -> tcpBroker.sendMessage("STATUS:" + connections.containsKey(userId));
+        } catch (NullPointerException ex) {
+            System.out.println("Получатель не в сети");
         }
     }
 

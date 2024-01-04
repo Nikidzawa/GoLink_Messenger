@@ -101,7 +101,7 @@ public class Register {
 
         if (password.getText().length() < 6) exception("Минимальный размер пароля должен составлять 6 символов");
         else if (password.getText().length() > 35) exception("Придумайте пароль покороче");
-        else if (userRepository.findFirstByPhone(inputNumber) != null) exception("Номер телефона уже зарегистрирован");
+        else if (userRepository.findFirstByPhone(inputNumber).isPresent()) exception("Номер телефона уже зарегистрирован");
         else loadAuth(inputNumber);
     }
 

@@ -14,17 +14,13 @@ import java.time.LocalDateTime;
 public class ImageEntity {
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
 
-    byte[] metadata;
+    private byte[] metadata;
 
-    LocalDateTime date;
+    private LocalDateTime date;
 
     @ManyToOne
     @JoinColumn(name = "sender_id")
-    private UserEntity sender;
-
-    @ManyToOne
-    @JoinColumn(name = "chat_id")
-    private ChatEntity chat;
+    private UserEntity owner;
 }

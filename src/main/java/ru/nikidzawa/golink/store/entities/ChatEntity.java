@@ -21,9 +21,6 @@ public class ChatEntity {
     @OneToMany(mappedBy = "chat", cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     private List<MessageEntity> messages;
 
-    @OneToMany(mappedBy = "chat", cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
-    private List<ImageEntity> images;
-
     @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<PersonalChat> personalChats;
 }

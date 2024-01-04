@@ -142,7 +142,7 @@ public class SelectAvatar {
             userRepository.saveAndFlush(userEntity);
             ImageEntity imageEntity = ImageEntity.builder()
                     .metadata(imageMetadata)
-                    .sender(userEntity)
+                    .owner(userEntity)
                     .build();
             imageRepository.saveAndFlush(imageEntity);
             userEntity.setAvatar(imageEntity);
@@ -163,6 +163,7 @@ public class SelectAvatar {
         GoLink goLink = loader.getController();
         goLink.setUserEntity(user);
         goLink.setScene(scene);
+        goLink.setContext(context);
 
         Stage stage = new Stage();
         stage.initStyle(StageStyle.UNDECORATED);

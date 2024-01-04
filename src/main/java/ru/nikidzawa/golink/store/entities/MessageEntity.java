@@ -15,11 +15,17 @@ public class MessageEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String message;
+
+    private byte[] metadata;
+
     private LocalDateTime date;
+
     @ManyToOne
     @JoinColumn(name = "sender_id", nullable = false)
     private UserEntity sender;
+
     @ManyToOne
     @JoinColumn(name = "chat_id", nullable = false)
     private ChatEntity chat;

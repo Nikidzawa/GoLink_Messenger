@@ -10,7 +10,6 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -26,6 +25,7 @@ import ru.nikidzawa.golink.store.entities.UserEntity;
 import ru.nikidzawa.golink.store.repositories.UserRepository;
 
 import java.util.Objects;
+import java.util.Optional;
 
 @Controller
 public class Login {
@@ -87,17 +87,17 @@ public class Login {
     }
 
     private void enterEvent() {
-        UserEntity user;
         try {
             long phoneValue = Long.parseLong(phone.getText());
-            user = userRepository.findFirstByPhone(phoneValue);
+            if (userRepository.existsByPhoneAndPassword(phoneValue, password.getText())) {
+                Optional<UserEntity> userEntity = userRepository.findFirstByPhone(phoneValue);
+                fxMenu(userEntity.orElseThrow());
+            } else {
+                exception();
+            }
         } catch (NumberFormatException ex) {
             exception();
-            return;
         }
-
-        if (user != null && user.getPassword().equals(password.getText())) fxMenu(user);
-        else exception();
     }
 
     @SneakyThrows
@@ -111,6 +111,7 @@ public class Login {
         GoLink goLink = loader.getController();
         goLink.setUserEntity(user);
         goLink.setScene(scene);
+        goLink.setContext(context);
 
         Stage stage = new Stage();
         stage.initStyle(StageStyle.UNDECORATED);
