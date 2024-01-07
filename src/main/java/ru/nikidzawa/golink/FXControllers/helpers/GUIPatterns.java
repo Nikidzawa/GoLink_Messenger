@@ -148,18 +148,18 @@ public class GUIPatterns {
         });
     }
 
-    public BorderPane newChatBuilder(UserEntity myAccount, UserEntity interlocutor, ChatEntity chat, PersonalChat personalChat) {
+    public BorderPane newChatBuilder(UserEntity myAccount, Contact contact, PersonalChat personalChat) {
         BorderPane borderPane = new BorderPane();
         borderPane.setCursor(Cursor.HAND);
         StackPane stackImg = new StackPane();
         GNAvatarView avatar = new GNAvatarView();
-        avatar.setImage(new Image(new ByteArrayInputStream(interlocutor.getAvatar().getMetadata())));
+        avatar.setImage(new Image(new ByteArrayInputStream(contact.getInterlocutor().getAvatar().getMetadata())));
         avatar.setType(AvatarType.CIRCLE);
         avatar.setStroke(Paint.valueOf("#001933"));
         stackImg.getChildren().add(avatar);
         stackImg.setPrefHeight(60);
         stackImg.setPrefWidth(60);
-        if (interlocutor.isConnected()) {
+        if (contact.getInterlocutor().isConnected()) {
             Circle circle = new Circle();
             circle.setFill(Paint.valueOf("GREEN"));
             circle.setRadius(7);
@@ -171,7 +171,7 @@ public class GUIPatterns {
         borderPane.setLeft(stackImg);
 
         BorderPane nameAndLastMessage = new BorderPane();
-        Text name = new Text(interlocutor.getName());
+        Text name = new Text(contact.getInterlocutor().getName());
         name.setTextAlignment(TextAlignment.LEFT);
         name.setFont(Font.font("System", 18));
         name.setFill(Paint.valueOf("white"));
@@ -180,43 +180,40 @@ public class GUIPatterns {
         lastMessageInfo.setStyle("-fx-background-color: #001933; -fx-text-fill: white");
         lastMessageInfo.setDisable(true);
         nameAndLastMessage.setLeft(lastMessageInfo);
-        List<MessageEntity> messages = chat.getMessages();
+        List<MessageEntity> messages = contact.getChat().getMessages();
         nameAndLastMessage.setPadding(new Insets(0, 0, 0, 10));
         borderPane.setCenter(nameAndLastMessage);
-        if (!messages.isEmpty()) {
+        VBox vBox = new VBox();
+        vBox.setSpacing(5);
+        Text date = new Text();
+        if (messages != null && !messages.isEmpty()) {
             MessageEntity lastMessage = messages.get(messages.size() - 1);
             String sender = lastMessage.getSender().getId().equals(myAccount.getId()) ? "Вы: " : "";
             lastMessageInfo.setText(sender + lastMessage.getMessage());
-            VBox vBox = new VBox();
-            vBox.setSpacing(5);
-            Text date = new Text();
-            try {
-                date.setText(lastMessage.getDate().format(DateTimeFormatter.ofPattern("HH:mm")));
-            } catch (IndexOutOfBoundsException ex) {
-                date.setText("");
-            }
+            date.setText(lastMessage.getDate().format(DateTimeFormatter.ofPattern("HH:mm")));
 
+        } else { lastMessageInfo.setText("Чат пуст"); }
             date.setFill(Paint.valueOf("white"));
             vBox.getChildren().add(date);
             Translate translate = new Translate();
             translate.setX(-7);
             vBox.getTransforms().add(translate);
 
-            byte newMessages = personalChat.getNewMessagesCount();
-            if (newMessages > 0) {
-                StackPane newMessagesVisualize = new StackPane();
-                Circle circle = new Circle();
-                circle.setRadius(12);
-                circle.setFill(Paint.valueOf("#80c3ff"));
-                circle.setStroke(Paint.valueOf("black"));
-                Text newMessageCount = new Text(newMessages >= 100 ? "99+" : String.valueOf(newMessages));
-                newMessagesVisualize.getChildren().add(circle);
-                newMessagesVisualize.getChildren().add(newMessageCount);
-                vBox.getChildren().add(newMessagesVisualize);
-            }
+            int newMessages = personalChat.getNewMessagesCount();
 
+            StackPane newMessagesVisualize = new StackPane();
+            Circle circle = new Circle();
+            circle.setRadius(12);
+            circle.setFill(Paint.valueOf("#80c3ff"));
+            circle.setStroke(Paint.valueOf("black"));
+            Text newMessageCount = new Text(newMessages >= 100 ? "99+" : String.valueOf(newMessages));
+            newMessagesVisualize.getChildren().add(circle);
+            newMessagesVisualize.getChildren().add(newMessageCount);
+            vBox.getChildren().add(newMessagesVisualize);
+            if (newMessages == 0) {
+                newMessagesVisualize.setVisible(false);
+            }
             borderPane.setRight(vBox);
-        } else { lastMessageInfo.setText("Чат пуст"); }
 
         borderPane.setOnMouseEntered(mouseEvent -> {
             lastMessageInfo.setStyle("-fx-background-color: #34577F; -fx-text-fill: white");
@@ -226,6 +223,13 @@ public class GUIPatterns {
             lastMessageInfo.setStyle("-fx-background-color: #001933; -fx-text-fill: white");
             borderPane.setStyle("-fx-background-color: #001933;");
         });
+
+        contact.setNameAndLastMessage(nameAndLastMessage);
+        contact.setDate(date);
+        contact.setLastMessageText(lastMessageInfo);
+        contact.setNewMessagesBlock(newMessagesVisualize);
+        contact.setNewMessagesCount(newMessageCount);
+
         return borderPane;
     }
 

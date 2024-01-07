@@ -1,6 +1,7 @@
 package ru.nikidzawa.golink.network;
 
 import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,12 +20,15 @@ public class Server implements TCPConnectionListener {
     public HashMap <String, TCPConnection> connections = new HashMap<>();
     @Getter
     private final int PORT;
+    @Getter
+    private final int CHAT_ID;
     public ServerSocket serverSocket;
 
     @SneakyThrows
-    public Server(int port) {
-        serverSocket = new ServerSocket(port);
-        PORT = serverSocket.getLocalPort();
+    public Server(int PORT, int CHAT_ID) {
+        serverSocket = new ServerSocket(PORT);
+        this.PORT = serverSocket.getLocalPort();
+        this.CHAT_ID = CHAT_ID;
     }
 
     public void start() {
@@ -57,7 +61,7 @@ public class Server implements TCPConnectionListener {
         connections.remove(tcpConnection.getUserId());
         if (connections.isEmpty()) {
             serverSocket.close();
-            new SOCSConnection().RELEASE_PORT(PORT);
+            new SOCSConnection().RELEASE_PORT(CHAT_ID);
         }
     }
 

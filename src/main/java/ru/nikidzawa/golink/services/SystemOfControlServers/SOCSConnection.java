@@ -22,25 +22,15 @@ public class SOCSConnection {
     }
 
     @SneakyThrows
-    public String CREATE_SERVER () {
-        out.println("CREATE_SERVER");
+    public String CREATE_SERVER (Long chatId) {
+        out.println("CREATE_SERVER:" + chatId);
         return in.readLine();
-    }
-    @SneakyThrows
-    public void RELEASE_PORT (int port) {
-        out.println("RELEASE_PORT:" + port);
-        socket.close();
     }
 
     @SneakyThrows
-    public void GET_SERVERS_PORTS () {
-        out.println("GET_SERVERS_PORTS");
+    public void RELEASE_PORT (int CHAT_ID) {
+        out.println("RELEASE_PORT:" + CHAT_ID);
         socket.close();
     }
 
-    @SneakyThrows
-    public String CHECK_USER (int port, String userId) {
-        out.println("CHECK_USER:" + port + ":" + userId);
-        return in.readLine();
-    }
 }

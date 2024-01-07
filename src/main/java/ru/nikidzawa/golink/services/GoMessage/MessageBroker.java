@@ -16,7 +16,6 @@ public class MessageBroker implements GoMessageListener{
     @Getter
     private final int PORT = 8081;
     public ServerSocket serverSocket;
-
     @SneakyThrows
     public MessageBroker() {
         serverSocket = new ServerSocket(PORT);
@@ -41,21 +40,15 @@ public class MessageBroker implements GoMessageListener{
 
     @Override
     public void onReceiveMessage(TCPBroker tcpBroker, String string) {
-        String[] strings = string.split(":");
+        String[] strings = string.split(":", 3);
         String command = strings[0];
         String userId = strings[1];
-        String value;
-        try {
-            value = strings[2];
-        } catch (ArrayIndexOutOfBoundsException ex) {
-            value = null;
-        }
         try {
             switch (command) {
-                case "UPDATE_CHAT_ROOMS" -> connections.get(userId).sendMessage("UPDATE_CHAT_ROOMS");
-                case "UPDATE_MESSAGES" -> connections.get(userId).sendMessage("UPDATE_MESSAGES");
-                case "NOTIFICATION" -> connections.get(userId).sendMessage("NOTIFICATION:" + value);
-                case "CHECK_USER_STATUS" -> tcpBroker.sendMessage("STATUS:" + connections.containsKey(userId));
+                case "ADD_MESSAGE_ON_CASH" -> connections.get(userId).sendMessage(command + ":" + strings[2]);
+                case "DELETE_MESSAGE" -> connections.get(userId).sendMessage(command + ":" + strings[2]);
+                case "CHECK_USER_STATUS" -> tcpBroker.sendMessage(command + ":" + connections.containsKey(userId));
+                case "CREATE_NEW_CHAT_ROOM" -> connections.get(userId).sendMessage(command + ":" + strings[2]);
             }
         } catch (NullPointerException ex) {
             System.out.println("Получатель не в сети");

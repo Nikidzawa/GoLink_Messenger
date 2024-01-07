@@ -3,6 +3,7 @@ package ru.nikidzawa.golink.store.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -32,5 +33,5 @@ public class UserEntity {
     private ImageEntity avatar;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<PersonalChat> userChats;
+    private List<PersonalChat> userChats = new ArrayList<>();
 }

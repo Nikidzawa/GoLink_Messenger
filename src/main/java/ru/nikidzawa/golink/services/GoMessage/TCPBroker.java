@@ -2,9 +2,6 @@ package ru.nikidzawa.golink.services.GoMessage;
 
 import lombok.Getter;
 import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.net.Socket;
@@ -15,7 +12,7 @@ public class TCPBroker  {
     private Thread thread;
     private final GoMessageListener listener;
     private final BufferedReader in;
-    private final BufferedWriter out;
+    final BufferedWriter out;
     @Getter
     private final String userId;
 
@@ -60,15 +57,51 @@ public class TCPBroker  {
         });
         thread.start();
     }
-
-    public synchronized void sendMessage(String string){
+    public synchronized void sendMessage (String string){
         try {
             if (string != null) {
                 out.write(string + "\n");
                 out.flush();
             }
-        } catch (IOException e) {
+        } catch (IOException ex) {
             disconnect();
+            throw new RuntimeException(ex);
+        }
+    }
+    public synchronized void CHECK_USER_STATUS (Long interlocutorId) {
+        try {
+            out.write("CHECK_USER_STATUS:" + interlocutorId + "\n");
+            out.flush();
+        } catch (IOException ex) {
+            disconnect();
+            throw new RuntimeException(ex);
+        }
+    }
+    public synchronized void ADD_MESSAGE_ON_CASH (Long receiver, Long chatId, Long messageId, String text) {
+        try {
+            out.write("ADD_MESSAGE_ON_CASH:" + receiver + ":" + chatId + ":" + messageId + ":" + text + "\n");
+            out.flush();
+        } catch (IOException ex) {
+            disconnect();
+            throw new RuntimeException(ex);
+        }
+    }
+    public synchronized void DELETE_MESSAGE (Long interlocutorId, Long chatId, Long messageId, int messagePosition) {
+        try {
+            out.write("DELETE_MESSAGE:" + interlocutorId + ":" + chatId + ":" + messageId + ":" + messagePosition + "\n");
+            out.flush();
+        } catch (IOException ex) {
+            disconnect();
+            throw new RuntimeException(ex);
+        }
+    }
+    public synchronized void CREATE_NEW_CHAT_ROOM (Long interlocutorId, Long userId, Long chatId, String name) {
+        try {
+            out.write("CREATE_NEW_CHAT_ROOM:" + interlocutorId + ":" + userId + ":" + chatId + ":" + name + "\n");
+            out.flush();
+        } catch (IOException ex) {
+            disconnect();
+            throw new RuntimeException(ex);
         }
     }
 
@@ -77,5 +110,4 @@ public class TCPBroker  {
         thread.interrupt();
         socket.close();
     }
-
 }

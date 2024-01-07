@@ -20,7 +20,8 @@ public class SOCS {
     }
 
     public SOCS() {
-        System.out.println("SOCS IS ACTIVE\n--------------");
+        System.out.println("СИСТЕМА КОНТРОЛЯ СЕРВЕРОВ БЫЛА УСПЕШНО ЗАПУЩЕНА" +
+                "\n-----------------------------------------------");
         int PORT = 8080;
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             while (true) {
@@ -55,29 +56,38 @@ public class SOCS {
         }catch (ArrayIndexOutOfBoundsException ex) {
             userId = null;
         }
-        switch (command) {
-            case "CREATE_SERVER" :
-                Server server = new Server(0);
-                int port = server.getPORT();
-                System.out.println("CREATE NEW SERVER ON PORT: " + port);
-                servers.put(port, server);
-                new Thread(server::start).start();
-                out.println(port);
-                break;
-            case "GET_SERVERS_PORTS":
-                for (Integer key : servers.keySet()) {
-                    System.out.println(key);
+        try {
+            switch (command) {
+                case "CREATE_SERVER" -> {
+                    Integer CHAT_ID = Integer.parseInt(value);
+                    if (servers.containsKey(CHAT_ID)) {
+                        int PORT = servers.get(CHAT_ID).getPORT();
+                        out.println(PORT);
+                        System.out.println("JOIN IN SERVER: " + PORT + " CHAT ID: " + CHAT_ID);
+                    } else {
+                        Server server = new Server(0, CHAT_ID);
+                        int PORT = server.getPORT();
+                        System.out.println("CREATE NEW SERVER ON PORT: " + PORT + " CHAT ID: " + CHAT_ID);
+                        servers.put(CHAT_ID, server);
+                        new Thread(server::start).start();
+                        out.println(PORT);
+                    }
                 }
-                break;
-            case "RELEASE_PORT":
-                int serverPort = Integer.parseInt(value);
-                servers.remove(serverPort);
-                System.out.println("Порт " + value + " освобождён");
-                break;
-            case "CHECK_USER":
-                out.println(servers.get(Integer.parseInt(value)).connections.containsKey(userId));
-                break;
+                case "GET_SERVERS_PORTS" -> {
+                    for (Integer key : servers.keySet()) {
+                        System.out.println(key);
+                    }
+                }
+                case "RELEASE_PORT" -> {
+                    int CHAT_ID = Integer.parseInt(value);
+                    servers.remove(CHAT_ID);
+                    System.out.println("Чат " + CHAT_ID + " очищен из локального кэша");
+                }
+                case "CHECK_USER" -> out.println(servers.get(Integer.parseInt(value)).connections.containsKey(userId));
+            }
+            clientSocket.close();
+        } catch (RuntimeException exception) {
+            throw new RuntimeException(exception);
         }
-        clientSocket.close();
     }
 }

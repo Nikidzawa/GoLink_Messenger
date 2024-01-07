@@ -26,5 +26,5 @@ public class PersonalChat {
     @JoinColumn(name = "interlocutor_id")
     private UserEntity interlocutor;
 
-    private byte newMessagesCount;
+    private int newMessagesCount;
 }

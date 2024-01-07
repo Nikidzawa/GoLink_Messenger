@@ -22,11 +22,11 @@ public class MessageEntity {
 
     private LocalDateTime date;
 
-    @ManyToOne
+    @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_id", nullable = false)
     private UserEntity sender;
 
-    @ManyToOne
+    @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_id", nullable = false)
     private ChatEntity chat;
 }
