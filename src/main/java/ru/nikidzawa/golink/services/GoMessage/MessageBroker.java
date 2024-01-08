@@ -46,8 +46,9 @@ public class MessageBroker implements GoMessageListener{
         try {
             switch (command) {
                 case "ADD_MESSAGE_ON_CASH" -> connections.get(userId).sendMessage(command + ":" + strings[2]);
+                case "EDIT_MESSAGE" -> connections.get(userId).sendMessage(command + ":" + strings[2]);
                 case "DELETE_MESSAGE" -> connections.get(userId).sendMessage(command + ":" + strings[2]);
-                case "CHECK_USER_STATUS" -> tcpBroker.sendMessage(command + ":" + connections.containsKey(userId));
+                case "CHANGE_USER_STATUS" -> tcpBroker.sendMessage(command + ":" + connections.containsKey(userId));
                 case "CREATE_NEW_CHAT_ROOM" -> connections.get(userId).sendMessage(command + ":" + strings[2]);
             }
         } catch (NullPointerException ex) {

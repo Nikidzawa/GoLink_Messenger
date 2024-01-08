@@ -167,7 +167,7 @@ public class GoLink implements TCPConnectionListener, GoMessageListener, ExitLis
     }
 
     public void setUserConfig () {
-        myAvatar.setImage((new Image(new ByteArrayInputStream(userEntity.getAvatar().getMetadata()))));
+        myAvatar.setImage((new Image(new ByteArrayInputStream(userEntity.getAvatar()))));
         profileName.setText(userEntity.getName());
     }
 
@@ -214,8 +214,8 @@ public class GoLink implements TCPConnectionListener, GoMessageListener, ExitLis
             if (selectedContact == null || !Objects.equals(selectedContact.getChat().getId(), chat.getId())) {
                 selectedContact = contact;
                 if (personalChat.getNewMessagesCount() > 0) {
-                    personalChat.setNewMessagesCount((byte) 0);
-                    personalChatRepository.saveAndFlush(personalChat);
+                    personalChat.setNewMessagesCount(0);
+                    personalChatRepository.save(personalChat);
                     contact.resetNotificationCount();
                 }
                 status.setVisible(true);
@@ -246,12 +246,12 @@ public class GoLink implements TCPConnectionListener, GoMessageListener, ExitLis
         String text = input.getText();
         if (!text.isEmpty()) {
             if (editable) {
-                message.setMessage(text);
+                selectedContact.editMessage(message, text);
                 input.clear();
 
                 int number = chat.getChildren().indexOf(messageBackground);
-                chat.getChildren().remove(messageBackground);
-                HBox myMessage = GUIPatterns.printMyMessage(message, (message.getDate()));
+                chat.getChildren().remove(number);
+                HBox myMessage = GUIPatterns.printMyMessage(message, message.getDate());
                 myMessage.setOnMouseClicked(clickOnMessage -> {
                     if (clickOnMessage.getButton() == MouseButton.SECONDARY) {
                         setMessageFunctions(message, myMessage, clickOnMessage);
@@ -259,8 +259,7 @@ public class GoLink implements TCPConnectionListener, GoMessageListener, ExitLis
                 });
                 chat.getChildren().add(number, myMessage);
                 messageRepository.save(message);
-                selectedContact.getChat().getMessages().remove(message);
-                selectedContact.getChat().getMessages().add(message);
+                tcpBroker.EDIT_MESSAGE(selectedContact.getInterlocutor().getId(), selectedContact.getChat().getId(), message.getId(), text, number);
                 editable = false;
                 sendZone.setTop(null);
             } else {
@@ -400,7 +399,7 @@ public class GoLink implements TCPConnectionListener, GoMessageListener, ExitLis
                 contact.setOnMouseClicked(mouseEvent -> {
                     searchPanel.clear();
                     List<PersonalChat> personalChats = userEntity.getUserChats();
-                    if (personalChats.isEmpty()) {
+                    if (personalChats == null || personalChats.isEmpty()) {
                         createNewChatRoom(interlocutor);
                         return;
                     }
@@ -422,7 +421,7 @@ public class GoLink implements TCPConnectionListener, GoMessageListener, ExitLis
     }
 
     private void createNewChatRoom(UserEntity interlocutor) {
-        ChatEntity newChat = ChatEntity.builder().build();
+        ChatEntity newChat = ChatEntity.builder().personalChats(new ArrayList<>()).messages(new ArrayList<>()).build();
         chatRepository.saveAndFlush(newChat);
         PersonalChat myPersonalChat = PersonalChat.builder()
                 .chat(newChat)
@@ -441,17 +440,18 @@ public class GoLink implements TCPConnectionListener, GoMessageListener, ExitLis
 
         newChat.setPersonalChats(List.of(myPersonalChat, participantPersonalChat));
         chatRepository.saveAndFlush(newChat);
-        Contact newContact = createContact(interlocutor, newChat, myPersonalChat);
-        contacts.put(newChat.getId(), newContact);
-        openChat(newChat, myPersonalChat, interlocutor, newContact);
-        tcpBroker.CREATE_NEW_CHAT_ROOM(interlocutor.getId(), userEntity.getId(), newChat.getId(), userEntity.getName());
         loadChatRooms();
+        Contact newContact = createContact (interlocutor, newChat, myPersonalChat);
+        openChat(newChat, myPersonalChat, interlocutor, newContact);
+        tcpBroker.CREATE_NEW_CHAT_ROOM(interlocutor.getId(), participantPersonalChat.getId());
+        userEntity.getUserChats().add(myPersonalChat);
     }
 
     private void scrolling () {
         PauseTransition pauseTransition = new PauseTransition(Duration.millis(20));
         pauseTransition.setOnFinished(event -> scrollPane.setVvalue(1));
         pauseTransition.play();
+
     }
 
     @Override
@@ -489,9 +489,6 @@ public class GoLink implements TCPConnectionListener, GoMessageListener, ExitLis
         userEntity.setConnected(true);
         userRepository.saveAndFlush(userEntity);
         List<PersonalChat> personalChats = userEntity.getUserChats();
-        if (personalChats != null && !personalChats.isEmpty()) {
-//            personalChats.forEach(chat -> tcpBroker.sendMessage("UPDATE_CHAT_ROOMS:" + chat.getInterlocutor().getId()));
-        }
     }
 
     @Override
@@ -501,6 +498,7 @@ public class GoLink implements TCPConnectionListener, GoMessageListener, ExitLis
         String value;
         String value2;
         String value3;
+        String value4;
         try {
             value = strings[1];
         } catch (ArrayIndexOutOfBoundsException ex) {
@@ -516,6 +514,11 @@ public class GoLink implements TCPConnectionListener, GoMessageListener, ExitLis
         } catch (ArrayIndexOutOfBoundsException ex) {
             value3 = null;
         }
+        try {
+            value4 = strings[4];
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            value4 = null;
+        }
         String finalValue = value3;
         switch (command) {
             case "DELETE_MESSAGE" -> {
@@ -527,16 +530,24 @@ public class GoLink implements TCPConnectionListener, GoMessageListener, ExitLis
                 } else contacts.get(chatId).deleteMessage(messageId);
             }
             case "CREATE_NEW_CHAT_ROOM" -> {
-                Long userId = Long.parseLong(value);
-                Long chatId = Long.parseLong(value2);
-                ChatEntity chatEntity = ChatEntity.builder().id(chatId).build();
-                UserEntity interlocutor = userRepository.getReferenceById(userId);
-                PersonalChat personalChat = PersonalChat.builder().interlocutor(interlocutor).user(userEntity).chat(chatEntity).build();
+                PersonalChat personalChat = personalChatRepository.findById(Long.parseLong(value)).get();
+                UserEntity interlocutor = personalChat.getInterlocutor();
+                ChatEntity chatEntity = personalChat.getChat();
                 Platform.runLater(() -> createContact(interlocutor, chatEntity, personalChat));
             }
             case "EDIT_MESSAGE" -> {
-                int messageId = Integer.parseInt(value2);
                 long chatId = Long.parseLong(value);
+                int messageId = Integer.parseInt(value2);
+                int position = Integer.parseInt(value4);
+                Contact contact = contacts.get(chatId);
+                MessageEntity messageEntity = contact.editMessage(messageId, value3);
+                if (selectedContact != null && selectedContact.getChat().getId() == chatId) {
+                    HBox myMessage = GUIPatterns.printForeignMessage(value3, messageEntity.getDate());
+                    Platform.runLater(() -> {
+                        chat.getChildren().remove(position);
+                        chat.getChildren().add(position, myMessage);
+                    });
+                }
             }
             case "ADD_MESSAGE_ON_CASH" -> {
                 Contact contact = contacts.get(Long.parseLong(value));
@@ -549,7 +560,7 @@ public class GoLink implements TCPConnectionListener, GoMessageListener, ExitLis
                     Sounds.notification();
                 }
             }
-            case "CHECK_USER_STATUS" -> status.setText(Boolean.parseBoolean(value) ? "В сети" : "Не в сети");
+            case "CHANGE_USER_STATUS" -> status.setText(Boolean.parseBoolean(value) ? "В сети" : "Не в сети");
         }
     }
 
@@ -565,7 +576,7 @@ public class GoLink implements TCPConnectionListener, GoMessageListener, ExitLis
     public void onExit() {
         userEntity.setConnected(false);
         userRepository.saveAndFlush(userEntity);
-//        userEntity.getUserChats().forEach(chat -> tcpBroker.sendMessage("UPDATE_CHAT_ROOMS:" + chat.getInterlocutor().getId()));
+        userEntity.getUserChats().forEach(chat -> tcpBroker.sendMessage("C:" + chat.getInterlocutor().getId()));
         tcpBroker.disconnect();
     }
 }

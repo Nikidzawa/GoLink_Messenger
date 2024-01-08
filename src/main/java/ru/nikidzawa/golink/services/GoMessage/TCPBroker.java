@@ -36,11 +36,13 @@ public class TCPBroker  {
         setUserId();
         start();
     }
+
     @SneakyThrows
     private void setUserId () {
         out.write(userId + "\n");
         out.flush();
     }
+
     private void start() {
         thread = new Thread(() -> {
             listener.onConnectionReady(TCPBroker.this);
@@ -57,6 +59,7 @@ public class TCPBroker  {
         });
         thread.start();
     }
+
     public synchronized void sendMessage (String string){
         try {
             if (string != null) {
@@ -70,7 +73,7 @@ public class TCPBroker  {
     }
     public synchronized void CHECK_USER_STATUS (Long interlocutorId) {
         try {
-            out.write("CHECK_USER_STATUS:" + interlocutorId + "\n");
+            out.write("CHANGE_USER_STATUS:" + interlocutorId + "\n");
             out.flush();
         } catch (IOException ex) {
             disconnect();
@@ -86,6 +89,15 @@ public class TCPBroker  {
             throw new RuntimeException(ex);
         }
     }
+    public synchronized void EDIT_MESSAGE(Long receiver, Long chatId, Long messageId, String text, int messagePosition) {
+        try {
+            out.write("EDIT_MESSAGE:" + receiver + ":" + chatId + ":" + messageId + ":" + text + ":" + messagePosition + "\n");
+            out.flush();
+        } catch (IOException ex) {
+            disconnect();
+            throw new RuntimeException(ex);
+        }
+    }
     public synchronized void DELETE_MESSAGE (Long interlocutorId, Long chatId, Long messageId, int messagePosition) {
         try {
             out.write("DELETE_MESSAGE:" + interlocutorId + ":" + chatId + ":" + messageId + ":" + messagePosition + "\n");
@@ -95,9 +107,9 @@ public class TCPBroker  {
             throw new RuntimeException(ex);
         }
     }
-    public synchronized void CREATE_NEW_CHAT_ROOM (Long interlocutorId, Long userId, Long chatId, String name) {
+    public synchronized void CREATE_NEW_CHAT_ROOM (Long interlocutorId, Long participantPersonalChatId) {
         try {
-            out.write("CREATE_NEW_CHAT_ROOM:" + interlocutorId + ":" + userId + ":" + chatId + ":" + name + "\n");
+            out.write("CREATE_NEW_CHAT_ROOM:" + interlocutorId + ":" + participantPersonalChatId + "\n");
             out.flush();
         } catch (IOException ex) {
             disconnect();

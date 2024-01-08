@@ -77,7 +77,7 @@ public class EditProfile implements ExitListener {
             name.setText(userEntity.getName());
             nickname.setText("@" + userEntity.getNickname());
             number.setText(userEntity.getPhone().toString());
-            avatar.setImage(new Image(new ByteArrayInputStream(userEntity.getAvatar().getMetadata())));
+            avatar.setImage(new Image(new ByteArrayInputStream(userEntity.getAvatar())));
 
             enter.setOnAction(actionEvent -> {
                 if (updateUserEntity()) {

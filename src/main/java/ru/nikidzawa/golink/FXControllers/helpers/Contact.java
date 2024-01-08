@@ -3,7 +3,6 @@ package ru.nikidzawa.golink.FXControllers.helpers;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,6 +12,8 @@ import ru.nikidzawa.golink.store.entities.PersonalChat;
 import ru.nikidzawa.golink.store.entities.UserEntity;
 
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Getter
@@ -62,6 +63,32 @@ public class Contact {
     public void addMessageOnCashAndPutLastMessage (MessageEntity message) {
         chat.getMessages().add(message);
         setLastMessage(message);
+    }
+
+    public void editMessage (MessageEntity message, String messageText) {
+        message.setMessage(messageText);
+        int indexMessage = chat.getMessages().indexOf(message);
+        if (indexMessage == chat.getMessages().size() - 1) {
+            try {
+                setLastMessage(message);
+            } catch (IndexOutOfBoundsException ex) {
+                setTextIfMessagesIsEmpty();
+            }
+        }
+    }
+
+    public MessageEntity editMessage (int messageId, String messageText) {
+        MessageEntity messageEntity = chat.getMessages().stream().filter(message -> message.getId() == messageId).findFirst().get();
+        messageEntity.setMessage(messageText);
+        int indexMessage = chat.getMessages().indexOf(messageEntity);
+        if (indexMessage == chat.getMessages().size() - 1) {
+            try {
+                setLastMessage(messageEntity);
+            } catch (IndexOutOfBoundsException ex) {
+                setTextIfMessagesIsEmpty();
+            }
+        }
+        return messageEntity;
     }
 
     public void deleteMessage (MessageEntity message) {

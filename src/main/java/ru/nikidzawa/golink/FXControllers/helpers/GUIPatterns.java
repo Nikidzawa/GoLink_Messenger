@@ -28,7 +28,6 @@ import lombok.Setter;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 import ru.nikidzawa.golink.FXControllers.GoLink;
-import ru.nikidzawa.golink.store.entities.ChatEntity;
 import ru.nikidzawa.golink.store.entities.MessageEntity;
 import ru.nikidzawa.golink.store.entities.PersonalChat;
 import ru.nikidzawa.golink.store.entities.UserEntity;
@@ -153,7 +152,7 @@ public class GUIPatterns {
         borderPane.setCursor(Cursor.HAND);
         StackPane stackImg = new StackPane();
         GNAvatarView avatar = new GNAvatarView();
-        avatar.setImage(new Image(new ByteArrayInputStream(contact.getInterlocutor().getAvatar().getMetadata())));
+        avatar.setImage(new Image(new ByteArrayInputStream(contact.getInterlocutor().getAvatar())));
         avatar.setType(AvatarType.CIRCLE);
         avatar.setStroke(Paint.valueOf("#001933"));
         stackImg.getChildren().add(avatar);
@@ -243,7 +242,7 @@ public class GUIPatterns {
         });
         StackPane stackImg = new StackPane();
         GNAvatarView avatar = new GNAvatarView();
-        avatar.setImage(new Image(new ByteArrayInputStream(user.getAvatar().getMetadata())));
+        avatar.setImage(new Image(new ByteArrayInputStream(user.getAvatar())));
         avatar.setType(AvatarType.CIRCLE);
         avatar.setStroke(Paint.valueOf("#001933"));
         stackImg.getChildren().add(avatar);

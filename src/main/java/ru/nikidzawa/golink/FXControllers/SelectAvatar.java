@@ -21,16 +21,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 import ru.nikidzawa.golink.FXControllers.helpers.GUIPatterns;
-import ru.nikidzawa.golink.store.entities.ImageEntity;
 import ru.nikidzawa.golink.store.entities.UserEntity;
-import ru.nikidzawa.golink.store.repositories.ImageRepository;
 import ru.nikidzawa.golink.store.repositories.UserRepository;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Objects;
-import java.util.Optional;
 
 @Controller
 public class SelectAvatar {
@@ -75,8 +72,6 @@ public class SelectAvatar {
     @Autowired
     UserRepository userRepository;
 
-    @Autowired
-    ImageRepository imageRepository;
     @Autowired
     GUIPatterns GUIPatterns;
 
@@ -137,15 +132,9 @@ public class SelectAvatar {
                     .name(userName)
                     .nickname(userNickname)
                     .phone(phone)
+                    .avatar(imageMetadata)
                     .password(password)
                     .build();
-            userRepository.saveAndFlush(userEntity);
-            ImageEntity imageEntity = ImageEntity.builder()
-                    .metadata(imageMetadata)
-                    .owner(userEntity)
-                    .build();
-            imageRepository.saveAndFlush(imageEntity);
-            userEntity.setAvatar(imageEntity);
             userRepository.saveAndFlush(userEntity);
             load(userEntity);
         }

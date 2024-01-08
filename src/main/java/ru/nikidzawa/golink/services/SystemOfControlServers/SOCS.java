@@ -42,24 +42,12 @@ public class SOCS {
     private void handleClient(Socket clientSocket) throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-        String[] strings = in.readLine().split(":");
+        String[] strings = in.readLine().split(":", 2);
         String command = strings[0];
-        String value;
-        String userId;
-        try {
-            value = strings[1];
-        }catch (ArrayIndexOutOfBoundsException ex) {
-            value = null;
-        }
-        try {
-            userId = strings[2];
-        }catch (ArrayIndexOutOfBoundsException ex) {
-            userId = null;
-        }
+        int CHAT_ID = Integer.parseInt(strings[1]);
         try {
             switch (command) {
                 case "CREATE_SERVER" -> {
-                    Integer CHAT_ID = Integer.parseInt(value);
                     if (servers.containsKey(CHAT_ID)) {
                         int PORT = servers.get(CHAT_ID).getPORT();
                         out.println(PORT);
@@ -73,17 +61,10 @@ public class SOCS {
                         out.println(PORT);
                     }
                 }
-                case "GET_SERVERS_PORTS" -> {
-                    for (Integer key : servers.keySet()) {
-                        System.out.println(key);
-                    }
-                }
                 case "RELEASE_PORT" -> {
-                    int CHAT_ID = Integer.parseInt(value);
                     servers.remove(CHAT_ID);
-                    System.out.println("Чат " + CHAT_ID + " очищен из локального кэша");
+                    System.out.println("Чат " + CHAT_ID + " очищен из кэша");
                 }
-                case "CHECK_USER" -> out.println(servers.get(Integer.parseInt(value)).connections.containsKey(userId));
             }
             clientSocket.close();
         } catch (RuntimeException exception) {

@@ -29,8 +29,7 @@ public class UserEntity {
 
     private boolean connected;
 
-    @OneToOne
-    private ImageEntity avatar;
+    private byte[] avatar;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<PersonalChat> userChats = new ArrayList<>();
