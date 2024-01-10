@@ -19,7 +19,7 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1200.0" prefWidth="1200.0" style="-fx-background-color: #001933;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.nikidzawa.golink.FXControllers.Register">
    <children>
-      <Button fx:id="enter" layoutX="429.0" layoutY="1069.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="261.0" style="-fx-background-color: #18314D;" text="Подтвердить номер" textAlignment="CENTER" textFill="WHITE">
+      <Button fx:id="enter" layoutX="429.0" layoutY="1069.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="261.0" style="-fx-background-color: linear-gradient(from 0% 5% to 90% 100%, blue, red);" text="Подтвердить номер" textAlignment="CENTER" textFill="WHITE">
          <font>
             <Font name="Arial" size="22.0" />
          </font>
@@ -27,12 +27,12 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <Text fill="WHITE" layoutX="463.0" layoutY="1144.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Уже есть аккаунт?" wrappingWidth="115.13671875">
+      <Text fill="WHITE" layoutX="478.0" layoutY="1141.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Уже есть аккаунт?" wrappingWidth="121.13671875">
          <font>
             <Font size="14.0" />
          </font>
       </Text>
-      <Text fx:id="login" fill="WHITE" layoutX="579.0" layoutY="1145.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Войти" wrappingWidth="42.13671875">
+      <Text fx:id="login" fill="WHITE" layoutX="597.0" layoutY="1141.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Войти" wrappingWidth="45.0" AnchorPane.leftAnchor="597.0" AnchorPane.rightAnchor="558.0" AnchorPane.topAnchor="1127.0">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
@@ -42,7 +42,7 @@
       </Text>
       <Text fontSmoothingType="LCD" layoutX="440.0" layoutY="331.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Регистрация" textAlignment="CENTER" wrappingWidth="261.13671875">
          <font>
-            <Font name="Arial" size="40.0" />
+            <Font name="Arial Bold" size="40.0" />
          </font>
          <fill>
             <LinearGradient endX="1.0" endY="1.0">
@@ -66,7 +66,7 @@
             </LinearGradient>
          </fill>
       </Text>
-      <VBox spacing="15" fx:id="menuItem" layoutX="712.0" layoutY="52.0" prefHeight="534.0" prefWidth="498.0" />
+      <VBox fx:id="menuItem" layoutX="712.0" layoutY="52.0" prefHeight="534.0" prefWidth="498.0" spacing="15" />
       <HBox alignment="TOP_RIGHT" prefHeight="38.0" prefWidth="1200.0" style="-fx-background-color: #18314D;">
          <children>
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="GoLink" wrappingWidth="80.13671875">
@@ -117,12 +117,12 @@
             <Image url="@/img/phone.png" />
          </image>
       </ImageView>
-      <TextField fx:id="phone" layoutX="323.0" layoutY="630.0" prefHeight="36.0" prefWidth="514.0" promptText="Телефон" style="-fx-background-color: #001933; -fx-border-color: #18314D; -fx-border-width: 0 0 2 0; -fx-text-fill: white;">
+      <TextField fx:id="phone" layoutX="323.0" layoutY="630.0" prefHeight="36.0" prefWidth="514.0" promptText="Телефон" style="-fx-background-color: #001933; -fx-border-color: blue; -fx-border-width: 0 0 2 0; -fx-text-fill: white;">
          <font>
             <Font name="Arial" size="17.0" />
          </font>
       </TextField>
-      <PasswordField fx:id="password" layoutX="323.0" layoutY="789.0" prefHeight="36.0" prefWidth="514.0" promptText="Придумайте пароль" style="-fx-background-color: #001933; -fx-border-color: #18314D; -fx-border-width: 0 0 2 0; -fx-text-fill: white;">
+      <PasswordField fx:id="password" layoutX="323.0" layoutY="789.0" prefHeight="36.0" prefWidth="514.0" promptText="Придумайте пароль" style="-fx-background-color: #001933; -fx-border-color: blue; -fx-border-width: 0 0 2 0; -fx-text-fill: white;">
          <font>
             <Font name="Arial" size="17.0" />
          </font>

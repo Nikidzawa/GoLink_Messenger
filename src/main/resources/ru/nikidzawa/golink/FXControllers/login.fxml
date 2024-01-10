@@ -21,7 +21,7 @@
    <children>
       <Text fontSmoothingType="LCD" layoutX="433.0" layoutY="325.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Вход" textAlignment="CENTER" wrappingWidth="261.13671875">
          <font>
-            <Font name="Arial" size="40.0" />
+            <Font name="Arial Bold" size="40.0" />
          </font>
          <fill>
             <LinearGradient endX="1.0" endY="1.0">
@@ -45,7 +45,7 @@
             </LinearGradient>
          </fill>
       </Text>
-      <Button fx:id="enter" layoutX="420.0" layoutY="1057.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="261.0" style="-fx-background-color: #18314D;" text="Войти" textAlignment="CENTER" textFill="WHITE">
+      <Button fx:id="enter" layoutX="420.0" layoutY="1057.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="261.0" style="-fx-background-color: linear-gradient(from 0% 5% to 90% 100%, blue, red);" text="Войти" textAlignment="CENTER" textFill="WHITE">
          <font>
             <Font name="Arial" size="22.0" />
          </font>
@@ -66,7 +66,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Text>
-      <VBox spacing="15" fx:id="menuItem" layoutX="702.0" layoutY="42.0" prefHeight="534.0" prefWidth="498.0" />
+      <VBox fx:id="menuItem" layoutX="702.0" layoutY="42.0" prefHeight="534.0" prefWidth="498.0" spacing="15" />
       <Text layoutX="419.0" layoutY="230.0" strokeType="OUTSIDE" strokeWidth="0.0" text="GoLink" wrappingWidth="290.13671875">
          <font>
             <Font name="System Bold" size="85.0" />
@@ -138,19 +138,19 @@
             </Button>
          </children>
       </HBox>
-      <PasswordField fx:id="password" layoutX="313.0" layoutY="779.0" prefHeight="36.0" prefWidth="514.0" promptText="Пароль" style="-fx-background-color: #001933; -fx-border-color: #18314D; -fx-border-width: 0 0 2 0; -fx-text-fill: white;">
+      <PasswordField fx:id="password" layoutX="313.0" layoutY="779.0" prefHeight="36.0" prefWidth="514.0" promptText="Пароль" style="-fx-background-color: #001933; -fx-border-color: blue; -fx-border-width: 0 0 2 0; -fx-text-fill: white;">
          <font>
             <Font name="Arial" size="17.0" />
          </font>
       </PasswordField>
-      <TextField fx:id="phone" layoutX="313.0" layoutY="620.0" prefHeight="36.0" prefWidth="514.0" promptText="Телефон" style="-fx-background-color: #001933; -fx-border-color: #18314D; -fx-border-width: 0 0 2 0; -fx-text-fill: white;">
+      <TextField fx:id="nickname" layoutX="313.0" layoutY="620.0" prefHeight="36.0" prefWidth="514.0" promptText="Никнейм" style="-fx-background-color: #001933; -fx-border-color: blue; -fx-border-width: 0 0 2 0; -fx-text-fill: white;">
          <font>
             <Font name="Arial" size="17.0" />
          </font>
       </TextField>
       <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="240.0" layoutY="608.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@/img/phone.png" />
+            <Image url="@/img/user.png" />
          </image>
       </ImageView>
       <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="240.0" layoutY="767.0" pickOnBounds="true" preserveRatio="true">

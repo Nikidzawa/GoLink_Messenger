@@ -81,7 +81,7 @@ public class VerifyNumber {
         for (int i = 0; i < 6; i++) {
             TextField textField = new TextField();
             textField.setPrefWidth(90);
-            textField.setStyle("-fx-border-width:0 0 2 0; -fx-text-fill: white; -fx-background-color:  #001933; -fx-border-color:  #18314D;");
+            textField.setStyle("-fx-border-width:0 0 2 0; -fx-text-fill: white; -fx-background-color:  #001933; -fx-border-color: blue;");
             textField.setPrefColumnCount(1);
             textField.setAlignment(Pos.CENTER);
             textField.setFont(Font.font(20));
@@ -100,6 +100,7 @@ public class VerifyNumber {
             });
             area.getChildren().add(textField);
         }
+        Platform.runLater(() -> area.getChildren().get(0).requestFocus());
     }
     private void handleInput(TextField currentTextField, int index, KeyEvent event) {
         String input = event.getText();

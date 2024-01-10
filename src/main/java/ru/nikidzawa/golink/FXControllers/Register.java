@@ -1,5 +1,9 @@
 package ru.nikidzawa.golink.FXControllers;
 
+import javafx.animation.FadeTransition;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -15,6 +19,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Duration;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,8 +94,9 @@ public class Register {
         enter.setOnAction(e -> enterEvent());
     }
 
+
     private void enterEvent() {
-        Long inputNumber = null;
+        Long inputNumber;
         try {
             inputNumber = Long.parseLong(phone.getText());
         } catch (NumberFormatException ex) {

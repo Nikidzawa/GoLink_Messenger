@@ -48,7 +48,7 @@ public class Login {
     private PasswordField password;
 
     @FXML
-    private TextField phone;
+    private TextField nickname;
 
     @FXML
     private Text register;
@@ -68,15 +68,12 @@ public class Login {
     @FXML
     void initialize() {
         Platform.runLater(() -> GUIPatterns.setBaseWindowTitleCommands(titleBar, minimizeButton, scaleButton, closeButton, context));
-
-        GUIPatterns.setConfig(phone);
-
         enter.setOnAction(e -> enterEvent());
 
         password.setOnKeyPressed(keyEvent -> {
             if (keyEvent.getCode() == KeyCode.ENTER) enterEvent();
         });
-        phone.setOnKeyPressed(keyEvent -> {
+        nickname.setOnKeyPressed(keyEvent -> {
             if (keyEvent.getCode() == KeyCode.ENTER)
                 if (password.getText().isEmpty()) {
                     password.requestFocus();
@@ -87,17 +84,11 @@ public class Login {
     }
 
     private void enterEvent() {
-        try {
-            long phoneValue = Long.parseLong(phone.getText());
-            if (userRepository.existsByPhoneAndPassword(phoneValue, password.getText())) {
-                Optional<UserEntity> userEntity = userRepository.findFirstByPhone(phoneValue);
-                fxMenu(userEntity.orElseThrow());
-            } else {
-                exception();
-            }
-        } catch (NumberFormatException ex) {
-            exception();
-        }
+        String finalNickname = nickname.getText();
+        if (userRepository.existsByPhoneAndPassword(finalNickname, password.getText())) {
+            Optional<UserEntity> userEntity = userRepository.findFirstByNickname(finalNickname);
+            fxMenu(userEntity.orElseThrow());
+        } else exception();
     }
 
     @SneakyThrows
@@ -135,6 +126,6 @@ public class Login {
     }
     private void exception () {
             GUIPatterns.createExceptionMessage(new Image(Objects.requireNonNull(getClass().getResource("/img/exception.png")).toExternalForm()),
-                    " Неверный телефон или пароль. Попробуйте ещё раз   ", menuItem);
+                    " Неверный никнейм или пароль. Попробуйте ещё раз   ", menuItem);
     }
 }

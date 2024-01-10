@@ -11,8 +11,9 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
-public class MessageBroker implements GoMessageListener{
-    public HashMap<String, TCPBroker> connections = new HashMap<>();
+public class MessageBroker implements GoMessageListener {
+    private HashMap<Integer, TCPBroker> connections = new HashMap<>();
+
     @Getter
     private final int PORT = 8081;
     public ServerSocket serverSocket;
@@ -34,15 +35,13 @@ public class MessageBroker implements GoMessageListener{
     }
 
     @Override
-    public void onConnectionReady(TCPBroker tcpBroker) {
-        connections.put(tcpBroker.getUserId(), tcpBroker);
-    }
+    public void onConnectionReady(TCPBroker tcpBroker) {connections.put(Integer.parseInt(tcpBroker.getUserId()), tcpBroker);}
 
     @Override
     public void onReceiveMessage(TCPBroker tcpBroker, String string) {
         String[] strings = string.split(":", 3);
         String command = strings[0];
-        String userId = strings[1];
+        int userId = Integer.parseInt(strings[1]);
         try {
             switch (command) {
                 case "ADD_MESSAGE_ON_CASH" -> connections.get(userId).sendMessage(command + ":" + strings[2]);
@@ -58,6 +57,6 @@ public class MessageBroker implements GoMessageListener{
 
     @Override
     public void onDisconnect(TCPBroker tcpBroker) {
-        connections.remove(tcpBroker.getUserId());
+        connections.remove(Integer.parseInt(tcpBroker.getUserId()));
     }
 }

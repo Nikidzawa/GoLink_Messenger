@@ -20,6 +20,7 @@ import java.util.Objects;
 @Setter
 public class Contact {
     //GUI
+    private BorderPane GUIContact;
     private Text date;
     private BorderPane nameAndLastMessage;
     private TextField lastMessageText;
@@ -30,6 +31,7 @@ public class Contact {
     private PersonalChat personalChat;
     private UserEntity interlocutor;
     private ChatEntity chat;
+    private int cashingNotificationCount;
     private int port;
 
     public Contact (UserEntity interlocutor, ChatEntity chat, PersonalChat personalChat) {
@@ -49,13 +51,13 @@ public class Contact {
     }
 
     public void resetNotificationCount() {
-        personalChat.setNewMessagesCount(0);
+        cashingNotificationCount = 0;
         newMessagesBlock.setVisible(false);
         newMessagesCount.setText("0");
     }
 
     public void addNotification () {
-        personalChat.setNewMessagesCount(personalChat.getNewMessagesCount() + 1);
+        cashingNotificationCount ++;
         newMessagesBlock.setVisible(true);
         newMessagesCount.setText(String.valueOf(Integer.parseInt(newMessagesCount.getText()) + 1));
     }

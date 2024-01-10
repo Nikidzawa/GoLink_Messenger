@@ -9,9 +9,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -21,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 import ru.nikidzawa.golink.FXControllers.helpers.GUIPatterns;
+import ru.nikidzawa.golink.services.DefaultAvatarCreator;
 import ru.nikidzawa.golink.store.entities.UserEntity;
 import ru.nikidzawa.golink.store.repositories.UserRepository;
 
@@ -59,7 +62,13 @@ public class SelectAvatar {
     private TextField name;
 
     @FXML
+    private Text firstNameSymbol;
+
+    @FXML
     private TextField nickname;
+
+    @FXML
+    ImageView camera;
 
     @FXML
     private Button scaleButton;
@@ -73,13 +82,26 @@ public class SelectAvatar {
     UserRepository userRepository;
 
     @Autowired
+    DefaultAvatarCreator defaultAvatarCreator;
+
+    @Autowired
     GUIPatterns GUIPatterns;
 
     @FXML
     void initialize() {
         Platform.runLater(() -> GUIPatterns.setBaseWindowTitleCommands(titleBar, minimizeButton, scaleButton, closeButton, context));
-
         image.setOnMouseClicked(mouseEvent -> selectImage());
+        firstNameSymbol.setOnMouseClicked(mouseEvent -> selectImage());
+
+        name.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.isEmpty()) {
+                camera.setVisible(true);
+                firstNameSymbol.setText("");
+            } else {
+                camera.setVisible(false);
+                firstNameSymbol.setText(name.getText().substring(0,1).toUpperCase());
+            }
+        });
 
         name.setOnKeyPressed(keyEvent -> {
             if (keyEvent.getCode() == KeyCode.ENTER) {
@@ -111,6 +133,7 @@ public class SelectAvatar {
             File selectedFile = fileChooser.showOpenDialog(image.getScene().getWindow());
 
             if (selectedFile != null) {
+                firstNameSymbol.setVisible(false);
                 image.setImage(new Image(selectedFile.getAbsolutePath()));
             try {
                 imageMetadata = Files.readAllBytes(selectedFile.toPath());
@@ -121,20 +144,25 @@ public class SelectAvatar {
         });
     }
 
+    @SneakyThrows
     private void registration () {
         String userName = name.getText();
         String userNickname = nickname.getText();
-        if (userName.length() > 25) exception("Ограничение на длину имени составляет 25 символов");
-        else if (imageMetadata == null) exception("Выберите фото");
+        if (userName.isEmpty()) exception("Введите имя");
+        else if (userNickname.isEmpty()) exception("Введите никнейм");
+        else if (userName.length() > 35) exception("Ограничение на длину имени составляет 35 символов");
+        else if (userNickname.length() > 35) exception("Ограничение на длину никнейма составляет 35 символов");
         else if (userRepository.findFirstByNickname(userNickname).isPresent()) exception("Пользователь с таким никнеймом уже существует");
         else {
             UserEntity userEntity = UserEntity.builder()
                     .name(userName)
                     .nickname(userNickname)
                     .phone(phone)
-                    .avatar(imageMetadata)
                     .password(password)
                     .build();
+            if (imageMetadata == null) {
+                userEntity.setAvatar(defaultAvatarCreator.createAvatar(firstNameSymbol.getText()));
+            } else userEntity.setAvatar(imageMetadata);
             userRepository.saveAndFlush(userEntity);
             load(userEntity);
         }
@@ -159,6 +187,7 @@ public class SelectAvatar {
         stage.setScene(scene);
         stage.show();
     }
+
     private void exception (String message) {
         GUIPatterns.createExceptionMessage(new Image(Objects.requireNonNull(getClass().getResource("/img/exception.png")).toExternalForm()),
                 message, menuItem);

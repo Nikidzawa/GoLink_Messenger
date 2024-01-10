@@ -8,6 +8,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -16,6 +17,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Polygon;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
@@ -109,27 +111,6 @@ public class GUIPatterns {
                 }
             }, 4000);
         }
-    }
-
-    public void makeInput (TextField input) {
-        input.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue) {
-                input.setStyle("-fx-background-color: #001933; -fx-border-color: blue; -fx-text-fill: white; -fx-border-width: 0 0 2 0");
-            } else {
-                input.setStyle("-fx-background-color: #001933; -fx-border-color: Gray; -fx-text-fill: white; -fx-border-width: 0 0 2 0");
-            }
-        });
-    }
-
-    public void makeSearch (TextField searchPanel) {
-        searchPanel.setStyle("-fx-background-color: #001933; -fx-border-color: blue; -fx-text-fill: white; -fx-border-width: 0 0 2 0");
-        searchPanel.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue) {
-                searchPanel.setStyle("-fx-background-color: #001933; -fx-border-color: blue; -fx-text-fill: white; -fx-border-width: 0 0 2 0");
-            } else {
-                searchPanel.setStyle("-fx-background-color: #001933; -fx-border-color: Gray; -fx-text-fill: white; -fx-border-width: 0 0 2 0");
-            }
-        });
     }
 
     public void setConfig (TextField phone) {
@@ -381,10 +362,7 @@ public class GUIPatterns {
         BorderPane borderPane = foreignBasicMessagePattern(localDateTime);
         Text text = new Text(message);
         TextFlow textFlow = new TextFlow(text);
-        textFlow.setStyle(
-                "-fx-font-family: Arial;" +
-                        "-fx-font-size: 14px;"
-        );
+        textFlow.setStyle("-fx-font-family: Arial;" + "-fx-font-size: 14px;");
         textFlow.setPadding(new Insets(5, 10, 3, 10));
 
         borderPane.setTop(textFlow);
@@ -394,11 +372,11 @@ public class GUIPatterns {
 
     private BorderPane foreignBasicMessagePattern(LocalDateTime localDateTime) {
         BorderPane borderPane = new BorderPane();
-        borderPane.setStyle("-fx-background-color: rgb(233, 233, 235); -fx-background-radius: 20px;");
+        borderPane.setStyle("-fx-background-color: rgb(233, 233, 235); -fx-background-radius:  0 15 20 25;");
         Text date = new Text(localDateTime.format(DateTimeFormatter.ofPattern("HH:mm")));
         date.setFill(Color.color(0, 0, 0));
         TextFlow dateFlow = new TextFlow(date);
-        dateFlow.setPadding(new Insets(0, 10, 5, 10));
+        dateFlow.setPadding(new Insets(0, 10, 5, 12));
         dateFlow.setTextAlignment(TextAlignment.LEFT);
         borderPane.setBottom(dateFlow);
         return borderPane;
@@ -406,11 +384,11 @@ public class GUIPatterns {
 
     private BorderPane myBasicMessagePattern(LocalDateTime localDateTime) {
         BorderPane borderPane = new BorderPane();
-        borderPane.setStyle("-fx-background-color: rgb(15, 125, 242); -fx-background-radius: 20px;");
+        borderPane.setStyle("-fx-background-color: rgb(15, 125, 242); -fx-background-radius: 15 0 25 20;");
         Text date = new Text(localDateTime.format(DateTimeFormatter.ofPattern("HH:mm")));
         date.setFill(Color.color(0.934, 0.925, 0.996));
         TextFlow dateFlow = new TextFlow(date);
-        dateFlow.setPadding(new Insets(0, 10, 5, 10));
+        dateFlow.setPadding(new Insets(0, 12, 5, 10));
         dateFlow.setTextAlignment(TextAlignment.RIGHT);
         borderPane.setBottom(dateFlow);
         return borderPane;
@@ -489,7 +467,7 @@ public class GUIPatterns {
     public HBox printMyMessage(MessageEntity message, LocalDateTime localDateTime) {
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER_RIGHT);
-        hBox.setPadding(new Insets(5, 5, 3, 10));
+        hBox.setPadding(new Insets(5, 15, 3, 10));
         BorderPane borderPane = myBasicMessagePattern(localDateTime);
         Text text = new Text(message.getMessage());
         TextFlow textFlow = new TextFlow(text);

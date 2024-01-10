@@ -12,6 +12,6 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
     Optional<UserEntity> findFirstByPhone (Long number);
     Optional<UserEntity> findFirstByNickname (String nickname);
-    @Query("SELECT CASE WHEN COUNT(u) > 0 THEN true ELSE false END FROM UserEntity u WHERE u.phone = :phone AND u.password = :password")
-    boolean existsByPhoneAndPassword(@Param("phone") Long phone, @Param("password") String password);
+    @Query("SELECT CASE WHEN COUNT(u) > 0 THEN true ELSE false END FROM UserEntity u WHERE u.nickname = :phone AND u.password = :password")
+    boolean existsByPhoneAndPassword(@Param("phone") String nickname, @Param("password") String password);
 }

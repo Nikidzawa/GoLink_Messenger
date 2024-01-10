@@ -37,7 +37,7 @@
             <Font name="System Italic" size="17.0" />
          </font>
       </TextField>
-      <Button fx:id="enter" layoutX="183.0" layoutY="464.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="189.0" style="-fx-background-color: blue;" text="Подтвердить" textFill="WHITE">
+      <Button fx:id="enter" layoutX="183.0" layoutY="464.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="189.0" style="-fx-background-color: linear-gradient(from 0% 5% to 90% 100%, blue, red);" text="Подтвердить" textFill="WHITE">
          <font>
             <Font name="System Bold" size="15.0" />
          </font>

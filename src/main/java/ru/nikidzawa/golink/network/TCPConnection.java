@@ -9,15 +9,15 @@ public class TCPConnection {
     private final Socket socket;
     private Thread thread;
     private final TCPConnectionListener listener;
-    private final DataOutputStream ous;
-    private final DataInputStream ois;
+    private final DataOutputStream out;
+    private final DataInputStream in;
     @Getter
     private final String userId;
     @SneakyThrows
-    public TCPConnection (Socket socket, TCPConnectionListener listener, String userId, DataInputStream ois) {
-        this.ois = ois;
+    public TCPConnection (Socket socket, TCPConnectionListener listener, String userId, DataInputStream in) {
+        this.in = in;
         this.socket = socket;
-        ous = new DataOutputStream(socket.getOutputStream());
+        out = new DataOutputStream(socket.getOutputStream());
         this.listener = listener;
         this.userId = userId;
         start();
@@ -28,15 +28,15 @@ public class TCPConnection {
         this.socket = socket;
         this.listener = listener;
         this.userId = userId;
-        ous = new DataOutputStream(socket.getOutputStream());
-        ois = new DataInputStream(socket.getInputStream());
+        out = new DataOutputStream(socket.getOutputStream());
+        in = new DataInputStream(socket.getInputStream());
         setUserId();
         start();
     }
     @SneakyThrows
     private void setUserId () {
-        ous.writeUTF(userId);
-        ous.flush();
+        out.writeUTF(userId);
+        out.flush();
     }
 
     private void start () {
@@ -44,12 +44,12 @@ public class TCPConnection {
             listener.onConnectionReady(TCPConnection.this);
             while (!Thread.interrupted()) {
                 try {
-                    switch (ois.readInt()) {
-                        case 30 -> listener.onReceiveMessage(TCPConnection.this, ois.readUTF());
+                    switch (in.readInt()) {
+                        case 30 -> listener.onReceiveMessage(TCPConnection.this, in.readUTF());
                         case 60 -> {
-                            int length = ois.readInt();
+                            int length = in.readInt();
                             byte[] photoBytes = new byte[length];
-                            ois.readFully(photoBytes);
+                            in.readFully(photoBytes);
                             listener.onReceiveImage(TCPConnection.this, photoBytes);
                         }
                     }
@@ -65,9 +65,9 @@ public class TCPConnection {
     public synchronized void sendMessage(String string) {
         try {
             if (string != null) {
-                ous.writeInt(30);
-                ous.writeUTF(string);
-                ous.flush();
+                out.writeInt(30);
+                out.writeUTF(string);
+                out.flush();
             }
         } catch (IOException e) {
             disconnect();
@@ -76,10 +76,10 @@ public class TCPConnection {
 
     @SneakyThrows
     public synchronized void sendPhoto (byte[] bytes) {
-        ous.writeInt(60);
-        ous.writeInt(bytes.length);
-        ous.write(bytes);
-        ous.flush();
+        out.writeInt(60);
+        out.writeInt(bytes.length);
+        out.write(bytes);
+        out.flush();
     }
 
     @SneakyThrows

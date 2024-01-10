@@ -1,20 +1,15 @@
 package ru.nikidzawa.golink.network;
 
 import lombok.Getter;
-import lombok.Setter;
 import lombok.SneakyThrows;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import ru.nikidzawa.golink.services.SystemOfControlServers.SOCSConnection;
-import ru.nikidzawa.golink.store.repositories.MessageRepository;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
-
 
 public class Server implements TCPConnectionListener {
     public HashMap <String, TCPConnection> connections = new HashMap<>();
