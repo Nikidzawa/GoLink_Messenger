@@ -1,4 +1,4 @@
-package ru.nikidzawa.golink.FXControllers.helpers;
+package ru.nikidzawa.golink.FXControllers.cash;
 
 import javafx.stage.Stage;
 import lombok.Getter;

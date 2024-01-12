@@ -8,7 +8,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -17,7 +16,6 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Polygon;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
@@ -30,6 +28,9 @@ import lombok.Setter;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 import ru.nikidzawa.golink.FXControllers.GoLink;
+import ru.nikidzawa.golink.FXControllers.cash.ContactCash;
+import ru.nikidzawa.golink.FXControllers.cash.MessageStage;
+import ru.nikidzawa.golink.network.TCPConnection;
 import ru.nikidzawa.golink.store.entities.MessageEntity;
 import ru.nikidzawa.golink.store.entities.PersonalChat;
 import ru.nikidzawa.golink.store.entities.UserEntity;
@@ -56,9 +57,12 @@ public class GUIPatterns {
         });
     }
 
-    public void setBaseWindowTitleCommands(Pane titleBar, Button minimizeButton, Button scaleButton, Button closeButton, ExitListener listener) {
+    public void setBaseWindowTitleCommands(Pane titleBar, Button minimizeButton, Button scaleButton, Button closeButton, TCPConnection tcpConnection) {
         setWindowTitleButtons(titleBar, minimizeButton, scaleButton, closeButton);
-        closeButton.setOnAction(actionEvent -> listener.onExit());
+        closeButton.setOnAction(actionEvent -> {
+            tcpConnection.disconnect();
+            Platform.exit();
+        });
     }
 
     private void setWindowTitleButtons(Pane titleBar, Button minimizeButton, Button scaleButton, Button closeButton) {
@@ -128,18 +132,18 @@ public class GUIPatterns {
         });
     }
 
-    public BorderPane newChatBuilder(UserEntity myAccount, Contact contact, PersonalChat personalChat) {
+    public BorderPane newChatBuilder(UserEntity myAccount, ContactCash contactCash, PersonalChat personalChat) {
         BorderPane borderPane = new BorderPane();
         borderPane.setCursor(Cursor.HAND);
         StackPane stackImg = new StackPane();
         GNAvatarView avatar = new GNAvatarView();
-        avatar.setImage(new Image(new ByteArrayInputStream(contact.getInterlocutor().getAvatar())));
+        avatar.setImage(new Image(new ByteArrayInputStream(contactCash.getInterlocutor().getAvatar())));
         avatar.setType(AvatarType.CIRCLE);
         avatar.setStroke(Paint.valueOf("#001933"));
         stackImg.getChildren().add(avatar);
         stackImg.setPrefHeight(60);
         stackImg.setPrefWidth(60);
-        if (contact.getInterlocutor().isConnected()) {
+        if (contactCash.getInterlocutor().isConnected()) {
             Circle circle = new Circle();
             circle.setFill(Paint.valueOf("GREEN"));
             circle.setRadius(7);
@@ -151,7 +155,7 @@ public class GUIPatterns {
         borderPane.setLeft(stackImg);
 
         BorderPane nameAndLastMessage = new BorderPane();
-        Text name = new Text(contact.getInterlocutor().getName());
+        Text name = new Text(contactCash.getInterlocutor().getName());
         name.setTextAlignment(TextAlignment.LEFT);
         name.setFont(Font.font("System", 18));
         name.setFill(Paint.valueOf("white"));
@@ -160,19 +164,22 @@ public class GUIPatterns {
         lastMessageInfo.setStyle("-fx-background-color: #001933; -fx-text-fill: white");
         lastMessageInfo.setDisable(true);
         nameAndLastMessage.setLeft(lastMessageInfo);
-        List<MessageEntity> messages = contact.getChat().getMessages();
+        List<MessageEntity> messages = contactCash.getChat().getMessages().stream().sorted(Comparator.comparing(MessageEntity::getDate).reversed()).toList();
         nameAndLastMessage.setPadding(new Insets(0, 0, 0, 10));
         borderPane.setCenter(nameAndLastMessage);
         VBox vBox = new VBox();
         vBox.setSpacing(5);
         Text date = new Text();
-        if (messages != null && !messages.isEmpty()) {
-            MessageEntity lastMessage = messages.get(messages.size() - 1);
-            String sender = lastMessage.getSender().getId().equals(myAccount.getId()) ? "Вы: " : "";
-            lastMessageInfo.setText(sender + lastMessage.getMessage());
+        if (!messages.isEmpty()) {
+            MessageEntity lastMessage = messages.get(0);
+            switch (lastMessage.getMessageType()) {
+                case IMAGE -> lastMessageInfo.setText(lastMessage.getSender().getId().equals(myAccount.getId()) ? "Вы: фотография" : "Фотография");
+                case TEXT, IMAGE_AND_TEXT -> lastMessageInfo.setText((lastMessage.getSender().getId().equals(myAccount.getId()) ? "Вы: " : " ") + lastMessage.getMessage());
+            }
             date.setText(lastMessage.getDate().format(DateTimeFormatter.ofPattern("HH:mm")));
+            contactCash.setLastMessage(lastMessage);
 
-        } else { lastMessageInfo.setText("Чат пуст"); }
+        } else {lastMessageInfo.setText("Чат пуст"); }
             date.setFill(Paint.valueOf("white"));
             vBox.getChildren().add(date);
             Translate translate = new Translate();
@@ -204,11 +211,11 @@ public class GUIPatterns {
             borderPane.setStyle("-fx-background-color: #001933;");
         });
 
-        contact.setNameAndLastMessage(nameAndLastMessage);
-        contact.setDate(date);
-        contact.setLastMessageText(lastMessageInfo);
-        contact.setNewMessagesBlock(newMessagesVisualize);
-        contact.setNewMessagesCount(newMessageCount);
+        contactCash.setNameAndLastMessage(nameAndLastMessage);
+        contactCash.setDate(date);
+        contactCash.setLastMessageText(lastMessageInfo);
+        contactCash.setNewMessagesBlock(newMessagesVisualize);
+        contactCash.setNewMessagesCount(newMessageCount);
 
         return borderPane;
     }
@@ -355,12 +362,12 @@ public class GUIPatterns {
         messageStage.show();
     }
 
-    public HBox printForeignMessage(String message, LocalDateTime localDateTime) {
+    public HBox printForeignMessage(MessageEntity message) {
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER_LEFT);
         hBox.setPadding(new Insets(5, 5, 5, 10));
-        BorderPane borderPane = foreignBasicMessagePattern(localDateTime);
-        Text text = new Text(message);
+        BorderPane borderPane = foreignBasicMessagePattern(message);
+        Text text = new Text(message.getMessage());
         TextFlow textFlow = new TextFlow(text);
         textFlow.setStyle("-fx-font-family: Arial;" + "-fx-font-size: 14px;");
         textFlow.setPadding(new Insets(5, 10, 3, 10));
@@ -370,10 +377,11 @@ public class GUIPatterns {
         return hBox;
     }
 
-    private BorderPane foreignBasicMessagePattern(LocalDateTime localDateTime) {
+    private BorderPane foreignBasicMessagePattern(MessageEntity message) {
         BorderPane borderPane = new BorderPane();
         borderPane.setStyle("-fx-background-color: rgb(233, 233, 235); -fx-background-radius:  0 15 20 25;");
-        Text date = new Text(localDateTime.format(DateTimeFormatter.ofPattern("HH:mm")));
+        String hasBeenChanged = message.isHasBeenChanged() ? "изменено " : "";
+        Text date = new Text(hasBeenChanged + message.getDate().format(DateTimeFormatter.ofPattern("HH:mm")));
         date.setFill(Color.color(0, 0, 0));
         TextFlow dateFlow = new TextFlow(date);
         dateFlow.setPadding(new Insets(0, 10, 5, 12));
@@ -382,10 +390,11 @@ public class GUIPatterns {
         return borderPane;
     }
 
-    private BorderPane myBasicMessagePattern(LocalDateTime localDateTime) {
+    private BorderPane myBasicMessagePattern(MessageEntity message) {
         BorderPane borderPane = new BorderPane();
         borderPane.setStyle("-fx-background-color: rgb(15, 125, 242); -fx-background-radius: 15 0 25 20;");
-        Text date = new Text(localDateTime.format(DateTimeFormatter.ofPattern("HH:mm")));
+        String hasBeenChanged = message.isHasBeenChanged() ? "изменено " : "";
+        Text date = new Text(hasBeenChanged + message.getDate().format(DateTimeFormatter.ofPattern("HH:mm")));
         date.setFill(Color.color(0.934, 0.925, 0.996));
         TextFlow dateFlow = new TextFlow(date);
         dateFlow.setPadding(new Insets(0, 12, 5, 10));
@@ -394,11 +403,11 @@ public class GUIPatterns {
         return borderPane;
     }
 
-    public HBox printForeignPhoto(Image image, LocalDateTime localDateTime) {
+    public HBox printForeignPhoto(Image image, MessageEntity message) {
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER_LEFT);
         hBox.setPadding(new Insets(5, 5, 5, 10));
-        BorderPane borderPane = foreignBasicMessagePattern(localDateTime);
+        BorderPane borderPane = foreignBasicMessagePattern(message);
         ImageView imageView = new ImageView();
         double width = image.getWidth();
         double height = image.getHeight();
@@ -429,11 +438,11 @@ public class GUIPatterns {
         return hBox;
     }
 
-    public HBox printMyPhoto(Image image, LocalDateTime localDateTime) {
+    public HBox printMyPhoto(Image image, MessageEntity message) {
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER_RIGHT);
         hBox.setPadding(new Insets(5, 5, 5, 10));
-        BorderPane borderPane = myBasicMessagePattern(localDateTime);
+        BorderPane borderPane = myBasicMessagePattern(message);
         ImageView imageView = new ImageView();
         double width = image.getWidth();
         double height = image.getHeight();
@@ -464,11 +473,11 @@ public class GUIPatterns {
         return hBox;
     }
 
-    public HBox printMyMessage(MessageEntity message, LocalDateTime localDateTime) {
+    public HBox printMyMessage(MessageEntity message) {
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER_RIGHT);
         hBox.setPadding(new Insets(5, 15, 3, 10));
-        BorderPane borderPane = myBasicMessagePattern(localDateTime);
+        BorderPane borderPane = myBasicMessagePattern(message);
         Text text = new Text(message.getMessage());
         TextFlow textFlow = new TextFlow(text);
         textFlow.setStyle(

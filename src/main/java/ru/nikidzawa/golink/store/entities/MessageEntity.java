@@ -2,6 +2,7 @@ package ru.nikidzawa.golink.store.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ru.nikidzawa.golink.store.MessageType;
 
 import java.time.LocalDateTime;
 
@@ -20,7 +21,11 @@ public class MessageEntity {
 
     private byte[] metadata;
 
+    private MessageType messageType;
+
     private LocalDateTime date;
+
+    private boolean hasBeenChanged = false;
 
     @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_id", nullable = false)

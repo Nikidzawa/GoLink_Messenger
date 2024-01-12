@@ -23,16 +23,13 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
-import ru.nikidzawa.golink.FXControllers.helpers.Contact;
-import ru.nikidzawa.golink.FXControllers.helpers.ExitListener;
+import ru.nikidzawa.golink.FXControllers.cash.ContactCash;
 import ru.nikidzawa.golink.FXControllers.helpers.GUIPatterns;
 import ru.nikidzawa.golink.FXControllers.Configurations.ScrollConfig;
+import ru.nikidzawa.golink.network.ServerListener;
 import ru.nikidzawa.golink.network.TCPConnection;
-import ru.nikidzawa.golink.network.TCPConnectionListener;
-import ru.nikidzawa.golink.services.GoMessage.GoMessageListener;
-import ru.nikidzawa.golink.services.GoMessage.TCPBroker;
 import ru.nikidzawa.golink.services.Sounds;
-import ru.nikidzawa.golink.services.SystemOfControlServers.SOCSConnection;
+import ru.nikidzawa.golink.store.MessageType;
 import ru.nikidzawa.golink.store.entities.*;
 import ru.nikidzawa.golink.store.repositories.*;
 
@@ -45,7 +42,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Controller
-public class GoLink implements TCPConnectionListener, GoMessageListener, ExitListener {
+public class GoLink implements ServerListener {
     @FXML
     private Button closeButton;
 
@@ -99,8 +96,7 @@ public class GoLink implements TCPConnectionListener, GoMessageListener, ExitLis
 
     @Setter
     private ConfigurableApplicationContext context;
-    private TCPConnection tcpConnection;
-    private TCPBroker tcpBroker;
+    private TCPConnection TCPConnection;
 
     @Autowired
     UserRepository userRepository;
@@ -113,8 +109,8 @@ public class GoLink implements TCPConnectionListener, GoMessageListener, ExitLis
     @Autowired
     GUIPatterns GUIPatterns;
 
-    HashMap<Long, Contact> contacts = new HashMap<>();
-    Contact selectedContact;
+    HashMap<Long, ContactCash> contacts = new HashMap<>();
+    ContactCash selectedContact;
     ScrollConfig scrollConfig;
 
     @Setter
@@ -129,23 +125,22 @@ public class GoLink implements TCPConnectionListener, GoMessageListener, ExitLis
     void initialize() {
         Platform.runLater(() -> {
             try {
-                tcpBroker = new TCPBroker(new Socket("localhost", 8081), this, userEntity.getId().toString());
+                TCPConnection = new TCPConnection(new Socket("localhost", 8081), this, userEntity.getId().toString());
             } catch (IOException ex) {
                 Platform.exit();
                 throw new RuntimeException(ex);
             }
+
             scrollConfig = new ScrollConfig(scrollPane);
             setUserConfig();
-            GUIPatterns.setBaseWindowTitleCommands(titleBar, minimizeButton, scaleButton, closeButton, this);
+            GUIPatterns.setBaseWindowTitleCommands(titleBar, minimizeButton, scaleButton, closeButton, TCPConnection);
             sendImageButton.setOnMouseClicked(mouseEvent -> selectImageConfig());
             send.setOnMouseClicked(actionEvent -> sendMessageConfiguration());
             scene.setOnKeyPressed(keyEvent -> {
                 if (selectedContact != null && keyEvent.getCode() == KeyCode.ENTER) {
                     sendMessageConfiguration();
                 }
-                if (keyEvent.getCode() == KeyCode.ESCAPE && tcpConnection != null) {
-                    tcpConnection.disconnect();
-                    tcpConnection = null;
+                if (keyEvent.getCode() == KeyCode.ESCAPE) {
                     selectedContact = null;
                     GUIPatterns.setEmptyChatConfiguration(chatField);
                     status.setVisible(false);
@@ -171,7 +166,7 @@ public class GoLink implements TCPConnectionListener, GoMessageListener, ExitLis
     }
 
     @SneakyThrows
-    private void openSettings(){
+    private void openSettings() {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/ru/nikidzawa/goLink/FXControllers/editProfile.fxml"));
         loader.setControllerFactory(context::getBean);
         Parent root = loader.load();
@@ -194,53 +189,53 @@ public class GoLink implements TCPConnectionListener, GoMessageListener, ExitLis
         if (personalChats != null && !personalChats.isEmpty()) {
             personalChats.forEach(personalChat -> createContact(personalChat.getInterlocutor(), personalChat.getChat(), personalChat));
         }
-    }
-    private void loadContactsFromCash () {
-        contactsField.getChildren().clear();
-        contacts.values().forEach(contact -> contactsField.getChildren().add(contact.getGUIContact()));
+        writeSortedContacts();
     }
 
-    private Contact createContact (UserEntity interlocutor, ChatEntity chat, PersonalChat personalChat) {
-        Contact contact = new Contact(interlocutor, chat, personalChat);
-        BorderPane GUIContact = GUIPatterns.newChatBuilder(userEntity, contact, personalChat);
-        GUIContact.setOnMouseClicked(e -> openChat(chat, personalChat, interlocutor, contact));
-        contact.setGUIContact(GUIContact);
-        contacts.put(chat.getId(), contact);
-        contactsField.getChildren().add(GUIContact);
-        return contact;
+    private void writeSortedContacts () {
+        contactsField.getChildren().clear();
+        List<ContactCash> GUI = contacts.values()
+                .stream()
+                .sorted(Comparator.comparing(contactCash ->
+                        contactCash.getLastMessage() != null ?
+                                contactCash.getLastMessage().getDate() :
+                                null, Comparator.nullsLast(Comparator.reverseOrder())))
+                .toList();
+        GUI.forEach(contactCash -> contactsField.getChildren().add(contactCash.getGUI()));
+    }
+
+    private void loadContactsFromCash () {
+        contactsField.getChildren().clear();
+        contacts.values().forEach(contactCash -> contactsField.getChildren().add(contactCash.getGUI()));
+    }
+
+    private ContactCash createContact (UserEntity interlocutor, ChatEntity chat, PersonalChat personalChat) {
+        ContactCash contactCash = new ContactCash(interlocutor, chat, personalChat, personalChatRepository);
+        BorderPane GUIContact = GUIPatterns.newChatBuilder(userEntity, contactCash, personalChat);
+        GUIContact.setOnMouseClicked(e -> openChat(chat, personalChat, interlocutor, contactCash));
+        contactCash.setGUI(GUIContact);
+        contacts.put(chat.getId(), contactCash);
+        return contactCash;
     }
 
     @SneakyThrows
-    private void openChat (ChatEntity chat, PersonalChat personalChat, UserEntity interlocutor, Contact contact) {
+    private void openChat (ChatEntity chat, PersonalChat personalChat, UserEntity interlocutor, ContactCash contactCash) {
             if (selectedContact == null || !Objects.equals(selectedContact.getChat().getId(), chat.getId())) {
-                selectedContact = contact;
+                selectedContact = contactCash;
                 scrollConfig.startScrollEvent();
-                if (personalChat.getNewMessagesCount() > 0) {
-                    personalChat.setNewMessagesCount(0);
-                    personalChatRepository.save(personalChat);
-                    contact.resetNotificationCount();
-                }
+                if (personalChat.getNewMessagesCount() > 0) {contactCash.resetNotificationCount();}
+
                 status.setVisible(true);
-                tcpBroker.CHECK_USER_STATUS(interlocutor.getId());
                 sendImageButton.setVisible(true);
                 input.setVisible(true);
                 send.setVisible(true);
+
+                TCPConnection.CHECK_USER_STATUS(interlocutor.getId());
                 chatRoomName.setText(interlocutor.getName());
 
-                if (tcpConnection != null) {
-                    tcpConnection.disconnect();
-                }
-                JoinAnActiveServerOrCreateANewOne(chat);
                 printMessages();
                 scrollConfig.scrolling();
             }
-    }
-
-    @SneakyThrows
-    private void JoinAnActiveServerOrCreateANewOne(ChatEntity chat) {
-        String userId = userEntity.getId().toString();
-        int port = Integer.parseInt(new SOCSConnection().CREATE_SERVER(chat.getId()));
-        tcpConnection = new TCPConnection(new Socket("localhost", port), this, userId);
     }
 
     private void sendMessageConfiguration() {
@@ -248,62 +243,63 @@ public class GoLink implements TCPConnectionListener, GoMessageListener, ExitLis
         if (!text.isEmpty()) {
             if (editable) {
                 selectedContact.editMessage(message, text);
-                input.clear();
-
-                int number = chatField.getChildren().indexOf(messageBackground);
-                chatField.getChildren().remove(number);
-                HBox myMessage = GUIPatterns.printMyMessage(message, message.getDate());
-                myMessage.setOnMouseClicked(clickOnMessage -> {
-                    if (clickOnMessage.getButton() == MouseButton.SECONDARY) {
-                        setMessageFunctions(message, myMessage, clickOnMessage);
-                    }
-                });
-                chatField.getChildren().add(number, myMessage);
                 messageRepository.save(message);
-                tcpBroker.EDIT_MESSAGE(selectedContact.getInterlocutor().getId(), selectedContact.getChat().getId(), message.getId(), text, number);
+                TCPConnection.EDIT(selectedContact.getInterlocutor().getId(), selectedContact.getChat().getId(), message.getId(), text);
                 editable = false;
                 sendZone.setTop(null);
             } else {
-                MessageEntity message = MessageEntity.builder()
-                        .message(text).date(LocalDateTime.now()).sender(userEntity).chat(selectedContact.getChat()).build();
-                messageRepository.saveAndFlush(message);
-                selectedContact.addMessageOnCashAndPutLastMessage(message);
-                tcpConnection.sendMessage(text);
-                tcpBroker.ADD_MESSAGE_ON_CASH(selectedContact.getInterlocutor().getId(), selectedContact.getChat().getId(), message.getId(), text);
-                HBox myMessage = GUIPatterns.printMyMessage(message, LocalDateTime.now());
-                myMessage.setOnMouseClicked(clickOnMessage -> {
+                MessageEntity message = MessageEntity
+                        .builder()
+                        .message(text)
+                        .date(LocalDateTime.now())
+                        .sender(userEntity)
+                        .chat(selectedContact.getChat())
+                        .messageType(MessageType.TEXT)
+                        .build();
+                messageRepository.save(message);
+
+                HBox GUI = GUIPatterns.printMyMessage(message);
+                selectedContact.addMessageOnCashAndPutLastMessage(GUI, message);
+                TCPConnection.POST(selectedContact.getInterlocutor().getId(), selectedContact.getChat().getId(), message.getId(), text);
+                GUI.setOnMouseClicked(clickOnMessage -> {
                     if (clickOnMessage.getButton() == MouseButton.SECONDARY) {
-                        setMessageFunctions(message, myMessage, clickOnMessage);
+                        setMessageFunctions(message, GUI, clickOnMessage);
                     }
                 });
-                chatField.getChildren().add(myMessage);
-                input.clear();
+                chatField.getChildren().add(GUI);
                 scrollConfig.scrolling();
+
+                contactsField.getChildren().remove(selectedContact.getGUI());
+                contactsField.getChildren().add(0, selectedContact.getGUI());
             }
         }
+        input.clear();
     }
 
+    @SneakyThrows
     public void printMessages() {
         chatField.getChildren().clear();
-        List<MessageEntity> messages = selectedContact.getChat().getMessages();
-        if (messages != null && !messages.isEmpty()) {
-           messages.stream().sorted(Comparator.comparing(MessageEntity::getDate)).toList().forEach(message -> {
-                if (message.getSender().getId().equals(userEntity.getId())) {
-                    if (message.getMetadata() != null) {
-                        chatField.getChildren().add(GUIPatterns.printMyPhoto(new Image(new ByteArrayInputStream((message).getMetadata())), (message).getDate()));
-                    } else {
-                        HBox myMessage = GUIPatterns.printMyMessage(message, (message.getDate()));
-                        myMessage.setOnMouseClicked(clickOnMessage -> {
-                            if (clickOnMessage.getButton() == MouseButton.SECONDARY) {
-                                setMessageFunctions(message, myMessage, clickOnMessage);
-                            }
-                        });
-                        chatField.getChildren().add(myMessage);
-                    }
+        List<MessageEntity> messages = selectedContact.getChat().getMessages().stream().sorted(Comparator.comparing(MessageEntity::getDate)).toList();
+        if (!messages.isEmpty()) {
+            messages.forEach(message -> {
+                boolean isMyMessage = message.getSender().getId().equals(userEntity.getId());
+                if (selectedContact.cashedMessageInformation.containsKey(message.getId())) {
+                    chatField.getChildren().add(selectedContact.cashedMessageInformation.get(message.getId()).getGUI());
                 } else {
-                    if (message.getMetadata() != null) {
-                        chatField.getChildren().add(GUIPatterns.printForeignPhoto(new Image(new ByteArrayInputStream(message.getMetadata())), message.getDate()));
-                    } else chatField.getChildren().add(GUIPatterns.printForeignMessage(message.getMessage(), message.getDate()));
+                    switch (message.getMessageType()) {
+                        case TEXT -> {
+                            HBox hBox = isMyMessage ? writeMyMessage(message) : writeForeignMessage(message);
+                            selectedContact.addMessageOnCash(hBox, message);
+                            chatField.getChildren().add(hBox);
+                        }
+                        case IMAGE -> {
+                            HBox hBox = isMyMessage ? GUIPatterns.printMyPhoto(new Image(new ByteArrayInputStream(message.getMetadata())), message) : GUIPatterns.printForeignPhoto(new Image(new ByteArrayInputStream(message.getMetadata())), message);
+                            selectedContact.addMessageOnCash(hBox, message);
+                            chatField.getChildren().add(hBox);
+                        }
+                        case DOCUMENT -> System.out.println("Получен документ");
+                        case AUDIO -> System.out.println("Получено аудио");
+                    }
                 }
             });
         }
@@ -349,9 +345,10 @@ public class GoLink implements TCPConnectionListener, GoMessageListener, ExitLis
     private void deleteMessageFunction (MessageEntity message) {
         messageRepository.deleteAllInBatch(Collections.singletonList(message));
         selectedContact.deleteMessage(message);
-        tcpBroker.DELETE_MESSAGE(selectedContact.getInterlocutor().getId(), selectedContact.getChat().getId(), message.getId(), chatField.getChildren().indexOf(messageBackground));
-        Platform.runLater(() -> chatField.getChildren().remove(messageBackground));
+        TCPConnection.DELETE(selectedContact.getInterlocutor().getId(), selectedContact.getChat().getId(), message.getId());
+        chatField.getChildren().remove(messageBackground);
     }
+
     private void editMessageFunction (String messageText) {
         editable = true;
         ImageView cancelButton = GUIPatterns.getCancelButton();
@@ -375,11 +372,19 @@ public class GoLink implements TCPConnectionListener, GoMessageListener, ExitLis
             if (selectedFile != null) {
                 try {
                     byte[] imageBytes = Files.readAllBytes(selectedFile.toPath());
-                    tcpConnection.sendPhoto(imageBytes);
-                    chatField.getChildren().add(GUIPatterns.printMyPhoto((new Image(new ByteArrayInputStream(imageBytes))), LocalDateTime.now()));
-                    scrollConfig.scrolling();
-                    MessageEntity messageEntity = MessageEntity.builder().metadata(imageBytes).sender(userEntity).chat(selectedContact.getChat()).date(LocalDateTime.now()).build();
+                    MessageEntity messageEntity = MessageEntity.builder()
+                            .metadata(imageBytes)
+                            .sender(userEntity)
+                            .chat(selectedContact.getChat())
+                            .messageType(MessageType.IMAGE)
+                            .date(LocalDateTime.now())
+                            .build();
                     messageRepository.saveAndFlush(messageEntity);
+                    TCPConnection.FILE_POST(selectedContact.getInterlocutor().getId(), selectedContact.getChat().getId(), messageEntity.getId(), MessageType.IMAGE, null, imageBytes);
+                    HBox hBox = GUIPatterns.printMyPhoto((new Image(new ByteArrayInputStream(imageBytes))), messageEntity);
+                    selectedContact.addMessageOnCashAndPutLastMessage(hBox, messageEntity);
+                    chatField.getChildren().add(hBox);
+                    scrollConfig.scrolling();
                 } catch (IOException ex) {
                     System.out.println("ошибка при попытке прочитать и отправить файл " + ex);
                 }
@@ -398,9 +403,9 @@ public class GoLink implements TCPConnectionListener, GoMessageListener, ExitLis
                 contact.setOnMouseClicked(mouseEvent -> {
                     searchPanel.clear();
                     contacts.values().stream()
-                            .filter(contact1 -> Objects.equals(contact1.getInterlocutor().getId(), interlocutor.getId()))
-                            .findFirst().ifPresentOrElse(existingContact -> {
-                                openChat(existingContact.getChat(), existingContact.getPersonalChat(), existingContact.getInterlocutor(), existingContact);
+                            .filter(contactCash1 -> Objects.equals(contactCash1.getInterlocutor().getId(), interlocutor.getId()))
+                            .findFirst().ifPresentOrElse(existingContactCash -> {
+                                openChat(existingContactCash.getChat(), existingContactCash.getPersonalChat(), existingContactCash.getInterlocutor(), existingContactCash);
                                 loadContactsFromCash();}, () -> createNewChatRoom(interlocutor));
                 });
             });
@@ -429,56 +434,25 @@ public class GoLink implements TCPConnectionListener, GoMessageListener, ExitLis
         newChat.setPersonalChats(List.of(myPersonalChat, participantPersonalChat));
         chatRepository.saveAndFlush(newChat);
         loadContactsFromCash();
-        Contact newContact = createContact (interlocutor, newChat, myPersonalChat);
-        openChat(newChat, myPersonalChat, interlocutor, newContact);
-        tcpBroker.CREATE_NEW_CHAT_ROOM(interlocutor.getId(), participantPersonalChat.getId());
+        ContactCash newContactCash = createContact (interlocutor, newChat, myPersonalChat);
+        openChat(newChat, myPersonalChat, interlocutor, newContactCash);
+        TCPConnection.CREATE_NEW_CHAT_ROOM(interlocutor.getId(), participantPersonalChat.getId());
         userEntity.getUserChats().add(myPersonalChat);
     }
 
     @Override
-    public void onConnectionReady(TCPConnection tcpConnection) {}
-
-    @Override
-    public void onReceiveMessage (TCPConnection tcpConnection, String string) {
-        if (!string.equals(userEntity.getId().toString())) {
-            Platform.runLater(() -> {
-                if (scrollPane.getVvalue() >= 0.95) {
-                    chatField.getChildren().add(GUIPatterns.printForeignMessage(string, LocalDateTime.now()));
-                    scrollConfig.scrolling();
-                }
-                else chatField.getChildren().add(GUIPatterns.printForeignMessage(string, LocalDateTime.now()));
-            });
-        }
-    }
-
-    @Override
-    public void onReceiveImage(TCPConnection tcpConnection, byte[] image) {
-        Platform.runLater(() -> {
-            if (scrollPane.getVvalue() >= 0.95) {
-                chatField.getChildren().add(GUIPatterns.printForeignPhoto(new Image(new ByteArrayInputStream(image)), LocalDateTime.now()));
-                scrollConfig.scrolling();
-            }
-            else chatField.getChildren().add(GUIPatterns.printForeignPhoto(new Image(new ByteArrayInputStream(image)), LocalDateTime.now()));
-        });
-    }
-
-    @Override
-    public void onDisconnect(TCPConnection tcpConnection) {}
-
-    @Override
-    public void onConnectionReady(TCPBroker tcpBroker) {
+    public void onConnectionReady(TCPConnection tcpConnection) {
         userEntity.setConnected(true);
         userRepository.saveAndFlush(userEntity);
     }
 
     @Override
-    public void onReceiveMessage(TCPBroker tcpBroker, String string) {
+    public void onReceiveMessage(TCPConnection tcpConnection, String string) {
         String[] strings = string.split(":");
         String command = strings[0];
         String value;
         String value2;
         String value3;
-        String value4;
         try {
             value = strings[1];
         } catch (ArrayIndexOutOfBoundsException ex) {
@@ -494,20 +468,39 @@ public class GoLink implements TCPConnectionListener, GoMessageListener, ExitLis
         } catch (ArrayIndexOutOfBoundsException ex) {
             value3 = null;
         }
-        try {
-            value4 = strings[4];
-        } catch (ArrayIndexOutOfBoundsException ex) {
-            value4 = null;
-        }
-        String finalValue = value3;
         switch (command) {
-            case "DELETE_MESSAGE" -> {
-                int messageId = Integer.parseInt(value2);
+            case "POST" -> {
+                long chatId = Long.parseLong(value);
+                ContactCash contactCash = contacts.get(chatId);
+                ChatEntity chatEntity = contactCash.getChat();
+                UserEntity interlocutor = contactCash.getInterlocutor();
+                writeReceivedMessage(MessageEntity.builder()
+                        .date(LocalDateTime.now())
+                        .chat(chatEntity)
+                        .messageType(MessageType.TEXT)
+                        .id(Long.parseLong(value2))
+                        .sender(interlocutor)
+                        .message(value3)
+                        .build(), contactCash, chatId);
+
+                Platform.runLater(() -> {
+                    contactsField.getChildren().remove(contactCash.getGUI());
+                    contactsField.getChildren().add(0, contactCash.getGUI());
+                });
+            }
+            case "EDIT" -> {
+                long chatId = Long.parseLong(value);
+                long messageId = Long.parseLong(value2);
+                ContactCash contactCash = contacts.get(chatId);
+                contactCash.editMessage(messageId, value3);
+            }
+            case "DELETE" -> {
+                long messageId = Long.parseLong(value2);
                 long chatId = Long.parseLong(value);
                 if (selectedContact != null && selectedContact.getChat().getId() == chatId) {
-                    selectedContact.deleteMessage(messageId);
-                    Platform.runLater(() -> chatField.getChildren().remove(Integer.parseInt(finalValue)));
-                } else contacts.get(chatId).deleteMessage(messageId);
+                    Platform.runLater(() -> chatField.getChildren().remove(selectedContact.deleteMessage(messageId)));
+                }
+                else contacts.get(chatId).deleteMessageDefault(messageId);
             }
             case "CREATE_NEW_CHAT_ROOM" -> {
                 PersonalChat personalChat = personalChatRepository.findById(Long.parseLong(value)).orElseThrow();
@@ -515,47 +508,102 @@ public class GoLink implements TCPConnectionListener, GoMessageListener, ExitLis
                 ChatEntity chatEntity = personalChat.getChat();
                 Platform.runLater(() -> createContact(interlocutor, chatEntity, personalChat));
             }
-            case "EDIT_MESSAGE" -> {
-                long chatId = Long.parseLong(value);
-                int messageId = Integer.parseInt(value2);
-                int position = Integer.parseInt(value4);
-                Contact contact = contacts.get(chatId);
-                MessageEntity messageEntity = contact.editMessage(messageId, value3);
-                if (selectedContact != null && selectedContact.getChat().getId() == chatId) {
-                    HBox myMessage = GUIPatterns.printForeignMessage(value3, messageEntity.getDate());
-                    Platform.runLater(() -> {
-                        chatField.getChildren().remove(position);
-                        chatField.getChildren().add(position, myMessage);
-                    });
-                }
-            }
-            case "ADD_MESSAGE_ON_CASH" -> {
-                Contact contact = contacts.get(Long.parseLong(value));
-                ChatEntity chatEntity = contact.getChat();
-                UserEntity interlocutor = contact.getInterlocutor();
-                MessageEntity messageEntity = MessageEntity.builder().date(LocalDateTime.now()).chat(chatEntity).id(Long.parseLong(value2)).sender(interlocutor).message(value3).build();
-                contact.addMessageOnCashAndPutLastMessage(messageEntity);
-                if (selectedContact == null || !Objects.equals(selectedContact.getChat().getId(), chatEntity.getId())) {
-                    contact.addNotification();
-                    Sounds.notification();
-                }
-            }
             case "CHANGE_USER_STATUS" -> status.setText(Boolean.parseBoolean(value) ? "В сети" : "Не в сети");
         }
     }
 
     @Override
-    public void onDisconnect(TCPBroker tcpBroker) {
-        if (tcpConnection != null) {
-            tcpConnection.disconnect();
+    public void onReceiveFile(TCPConnection tcpConnection, String protocol, byte[] content) {
+        String[] strings = protocol.split(":");
+        String command = strings[0];
+        String value;
+        String value2;
+        String value3;
+        try {
+            value = strings[1];
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            value = null;
         }
-        Platform.exit();
+        try {
+            value2 = strings[2];
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            value2 = null;
+        }
+        try {
+            value3 = strings[3];
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            value3 = null;
+        }
+        switch (command) {
+            case "POST" -> {
+                long chatId = Long.parseLong(value);
+                ContactCash contactCash = contacts.get(chatId);
+                ChatEntity chatEntity = contactCash.getChat();
+                UserEntity interlocutor = contactCash.getInterlocutor();
+                MessageType messageType = MessageType.valueOf(value3);
+                MessageEntity messageEntity = MessageEntity.builder()
+                        .date(LocalDateTime.now())
+                        .chat(chatEntity)
+                        .id(Long.parseLong(value2))
+                        .sender(interlocutor)
+                        .messageType(messageType)
+                        .metadata(content)
+                        .build();
+                switch (messageType) {
+                    case IMAGE -> writeReceivedImage(messageEntity, contactCash, chatId);
+                    case IMAGE_AND_TEXT -> messageEntity.setMessage(strings[4]);
+                }
+                Platform.runLater(() -> {
+                    contactsField.getChildren().remove(contactCash.getGUI());
+                    contactsField.getChildren().add(0, contactCash.getGUI());
+                });
+            }
+        }
+    }
+    private void writeReceivedImage (MessageEntity message, ContactCash contactCash, Long chatId) {
+        HBox hBox = GUIPatterns.printForeignPhoto(new Image(new ByteArrayInputStream(message.getMetadata())), message);
+        contactCash.addMessageOnCashAndPutLastMessage(hBox, message);
+        if (selectedContact != null && Objects.equals(selectedContact.getChat().getId(), chatId)) {
+            Platform.runLater(() -> {
+                if (scrollPane.getVvalue() >= 0.95) {
+                    chatField.getChildren().add(hBox);
+                    scrollConfig.scrolling();
+                } else chatField.getChildren().add(hBox);
+            });
+        } else {
+            contactCash.addNotification(message);
+            Sounds.notification();
+        }
+    }
+
+    private void writeReceivedMessage (MessageEntity message, ContactCash contactCash, Long chatId) {
+        HBox hBox = GUIPatterns.printForeignMessage(message);
+        contactCash.addMessageOnCashAndPutLastMessage(hBox, message);
+        if (selectedContact != null && Objects.equals(selectedContact.getChat().getId(), chatId)) {
+            Platform.runLater(() -> {
+                if (scrollPane.getVvalue() >= 0.95) {
+                    chatField.getChildren().add(hBox);
+                    scrollConfig.scrolling();
+                } else chatField.getChildren().add(hBox);
+            });
+        } else {
+            contactCash.addNotification(message);
+            Sounds.notification();
+        }
+    }
+
+    private HBox writeForeignMessage (MessageEntity message) {
+        return GUIPatterns.printForeignMessage(message);
+    }
+
+    private HBox writeMyMessage (MessageEntity message) {
+        HBox GUI = GUIPatterns.printMyMessage(message);
+        GUI.setOnMouseClicked(clickOnMessage -> {
+            if (clickOnMessage.getButton() == MouseButton.SECONDARY) setMessageFunctions(message, GUI, clickOnMessage);
+        });
+        return GUI;
     }
 
     @Override
-    public void onExit() {
-        userEntity.setConnected(false);
-        userRepository.saveAndFlush(userEntity);
-        tcpBroker.disconnect();
-    }
+    public void onDisconnect(TCPConnection tcpConnection) {Platform.exit();}
 }

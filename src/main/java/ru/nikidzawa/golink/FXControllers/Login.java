@@ -73,6 +73,7 @@ public class Login {
         password.setOnKeyPressed(keyEvent -> {
             if (keyEvent.getCode() == KeyCode.ENTER) enterEvent();
         });
+
         nickname.setOnKeyPressed(keyEvent -> {
             if (keyEvent.getCode() == KeyCode.ENTER)
                 if (password.getText().isEmpty()) {
@@ -84,7 +85,7 @@ public class Login {
     }
 
     private void enterEvent() {
-        String finalNickname = nickname.getText();
+        String finalNickname = nickname.getText().toLowerCase();
         if (userRepository.existsByPhoneAndPassword(finalNickname, password.getText())) {
             Optional<UserEntity> userEntity = userRepository.findFirstByNickname(finalNickname);
             fxMenu(userEntity.orElseThrow());

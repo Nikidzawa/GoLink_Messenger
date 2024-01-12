@@ -147,7 +147,7 @@ public class SelectAvatar {
     @SneakyThrows
     private void registration () {
         String userName = name.getText();
-        String userNickname = nickname.getText();
+        String userNickname = nickname.getText().toLowerCase();
         if (userName.isEmpty()) exception("Введите имя");
         else if (userNickname.isEmpty()) exception("Введите никнейм");
         else if (userName.length() > 35) exception("Ограничение на длину имени составляет 35 символов");

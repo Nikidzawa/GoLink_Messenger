@@ -3,35 +3,29 @@ package ru.nikidzawa.golink.network;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
-import ru.nikidzawa.golink.services.SystemOfControlServers.SOCSConnection;
-
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
-import java.util.Map;
 
-public class Server implements TCPConnectionListener {
-    public HashMap <String, TCPConnection> connections = new HashMap<>();
+public class Server implements ServerListener {
+    private HashMap<Integer, TCPConnection> connections = new HashMap<>();
     @Getter
-    private final int PORT;
-    @Getter
-    private final int CHAT_ID;
+    private final int PORT = 8081;
     public ServerSocket serverSocket;
 
+    public static void main(String[] args) {new Server();}
     @SneakyThrows
-    public Server(int PORT, int CHAT_ID) {
+    public Server() {
+        System.out.println("Сервер запущен");
         serverSocket = new ServerSocket(PORT);
-        this.PORT = serverSocket.getLocalPort();
-        this.CHAT_ID = CHAT_ID;
-    }
-
-    public void start() {
         while (true) {
             try {
                 Socket socket = serverSocket.accept();
                 DataInputStream in = new DataInputStream(socket.getInputStream());
                 String userId = in.readUTF();
+
                 new TCPConnection(socket, this, userId, in);
             } catch (IOException ex) {
                 System.out.println("Сервер на порту " + PORT + " прекратил свою работу");
@@ -41,46 +35,42 @@ public class Server implements TCPConnectionListener {
     }
 
     @Override
-    public synchronized void onConnectionReady(TCPConnection tcpConnection) {
-        connections.put(tcpConnection.getUserId(), tcpConnection);
-    }
+    public void onConnectionReady(TCPConnection tcpConnection) {connections.put(Integer.parseInt(tcpConnection.getUserId()), tcpConnection);}
 
     @Override
-    public synchronized void onReceiveMessage(TCPConnection tcpConnection, String string) {
-        sendMessage(tcpConnection, string);
-    }
-
-    @Override
-    @SneakyThrows
-    public synchronized void onDisconnect(TCPConnection tcpConnection) {
-        connections.remove(tcpConnection.getUserId());
-        if (connections.isEmpty()) {
-            serverSocket.close();
-            new SOCSConnection().RELEASE_PORT(CHAT_ID);
-        }
-    }
-
-    public void sendMessage(TCPConnection tcpConnection, String message) {
-        System.out.println(connections.size());
-        String userId = tcpConnection.getUserId();
-//        String messageWithUserId = userId + ": " + message;
-
-        for (Map.Entry<String, TCPConnection> entry : connections.entrySet()) {
-            if (!entry.getKey().equals(userId)) {
-                entry.getValue().sendMessage(message);
+    public void onReceiveMessage(TCPConnection tcpConnection, String string) {
+        String[] strings = string.split(":", 3);
+        String command = strings[0];
+        int userId = Integer.parseInt(strings[1]);
+        try {
+            switch (command) {
+                case "POST" -> connections.get(userId).sendMessage(command + ":" + strings[2]);
+                case "EDIT" -> connections.get(userId).sendMessage(command + ":" + strings[2]);
+                case "DELETE" -> connections.get(userId).sendMessage(command + ":" + strings[2]);
+                case "CHANGE_USER_STATUS" -> tcpConnection.sendMessage(command + ":" + connections.containsKey(userId));
+                case "CREATE_NEW_CHAT_ROOM" -> connections.get(userId).sendMessage(command + ":" + strings[2]);
             }
+        } catch (NullPointerException ex) {
+            System.out.println("Получатель не в сети");
         }
     }
 
     @Override
-    public void onReceiveImage(TCPConnection tcpConnection, byte[] image) {
-        System.out.println(connections.size());
-        String userId = tcpConnection.getUserId();
-
-        for (Map.Entry<String, TCPConnection> entry : connections.entrySet()) {
-            if (!entry.getKey().equals(userId)) {
-                entry.getValue().sendPhoto(image);
+    public void onReceiveFile(TCPConnection tcpConnection, String protocol, byte[] content) {
+        String[] strings = protocol.split(":", 3);
+        String command = strings[0];
+        int userId = Integer.parseInt(strings[1]);
+        try {
+            switch (command) {
+                case "POST" -> connections.get(userId).sendFile(command + ":" + strings[2], content);
             }
+        } catch (NullPointerException ex) {
+            System.out.println("Получатель не в сети");
         }
+    }
+
+    @Override
+    public void onDisconnect(TCPConnection tcpConnection) {
+        connections.remove(Integer.parseInt(tcpConnection.getUserId()));
     }
 }

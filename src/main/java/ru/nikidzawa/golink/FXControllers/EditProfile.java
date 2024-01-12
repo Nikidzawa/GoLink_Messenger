@@ -21,7 +21,7 @@ import ru.nikidzawa.golink.store.repositories.UserRepository;
 import java.io.ByteArrayInputStream;
 
 @Component
-public class EditProfile implements ExitListener {
+public class EditProfile {
     @FXML
     private GNAvatarView avatar;
 
@@ -72,7 +72,7 @@ public class EditProfile implements ExitListener {
     void initialize() {
         Platform.runLater(() -> {
             enter.requestFocus();
-            GUIPatterns.setBaseWindowTitleCommands(titleBar, minimizeButton, scaleButton, closeButton, this);
+//            GUIPatterns.setBaseWindowTitleCommands(titleBar, minimizeButton, scaleButton, closeButton);
 
             name.setText(userEntity.getName());
             nickname.setText("@" + userEntity.getNickname());
@@ -130,9 +130,5 @@ public class EditProfile implements ExitListener {
     }
     private void exception (String exMessage) {
         System.out.println(exMessage);
-    }
-    @Override
-    public void onExit() {
-        scene.getWindow().hide();
     }
 }

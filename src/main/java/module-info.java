@@ -44,16 +44,13 @@ module ru.nikidzawa.golink {
     opens ru.nikidzawa.golink to javafx.fxml, spring.core, org.hibernate.orm.core;
     exports ru.nikidzawa.golink;
     exports ru.nikidzawa.golink.FXControllers.helpers;
-    exports ru.nikidzawa.golink.services.SystemOfControlServers;
-    opens ru.nikidzawa.golink.services.SystemOfControlServers to javafx.fxml, org.hibernate.orm.core, spring.core;
+    exports ru.nikidzawa.golink.store;
     exports ru.nikidzawa.golink.store.entities;
     opens ru.nikidzawa.golink.store.entities to javafx.fxml, org.hibernate.orm.core, spring.core;
     exports ru.nikidzawa.golink.store.repositories;
     opens ru.nikidzawa.golink.store.repositories to javafx.fxml, org.hibernate.orm.core, spring.core;
     exports ru.nikidzawa.golink.network;
     opens ru.nikidzawa.golink.network to javafx.fxml, org.hibernate.orm.core, spring.core;
-    exports ru.nikidzawa.golink.services.GoMessage;
-    opens ru.nikidzawa.golink.services.GoMessage to javafx.fxml, org.hibernate.orm.core, spring.core;
     exports ru.nikidzawa.golink.services;
     opens ru.nikidzawa.golink.services to javafx.fxml, org.hibernate.orm.core, spring.core;
     exports ru.nikidzawa.golink.FXControllers;
@@ -62,4 +59,6 @@ module ru.nikidzawa.golink {
     opens ru.nikidzawa.golink.FXControllers.helpers to javafx.fxml, org.hibernate.orm.core, spring.core;
     exports ru.nikidzawa.golink.FXControllers.Configurations;
     opens ru.nikidzawa.golink.FXControllers.Configurations to javafx.fxml, org.hibernate.orm.core, spring.core;
+    exports ru.nikidzawa.golink.FXControllers.cash;
+    opens ru.nikidzawa.golink.FXControllers.cash to javafx.fxml, org.hibernate.orm.core, spring.core;
 }
