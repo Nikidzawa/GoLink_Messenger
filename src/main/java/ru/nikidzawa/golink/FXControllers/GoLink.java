@@ -26,13 +26,15 @@ import org.springframework.stereotype.Controller;
 import ru.nikidzawa.golink.FXControllers.cash.ContactCash;
 import ru.nikidzawa.golink.FXControllers.helpers.GUIPatterns;
 import ru.nikidzawa.golink.FXControllers.Configurations.ScrollConfig;
+import ru.nikidzawa.golink.services.sound.AudioHelper;
 import ru.nikidzawa.golink.network.ServerListener;
 import ru.nikidzawa.golink.network.TCPConnection;
-import ru.nikidzawa.golink.services.Sounds;
+import ru.nikidzawa.golink.services.sound.SongPlayer;
 import ru.nikidzawa.golink.store.MessageType;
 import ru.nikidzawa.golink.store.entities.*;
 import ru.nikidzawa.golink.store.repositories.*;
 
+import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -92,6 +94,9 @@ public class GoLink implements ServerListener {
     private ImageView sendImageButton;
 
     @FXML
+    private ImageView microphone;
+
+    @FXML
     private GNAvatarView myAvatar;
 
     @Setter
@@ -147,8 +152,36 @@ public class GoLink implements ServerListener {
                     sendImageButton.setVisible(false);
                     send.setVisible(false);
                     input.setVisible(false);
+                    microphone.setVisible(false);
                     editable = false;
                     chatRoomName.setText("");
+                }
+            });
+            microphone.setOnMousePressed(mouseEvent -> {
+                AudioHelper.startRecording();
+            });
+            microphone.setOnMouseReleased(mouseEvent -> {
+                AudioHelper.stopRecording();
+                try {
+                    byte[] metadata = AudioHelper.convertAudioToBytes(AudioHelper.getFile());
+                    MessageEntity messageEntity = MessageEntity.builder()
+                            .messageType(MessageType.AUDIO)
+                            .metadata(metadata)
+                            .sender(userEntity)
+                            .date(LocalDateTime.now())
+                            .chat(selectedContact.getChat())
+                            .build();
+                    HBox GUI = GUIPatterns.printMyAudio(messageEntity, AudioHelper.getFile());
+                    messageRepository.save(messageEntity);
+                    TCPConnection.FILE_POST(selectedContact.getInterlocutor().getId(), selectedContact.getChat().getId(), messageEntity.getId(), MessageType.AUDIO, null, metadata);
+                    selectedContact.addMessageOnCashAndPutLastMessage(GUI, messageEntity);
+                    chatField.getChildren().add(GUI);
+                    scrollConfig.scrolling();
+
+                    contactsField.getChildren().remove(selectedContact.getGUI());
+                    contactsField.getChildren().add(0, selectedContact.getGUI());
+                } catch (IOException | UnsupportedAudioFileException e) {
+                    throw new RuntimeException(e);
                 }
             });
             settingsButton.setOnMouseClicked(mouseEvent -> openSettings());
@@ -229,6 +262,7 @@ public class GoLink implements ServerListener {
                 sendImageButton.setVisible(true);
                 input.setVisible(true);
                 send.setVisible(true);
+                microphone.setVisible(true);
 
                 TCPConnection.CHECK_USER_STATUS(interlocutor.getId());
                 chatRoomName.setText(interlocutor.getName());
@@ -297,8 +331,13 @@ public class GoLink implements ServerListener {
                             selectedContact.addMessageOnCash(hBox, message);
                             chatField.getChildren().add(hBox);
                         }
+                        case AUDIO -> {
+                            HBox hBox = isMyMessage ? GUIPatterns.printMyAudio(message, AudioHelper.convertBytesToAudio(message.getMetadata())) : GUIPatterns.printForeignAudio(message, AudioHelper.convertBytesToAudio(message.getMetadata()));
+                            selectedContact.addMessageOnCash(hBox, message);
+                            chatField.getChildren().add(hBox);
+                        }
+
                         case DOCUMENT -> System.out.println("Получен документ");
-                        case AUDIO -> System.out.println("Получено аудио");
                     }
                 }
             });
@@ -441,10 +480,7 @@ public class GoLink implements ServerListener {
     }
 
     @Override
-    public void onConnectionReady(TCPConnection tcpConnection) {
-        userEntity.setConnected(true);
-        userRepository.saveAndFlush(userEntity);
-    }
+    public void onConnectionReady(TCPConnection tcpConnection) {}
 
     @Override
     public void onReceiveMessage(TCPConnection tcpConnection, String string) {
@@ -552,6 +588,7 @@ public class GoLink implements ServerListener {
                 switch (messageType) {
                     case IMAGE -> writeReceivedImage(messageEntity, contactCash, chatId);
                     case IMAGE_AND_TEXT -> messageEntity.setMessage(strings[4]);
+                    case AUDIO -> writeReceivedAudio(messageEntity, contactCash, chatId);
                 }
                 Platform.runLater(() -> {
                     contactsField.getChildren().remove(contactCash.getGUI());
@@ -560,6 +597,22 @@ public class GoLink implements ServerListener {
             }
         }
     }
+    private void writeReceivedAudio (MessageEntity message, ContactCash contactCash, Long chatId) {
+        HBox hBox = GUIPatterns.printForeignAudio(message, AudioHelper.convertBytesToAudio(message.getMetadata()));
+        contactCash.addMessageOnCashAndPutLastMessage(hBox, message);
+        if (selectedContact != null && Objects.equals(selectedContact.getChat().getId(), chatId)) {
+            Platform.runLater(() -> {
+                if (scrollPane.getVvalue() >= 0.95) {
+                    chatField.getChildren().add(hBox);
+                    scrollConfig.scrolling();
+                } else chatField.getChildren().add(hBox);
+            });
+        } else {
+            contactCash.addNotification(message);
+            SongPlayer.notification();
+        }
+    }
+
     private void writeReceivedImage (MessageEntity message, ContactCash contactCash, Long chatId) {
         HBox hBox = GUIPatterns.printForeignPhoto(new Image(new ByteArrayInputStream(message.getMetadata())), message);
         contactCash.addMessageOnCashAndPutLastMessage(hBox, message);
@@ -572,7 +625,7 @@ public class GoLink implements ServerListener {
             });
         } else {
             contactCash.addNotification(message);
-            Sounds.notification();
+            SongPlayer.notification();
         }
     }
 
@@ -588,7 +641,7 @@ public class GoLink implements ServerListener {
             });
         } else {
             contactCash.addNotification(message);
-            Sounds.notification();
+            SongPlayer.notification();
         }
     }
 

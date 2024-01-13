@@ -1,4 +1,4 @@
-package ru.nikidzawa.golink.services;
+package ru.nikidzawa.golink.services.GrapgicPatterns;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.VPos;

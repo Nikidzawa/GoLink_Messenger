@@ -15,6 +15,7 @@ public class Server implements ServerListener {
     private final int PORT = 8081;
     public ServerSocket serverSocket;
 
+    @SneakyThrows
     public static void main(String[] args) {new Server();}
     @SneakyThrows
     public Server() {
@@ -70,7 +71,5 @@ public class Server implements ServerListener {
     }
 
     @Override
-    public void onDisconnect(TCPConnection tcpConnection) {
-        connections.remove(Integer.parseInt(tcpConnection.getUserId()));
-    }
+    public void onDisconnect(TCPConnection tcpConnection) {connections.remove(Integer.parseInt(tcpConnection.getUserId()));}
 }

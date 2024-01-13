@@ -8,6 +8,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -25,20 +26,23 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 import ru.nikidzawa.golink.FXControllers.GoLink;
 import ru.nikidzawa.golink.FXControllers.cash.ContactCash;
 import ru.nikidzawa.golink.FXControllers.cash.MessageStage;
 import ru.nikidzawa.golink.network.TCPConnection;
+import ru.nikidzawa.golink.services.sound.AudioPlayer;
 import ru.nikidzawa.golink.store.entities.MessageEntity;
 import ru.nikidzawa.golink.store.entities.PersonalChat;
 import ru.nikidzawa.golink.store.entities.UserEntity;
 
 import java.io.ByteArrayInputStream;
-import java.time.LocalDateTime;
+import java.io.File;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Setter
 @Component
@@ -143,7 +147,7 @@ public class GUIPatterns {
         stackImg.getChildren().add(avatar);
         stackImg.setPrefHeight(60);
         stackImg.setPrefWidth(60);
-        if (contactCash.getInterlocutor().isConnected()) {
+        if (false) {
             Circle circle = new Circle();
             circle.setFill(Paint.valueOf("GREEN"));
             circle.setRadius(7);
@@ -175,6 +179,7 @@ public class GUIPatterns {
             switch (lastMessage.getMessageType()) {
                 case IMAGE -> lastMessageInfo.setText(lastMessage.getSender().getId().equals(myAccount.getId()) ? "Вы: фотография" : "Фотография");
                 case TEXT, IMAGE_AND_TEXT -> lastMessageInfo.setText((lastMessage.getSender().getId().equals(myAccount.getId()) ? "Вы: " : " ") + lastMessage.getMessage());
+                case AUDIO -> lastMessageInfo.setText(lastMessage.getSender().getId().equals(myAccount.getId()) ? "Вы: аудиофайл" : "Аудиофайл");
             }
             date.setText(lastMessage.getDate().format(DateTimeFormatter.ofPattern("HH:mm")));
             contactCash.setLastMessage(lastMessage);
@@ -401,6 +406,70 @@ public class GUIPatterns {
         dateFlow.setTextAlignment(TextAlignment.RIGHT);
         borderPane.setBottom(dateFlow);
         return borderPane;
+    }
+    @SneakyThrows
+    public HBox printMyAudio (MessageEntity message, File file) {
+        HBox hBox = new HBox();
+        hBox.setAlignment(Pos.CENTER_RIGHT);
+        hBox.setPadding(new Insets(5, 5, 5, 10));
+        BorderPane borderPane = myBasicMessagePattern(message);
+        ImageView imageView = new ImageView();
+        imageView.setCursor(Cursor.HAND);
+        BorderPane.setMargin(imageView, new Insets(10, 0, 0, 10));
+
+        borderPane.setLeft(imageView);
+        Text timer = new Text();
+        ProgressBar progressBar = new ProgressBar();
+        new AudioPlayer(file, progressBar, duration -> {
+            long totalSeconds = (long) duration.toSeconds();
+            int minutes = (int) (totalSeconds / 60);
+            int seconds = (int) (totalSeconds % 60);
+            timer.setText(String.format("%d%d:%d%d", minutes / 10, minutes % 10, seconds / 10, seconds % 10));
+        }, true, imageView);
+
+        imageView.setFitWidth(40);
+        imageView.setFitHeight(40);
+        BorderPane.setMargin(progressBar, new Insets(10, 0, 0, 5));
+        progressBar.setPrefWidth(180);
+        borderPane.setCenter(progressBar);
+        BorderPane.setMargin(timer, new Insets(20, 10, 0, 5));
+        timer.setFill(Color.WHITE);
+        borderPane.setPrefWidth(280);
+        borderPane.setRight(timer);
+        hBox.getChildren().add(borderPane);
+        return hBox;
+    }
+
+    public HBox printForeignAudio (MessageEntity message, File file) {
+        HBox hBox = new HBox();
+        hBox.setAlignment(Pos.CENTER_LEFT);
+        hBox.setPadding(new Insets(5, 5, 5, 10));
+        BorderPane borderPane = foreignBasicMessagePattern(message);
+        ImageView imageView = new ImageView();
+        imageView.setCursor(Cursor.HAND);
+        BorderPane.setMargin(imageView, new Insets(10, 0, 0, 10));
+
+        borderPane.setLeft(imageView);
+        Text timer = new Text();
+        ProgressBar progressBar = new ProgressBar();
+        new AudioPlayer(file, progressBar, duration -> {
+            long totalSeconds = (long) duration.toSeconds();
+            int minutes = (int) (totalSeconds / 60);
+            int seconds = (int) (totalSeconds % 60);
+            timer.setText(String.format("%d%d:%d%d", minutes / 10, minutes % 10, seconds / 10, seconds % 10));
+        }, false, imageView);
+
+        imageView.setFitWidth(40);
+        imageView.setFitHeight(40);
+        BorderPane.setMargin(progressBar, new Insets(10, 0, 0, 5));
+        progressBar.setPrefWidth(180);
+        borderPane.setCenter(progressBar);
+        BorderPane.setMargin(timer, new Insets(20, 10, 0, 5));
+        timer.setFill(Color.BLACK);
+        borderPane.setPrefWidth(280);
+        borderPane.setRight(timer);
+        hBox.getChildren().add(borderPane);
+        return hBox;
     }
 
     public HBox printForeignPhoto(Image image, MessageEntity message) {

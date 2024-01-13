@@ -102,34 +102,57 @@
          <bottom>
             <BorderPane fx:id="sendZone" prefHeight="45.0" prefWidth="878.0" style="-fx-border-color: black; -fx-border-width: 0 0  0 1 0;" BorderPane.alignment="CENTER">
                <center>
-                  <TextField fx:id="input" prefHeight="40.0" prefWidth="753.0" promptText="Введите сообщение..." style="-fx-background-color: #001933; -fx-border-color: blue; -fx-border-width: 0 0 2 0; -fx-text-fill: white;" visible="false" BorderPane.alignment="CENTER">
+                  <TextField fx:id="input" prefHeight="40.0" prefWidth="776.0" promptText="Введите сообщение..." style="-fx-background-color: #001933; -fx-border-color: blue; -fx-border-width: 0 0 2 0; -fx-text-fill: white;" visible="false" BorderPane.alignment="CENTER">
                      <font>
                         <Font size="15.0" />
                      </font>
                      <BorderPane.margin>
-                        <Insets left="5.0" />
+                        <Insets left="10.0" />
                      </BorderPane.margin>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
                   </TextField>
                </center>
                <left>
-                  <ImageView fx:id="sendImageButton" fitHeight="32.0" fitWidth="34.0" pickOnBounds="true" preserveRatio="true" visible="false" BorderPane.alignment="CENTER">
+                  <ImageView fx:id="sendImageButton" fitHeight="35.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" visible="false" BorderPane.alignment="CENTER">
                      <image>
                         <Image url="@/img/img.png" />
                      </image>
                      <BorderPane.margin>
                         <Insets left="5.0" />
                      </BorderPane.margin>
-                  </ImageView>
-               </left>
-               <right>
-                  <ImageView fx:id="send" fitHeight="40.0" fitWidth="45.0" pickOnBounds="true" preserveRatio="true" visible="false" BorderPane.alignment="CENTER">
-                     <image>
-                        <Image url="@../../../../img/sendMessageIcon.png" />
-                     </image>
                      <cursor>
                         <Cursor fx:constant="HAND" />
                      </cursor>
                   </ImageView>
+               </left>
+               <right>
+                  <BorderPane prefHeight="45.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+                     <right>
+                        <ImageView fx:id="send" fitHeight="35.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" visible="false" BorderPane.alignment="CENTER">
+                           <image>
+                              <Image url="@/img/sendMessageIcon.png" />
+                           </image>
+                           <BorderPane.margin>
+                              <Insets right="10.0" />
+                           </BorderPane.margin>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </ImageView>
+                     </right>
+                     <center>
+                        <ImageView fx:id="microphone" fitHeight="35.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" visible="false" BorderPane.alignment="CENTER">
+                           <image>
+                              <Image url="@/img/microphone.png" />
+                           </image>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </ImageView>
+                     </center>
+                  </BorderPane>
                </right>
             </BorderPane>
          </bottom>

@@ -27,8 +27,6 @@ public class UserEntity {
 
     private String password;
 
-    private boolean connected;
-
     private byte[] avatar;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)

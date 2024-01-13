@@ -1,9 +1,5 @@
 package ru.nikidzawa.golink.FXControllers;
 
-import javafx.animation.FadeTransition;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -19,15 +15,13 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.util.Duration;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 import ru.nikidzawa.golink.FXControllers.helpers.GUIPatterns;
-import ru.nikidzawa.golink.services.SMSAuthenticate;
-import ru.nikidzawa.golink.store.entities.UserEntity;
+import ru.nikidzawa.golink.services.smsAuthenticate.SMSAuthenticate;
 import ru.nikidzawa.golink.store.repositories.UserRepository;
 
 import java.util.Objects;
