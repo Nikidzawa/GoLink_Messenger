@@ -183,7 +183,9 @@ public class SelectAvatar {
         goLink.setContext(context);
 
         Stage stage = new Stage();
+        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/img/logo.png"))));
         stage.initStyle(StageStyle.UNDECORATED);
+        stage.setTitle("GoLink");
         stage.setScene(scene);
         stage.show();
     }

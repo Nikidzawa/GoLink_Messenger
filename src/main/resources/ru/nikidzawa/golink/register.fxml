@@ -19,9 +19,9 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1200.0" prefWidth="1200.0" style="-fx-background-color: #001933;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.nikidzawa.golink.FXControllers.Register">
    <children>
-      <Button fx:id="enter" layoutX="429.0" layoutY="1069.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="261.0" style="-fx-background-color: linear-gradient(from 0% 5% to 90% 100%, blue, red);" text="Подтвердить номер" textAlignment="CENTER" textFill="WHITE">
+      <Button fx:id="enter" layoutX="429.0" layoutY="1069.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="261.0" style="-fx-background-color: linear-gradient(from 0% 5% to 90% 100%, blue, red);" text="Продолжить" textAlignment="CENTER" textFill="WHITE">
          <font>
-            <Font name="Arial" size="22.0" />
+            <Font name="Open Sans Regular" size="22.0" />
          </font>
          <cursor>
             <Cursor fx:constant="HAND" />
@@ -40,31 +40,10 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Text>
-      <Text fontSmoothingType="LCD" layoutX="440.0" layoutY="331.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Регистрация" textAlignment="CENTER" wrappingWidth="261.13671875">
+      <Text fill="WHITE" layoutX="420.0" layoutY="490.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Регистрация" textAlignment="CENTER" wrappingWidth="274.13671875">
          <font>
             <Font name="Arial Bold" size="40.0" />
          </font>
-         <fill>
-            <LinearGradient endX="1.0" endY="1.0">
-               <stops>
-                  <Stop>
-                     <color>
-                        <Color red="0.2368421107530594" blue="0.7894737124443054" />
-                     </color>
-                  </Stop>
-                  <Stop offset="0.9966442953020134">
-                     <color>
-                        <Color red="1.0" />
-                     </color>
-                  </Stop>
-                  <Stop offset="1.0">
-                     <color>
-                        <Color red="1.0" />
-                     </color>
-                  </Stop>
-               </stops>
-            </LinearGradient>
-         </fill>
       </Text>
       <VBox fx:id="menuItem" layoutX="712.0" layoutY="52.0" prefHeight="534.0" prefWidth="498.0" spacing="15" />
       <HBox alignment="TOP_RIGHT" prefHeight="38.0" prefWidth="1200.0" style="-fx-background-color: #18314D;">
@@ -132,31 +111,15 @@
             <Image url="@/img/free-icon-font-key-3914475.png" />
          </image>
       </ImageView>
-      <Text layoutX="429.0" layoutY="240.0" strokeType="OUTSIDE" strokeWidth="0.0" text="GoLink" wrappingWidth="290.13671875">
+      <ImageView fitHeight="80.0" fitWidth="90.0" layoutX="390.0" layoutY="220.0">
+         <image>
+            <Image url="@/img/logo.png" />
+         </image>
+      </ImageView>
+      <Text fill="WHITE" layoutX="500.0" layoutY="280.0" strokeType="OUTSIDE" strokeWidth="0.0" text="GoLink" wrappingWidth="201.13671875">
          <font>
-            <Font name="System Bold" size="85.0" />
+            <Font name="Arial Bold" size="56.0" />
          </font>
-         <fill>
-            <LinearGradient endX="1.0" endY="1.0">
-               <stops>
-                  <Stop>
-                     <color>
-                        <Color red="0.2368421107530594" blue="0.7894737124443054" />
-                     </color>
-                  </Stop>
-                  <Stop offset="0.9966442953020134">
-                     <color>
-                        <Color red="1.0" />
-                     </color>
-                  </Stop>
-                  <Stop offset="1.0">
-                     <color>
-                        <Color red="1.0" />
-                     </color>
-                  </Stop>
-               </stops>
-            </LinearGradient>
-         </fill>
       </Text>
    </children>
 </AnchorPane>

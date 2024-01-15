@@ -1,36 +1,48 @@
 package ru.nikidzawa.golink.FXControllers.cash;
 
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
 import lombok.*;
+import ru.nikidzawa.golink.FXControllers.helpers.GUIPatterns;
 import ru.nikidzawa.golink.store.entities.MessageEntity;
 
+import java.io.ByteArrayInputStream;
 import java.time.format.DateTimeFormatter;
 
 public class MessageCash {
     @Getter
-    @Setter
     private MessageEntity message;
     @Getter
-    private final HBox GUI;
+    private final HBox messageBackground;
+    @Getter
+    private final BorderPane GUI;
     private Text messageText;
+    private ImageView imageView;
     private Text date;
 
-    public MessageCash (HBox GUI, MessageEntity message) {
+    public MessageCash (HBox messageBackground, BorderPane GUI, MessageEntity message, ImageView imageView, Text messageText, Text date) {
+        this.messageBackground = messageBackground;
         this.GUI = GUI;
         this.message = message;
-        switch (message.getMessageType()) {
-            case TEXT -> {
-                BorderPane borderPane = (BorderPane) GUI.getChildren().stream().filter(node -> node instanceof BorderPane).findFirst().orElseThrow();
-                TextFlow messageFlow = (TextFlow) borderPane.getTop();
-                TextFlow dateFlow = (TextFlow) borderPane.getBottom();
+        this.imageView = imageView;
+        this.messageText = messageText;
+        this.date = date;
+    }
 
-                date = (Text) dateFlow.getChildren().stream().filter(node -> node instanceof Text).findFirst().orElseThrow();
-                messageText = (Text) messageFlow.getChildren().stream().filter(node -> node instanceof Text).findFirst().orElseThrow();
-            }
-        }
+    public MessageCash (HBox messageBackground, BorderPane GUI, MessageEntity message) {
+        this.messageBackground = messageBackground;
+        this.GUI = GUI;
+        this.message = message;
+    }
+
+    public Image getImage () {return imageView.getImage();}
+
+    public void setImage (byte[] imageBytes) {
+        message.setMetadata(imageBytes);
+        GUIPatterns.setImageConfig(new Image(new ByteArrayInputStream(imageBytes)), imageView);
     }
 
     public void changeText (String newMessageText) {

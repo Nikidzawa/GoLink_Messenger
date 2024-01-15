@@ -61,8 +61,8 @@ module ru.nikidzawa.golink {
     opens ru.nikidzawa.golink.FXControllers.cash to javafx.fxml, org.hibernate.orm.core, spring.core;
     exports ru.nikidzawa.golink.services.sound;
     opens ru.nikidzawa.golink.services.sound to javafx.fxml, org.hibernate.orm.core, spring.core;
-    exports ru.nikidzawa.golink.services.smsAuthenticate;
-    opens ru.nikidzawa.golink.services.smsAuthenticate to javafx.fxml, org.hibernate.orm.core, spring.core;
+    exports ru.nikidzawa.golink.services.SMSAuthenticate;
+    opens ru.nikidzawa.golink.services.SMSAuthenticate to javafx.fxml, org.hibernate.orm.core, spring.core;
     exports ru.nikidzawa.golink.services.GrapgicPatterns;
     opens ru.nikidzawa.golink.services.GrapgicPatterns to javafx.fxml, org.hibernate.orm.core, spring.core;
 }

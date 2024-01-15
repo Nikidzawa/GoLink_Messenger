@@ -19,31 +19,10 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1200.0" prefWidth="1200.0" style="-fx-background-color: #001933;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.nikidzawa.golink.FXControllers.Login">
    <children>
-      <Text fontSmoothingType="LCD" layoutX="433.0" layoutY="325.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Вход" textAlignment="CENTER" wrappingWidth="261.13671875">
+      <Text fill="WHITE" layoutX="420.0" layoutY="490.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Вход" textAlignment="CENTER" wrappingWidth="261.13671875">
          <font>
             <Font name="Arial Bold" size="40.0" />
          </font>
-         <fill>
-            <LinearGradient endX="1.0" endY="1.0">
-               <stops>
-                  <Stop>
-                     <color>
-                        <Color red="0.2368421107530594" blue="0.7894737124443054" />
-                     </color>
-                  </Stop>
-                  <Stop offset="0.9966442953020134">
-                     <color>
-                        <Color red="1.0" />
-                     </color>
-                  </Stop>
-                  <Stop offset="1.0">
-                     <color>
-                        <Color red="1.0" />
-                     </color>
-                  </Stop>
-               </stops>
-            </LinearGradient>
-         </fill>
       </Text>
       <Button fx:id="enter" layoutX="420.0" layoutY="1057.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="261.0" style="-fx-background-color: linear-gradient(from 0% 5% to 90% 100%, blue, red);" text="Войти" textAlignment="CENTER" textFill="WHITE">
          <font>
@@ -67,31 +46,10 @@
          </cursor>
       </Text>
       <VBox fx:id="menuItem" layoutX="702.0" layoutY="42.0" prefHeight="534.0" prefWidth="498.0" spacing="15" />
-      <Text layoutX="419.0" layoutY="230.0" strokeType="OUTSIDE" strokeWidth="0.0" text="GoLink" wrappingWidth="290.13671875">
+      <Text fill="WHITE" layoutX="500.0" layoutY="280.0" strokeType="OUTSIDE" strokeWidth="0.0" text="GoLink" wrappingWidth="197.13671875">
          <font>
-            <Font name="System Bold" size="85.0" />
+            <Font name="Arial Bold" size="56.0" />
          </font>
-         <fill>
-            <LinearGradient endX="1.0" endY="1.0">
-               <stops>
-                  <Stop>
-                     <color>
-                        <Color red="0.2368421107530594" blue="0.7894737124443054" />
-                     </color>
-                  </Stop>
-                  <Stop offset="0.9966442953020134">
-                     <color>
-                        <Color red="1.0" />
-                     </color>
-                  </Stop>
-                  <Stop offset="1.0">
-                     <color>
-                        <Color red="1.0" />
-                     </color>
-                  </Stop>
-               </stops>
-            </LinearGradient>
-         </fill>
       </Text>
       <HBox alignment="TOP_RIGHT" prefHeight="38.0" prefWidth="1200.0" style="-fx-background-color: #18314D;">
          <children>
@@ -156,6 +114,11 @@
       <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="240.0" layoutY="767.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@/img/free-icon-font-key-3914475.png" />
+         </image>
+      </ImageView>
+      <ImageView fitHeight="80.0" fitWidth="92.0" layoutX="390.0" layoutY="220.0">
+         <image>
+            <Image url="@/img/logo.png" />
          </image>
       </ImageView>
    </children>

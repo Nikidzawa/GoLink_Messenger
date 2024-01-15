@@ -136,6 +136,7 @@ public class VerifyNumber {
         selectAvatar.setContext(context);
         Parent root = loader.getRoot();
         Stage stage = new Stage();
+        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/img/logo.png"))));
         stage.initStyle(StageStyle.UNDECORATED);
         stage.setScene(new Scene(root));
         stage.show();
@@ -161,7 +162,9 @@ public class VerifyNumber {
         register.setContext(context);
 
         Stage stage = new Stage();
+        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/img/logo.png"))));
         stage.initStyle(StageStyle.UNDECORATED);
+        stage.setTitle("GoLink");
         stage.setScene(new Scene(root));
         stage.show();
     }

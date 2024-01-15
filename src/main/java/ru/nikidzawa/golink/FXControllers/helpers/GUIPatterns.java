@@ -25,12 +25,14 @@ import javafx.scene.transform.Translate;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
+import javafx.util.Pair;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 import ru.nikidzawa.golink.FXControllers.GoLink;
 import ru.nikidzawa.golink.FXControllers.cash.ContactCash;
+import ru.nikidzawa.golink.FXControllers.cash.MessageCash;
 import ru.nikidzawa.golink.FXControllers.cash.MessageStage;
 import ru.nikidzawa.golink.network.TCPConnection;
 import ru.nikidzawa.golink.services.sound.AudioPlayer;
@@ -42,13 +44,13 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 @Setter
 @Component
 public class GUIPatterns {
     private double xOffset = 0;
     private double yOffset = 0;
+    @Setter
     private MessageStage messageStage;
 
     public void setBaseWindowTitleCommands(Pane titleBar, Button minimizeButton, Button scaleButton, Button closeButton, ConfigurableApplicationContext context) {
@@ -356,10 +358,15 @@ public class GUIPatterns {
         vBox.setStyle("-fx-background-color:  #18314D; -fx-border-color: black; -fx-spacing: 5");
 
         vBox.getChildren().add(copy);
-        vBox.getChildren().add(edit);
         vBox.getChildren().add(delete);
+        double finalHeight = delete.getPrefHeight();
+        if (edit != null && copy != null) {
+            finalHeight += copy.getPrefHeight();
+            finalHeight += edit.getPrefHeight();
+            vBox.getChildren().add(edit);
+        }
 
-        Scene scene = new Scene(vBox, 154, 105);
+        Scene scene = new Scene(vBox, 154, finalHeight);
         messageStage.setScene(scene);
 
         messageStage.setX(mouseX);
@@ -367,36 +374,13 @@ public class GUIPatterns {
         messageStage.show();
     }
 
-    public HBox printForeignMessage(MessageEntity message) {
+    @SneakyThrows
+    public MessageCash printMyAudioGUIAndGetCash (MessageEntity message, File file) {
         HBox hBox = new HBox();
-        hBox.setAlignment(Pos.CENTER_LEFT);
-        hBox.setPadding(new Insets(5, 5, 5, 10));
-        BorderPane borderPane = foreignBasicMessagePattern(message);
-        Text text = new Text(message.getMessage());
-        TextFlow textFlow = new TextFlow(text);
-        textFlow.setStyle("-fx-font-family: Arial;" + "-fx-font-size: 14px;");
-        textFlow.setPadding(new Insets(5, 10, 3, 10));
-
-        borderPane.setTop(textFlow);
-        hBox.getChildren().add(borderPane);
-        return hBox;
-    }
-
-    private BorderPane foreignBasicMessagePattern(MessageEntity message) {
+        hBox.setAlignment(Pos.CENTER_RIGHT);
+        hBox.setPadding(new Insets(0, 15, 0, 0));
         BorderPane borderPane = new BorderPane();
-        borderPane.setStyle("-fx-background-color: rgb(233, 233, 235); -fx-background-radius:  0 15 20 25;");
-        String hasBeenChanged = message.isHasBeenChanged() ? "изменено " : "";
-        Text date = new Text(hasBeenChanged + message.getDate().format(DateTimeFormatter.ofPattern("HH:mm")));
-        date.setFill(Color.color(0, 0, 0));
-        TextFlow dateFlow = new TextFlow(date);
-        dateFlow.setPadding(new Insets(0, 10, 5, 12));
-        dateFlow.setTextAlignment(TextAlignment.LEFT);
-        borderPane.setBottom(dateFlow);
-        return borderPane;
-    }
 
-    private BorderPane myBasicMessagePattern(MessageEntity message) {
-        BorderPane borderPane = new BorderPane();
         borderPane.setStyle("-fx-background-color: rgb(15, 125, 242); -fx-background-radius: 15 0 25 20;");
         String hasBeenChanged = message.isHasBeenChanged() ? "изменено " : "";
         Text date = new Text(hasBeenChanged + message.getDate().format(DateTimeFormatter.ofPattern("HH:mm")));
@@ -405,14 +389,7 @@ public class GUIPatterns {
         dateFlow.setPadding(new Insets(0, 12, 5, 10));
         dateFlow.setTextAlignment(TextAlignment.RIGHT);
         borderPane.setBottom(dateFlow);
-        return borderPane;
-    }
-    @SneakyThrows
-    public HBox printMyAudio (MessageEntity message, File file) {
-        HBox hBox = new HBox();
-        hBox.setAlignment(Pos.CENTER_RIGHT);
-        hBox.setPadding(new Insets(5, 5, 5, 10));
-        BorderPane borderPane = myBasicMessagePattern(message);
+
         ImageView imageView = new ImageView();
         imageView.setCursor(Cursor.HAND);
         BorderPane.setMargin(imageView, new Insets(10, 0, 0, 10));
@@ -437,14 +414,24 @@ public class GUIPatterns {
         borderPane.setPrefWidth(280);
         borderPane.setRight(timer);
         hBox.getChildren().add(borderPane);
-        return hBox;
+        return new MessageCash(hBox, borderPane, message);
     }
 
-    public HBox printForeignAudio (MessageEntity message, File file) {
+    public MessageCash printForeignAudioGUIAndGetCash (MessageEntity message, File file) {
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER_LEFT);
-        hBox.setPadding(new Insets(5, 5, 5, 10));
-        BorderPane borderPane = foreignBasicMessagePattern(message);
+
+        hBox.setPadding(new Insets(0, 0, 0, 10));
+        BorderPane borderPane = new BorderPane();
+        borderPane.setStyle("-fx-background-color: rgb(233, 233, 235); -fx-background-radius:  0 15 20 25;");
+        String hasBeenChanged = message.isHasBeenChanged() ? "изменено " : "";
+        Text date = new Text(hasBeenChanged + message.getDate().format(DateTimeFormatter.ofPattern("HH:mm")));
+        date.setFill(Color.color(0, 0, 0));
+        TextFlow dateFlow = new TextFlow(date);
+        dateFlow.setPadding(new Insets(0, 10, 5, 12));
+        dateFlow.setTextAlignment(TextAlignment.LEFT);
+        borderPane.setBottom(dateFlow);
+
         ImageView imageView = new ImageView();
         imageView.setCursor(Cursor.HAND);
         BorderPane.setMargin(imageView, new Insets(10, 0, 0, 10));
@@ -469,111 +456,134 @@ public class GUIPatterns {
         borderPane.setPrefWidth(280);
         borderPane.setRight(timer);
         hBox.getChildren().add(borderPane);
-        return hBox;
+
+        return new MessageCash(hBox, borderPane, message);
     }
 
-    public HBox printForeignPhoto(Image image, MessageEntity message) {
+    public MessageCash makeForeignMessageGUIAndGetCash (MessageEntity message) {
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER_LEFT);
-        hBox.setPadding(new Insets(5, 5, 5, 10));
-        BorderPane borderPane = foreignBasicMessagePattern(message);
-        ImageView imageView = new ImageView();
-        double width = image.getWidth();
-        double height = image.getHeight();
-        if (width > 750) {
-            imageView.setFitWidth(750);
-        } else {
-            imageView.setFitWidth(width);
-        }
-        if (height > 500) {
-            imageView.setFitHeight(500);
-        }
-        else {
-            imageView.setFitHeight(height);
-        }
-        imageView.setImage(image);
-        borderPane.setTop(imageView);
+        hBox.setPadding(new Insets(0, 0, 0, 10));
+
+        BorderPane borderPane = new BorderPane();
+        borderPane.setStyle("-fx-background-color: rgb(233, 233, 235); -fx-background-radius:  0 15 20 25;");
+        String hasBeenChanged = message.isHasBeenChanged() ? "изменено " : "";
+        Text date = new Text(hasBeenChanged + message.getDate().format(DateTimeFormatter.ofPattern("HH:mm")));
+        date.setFill(Color.BLACK);
+        TextFlow dateFlow = new TextFlow(date);
+        dateFlow.setPadding(new Insets(0, 10, 5, 12));
+        dateFlow.setTextAlignment(TextAlignment.LEFT);
+        borderPane.setBottom(dateFlow);
+
+        Text messageText = new Text();
+        TextFlow textFlow = new TextFlow(messageText);
+        textFlow.setStyle("-fx-font-family: Arial; -fx-font-size: 14px;");
+        textFlow.setPadding(new Insets(5, 10, 3, 10));
+        borderPane.setCenter(textFlow);
         hBox.getChildren().add(borderPane);
-        imageView.setOnMouseClicked(mouseEvent -> {
-            Stage imageScene = new Stage();
-            ImageView enlargedImageView = new ImageView(image);
-            enlargedImageView.setFitWidth(width);
-            enlargedImageView.setFitHeight(height);
-            enlargedImageView.setPreserveRatio(true);
-            Scene scene = new Scene(new Pane(enlargedImageView));
-            imageScene.setScene(scene);
-            imageScene.show();
-        });
-        return hBox;
+
+        ImageView imageView = new ImageView();
+        borderPane.setTop(imageView);
+
+        switch (message.getMessageType()) {
+            case TEXT -> messageText.setText(message.getMessage());
+            case IMAGE -> {
+                textFlow.setVisible(false);
+                setImageConfig(new Image(new ByteArrayInputStream(message.getMetadata())), imageView);
+            }
+            case IMAGE_AND_TEXT -> {
+                messageText.setText(message.getMessage());
+                setImageConfig(new Image(new ByteArrayInputStream(message.getMetadata())), imageView);
+            }
+        }
+        return new MessageCash(hBox, borderPane, message, imageView, messageText, date);
     }
 
-    public HBox printMyPhoto(Image image, MessageEntity message) {
+    public MessageCash makeMyMessageGUIAndGetCash (MessageEntity message) {
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER_RIGHT);
-        hBox.setPadding(new Insets(5, 5, 5, 10));
-        BorderPane borderPane = myBasicMessagePattern(message);
-        ImageView imageView = new ImageView();
-        double width = image.getWidth();
-        double height = image.getHeight();
-        if (width > 750) {
-            imageView.setFitWidth(750);
-        } else {
-            imageView.setFitWidth(width);
-        }
-        if (height > 500) {
-            imageView.setFitHeight(500);
-        }
-        else {
-            imageView.setFitHeight(height);
-        }
-        imageView.setImage(image);
-        borderPane.setTop(imageView);
-        hBox.getChildren().add(borderPane);
-        imageView.setOnMouseClicked(mouseEvent -> {
-            Stage imageScene = new Stage();
-            ImageView enlargedImageView = new ImageView(image);
-            enlargedImageView.setFitWidth(width);
-            enlargedImageView.setFitHeight(height);
-            enlargedImageView.setPreserveRatio(true);
-            Scene scene = new Scene(new Pane(enlargedImageView));
-            imageScene.setScene(scene);
-            imageScene.show();
-        });
-        return hBox;
-    }
+        hBox.setPadding(new Insets(0, 15, 0, 0));
 
-    public HBox printMyMessage(MessageEntity message) {
-        HBox hBox = new HBox();
-        hBox.setAlignment(Pos.CENTER_RIGHT);
-        hBox.setPadding(new Insets(5, 15, 3, 10));
-        BorderPane borderPane = myBasicMessagePattern(message);
-        Text text = new Text(message.getMessage());
-        TextFlow textFlow = new TextFlow(text);
-        textFlow.setStyle(
-                "-fx-color: rgb(239, 242, 255);" +
-                        "-fx-font-family: Arial;" + "-fx-font-size: 14px;"
-        );
+        BorderPane borderPane = new BorderPane();
+        borderPane.setStyle("-fx-background-color: rgb(15, 125, 242); -fx-background-radius: 15 0 25 20;");
+        String hasBeenChanged = message.isHasBeenChanged() ? "изменено " : "";
+        Text date = new Text(hasBeenChanged + message.getDate().format(DateTimeFormatter.ofPattern("HH:mm")));
+        date.setFill(Color.WHITE);
+        TextFlow dateFlow = new TextFlow(date);
+        dateFlow.setPadding(new Insets(0, 12, 5, 10));
+        dateFlow.setTextAlignment(TextAlignment.RIGHT);
+        borderPane.setBottom(dateFlow);
+
+        Text messageText = new Text();
+        TextFlow textFlow = new TextFlow(messageText);
+        textFlow.setStyle("-fx-color: rgb(239, 242, 255); -fx-font-family: Arial; -fx-font-size: 14px;");
         textFlow.setPadding(new Insets(5, 10, 5, 10));
-        text.setFill(Color.color(0.934, 0.925, 0.996));
-
-        borderPane.setTop(textFlow);
+        messageText.setFill(Color.color(0.934, 0.925, 0.996));
+        borderPane.setCenter(textFlow);
         hBox.getChildren().add(borderPane);
-        return hBox;
+        ImageView imageView = new ImageView();
+        borderPane.setTop(imageView);
+
+        switch (message.getMessageType()) {
+            case TEXT -> messageText.setText(message.getMessage());
+            case IMAGE -> setImageConfig(new Image(new ByteArrayInputStream(message.getMetadata())), imageView);
+            case IMAGE_AND_TEXT -> {
+                messageText.setText(message.getMessage());
+                setImageConfig(new Image(new ByteArrayInputStream(message.getMetadata())), imageView);
+            }
+        }
+        return new MessageCash(hBox, borderPane, message, imageView, messageText, date);
     }
 
-    public BorderPane getBackgroundEditMessageInterface(String messageText)  {
+    public static void setImageConfig(Image image, ImageView imageView) {
+        double width = image.getWidth();
+        double height = image.getHeight();
+        if (width > 750) {
+            imageView.setFitWidth(750);
+        } else {
+            imageView.setFitWidth(width);
+        }
+        if (height > 600) {
+            imageView.setFitHeight(600);
+        }
+        else {
+            imageView.setFitHeight(height);
+        }
+        imageView.setImage(image);
+        imageView.setOnMouseClicked(mouseEvent -> {
+            if (mouseEvent.getButton() != MouseButton.SECONDARY) {
+                Stage imageScene = new Stage();
+                ImageView enlargedImageView = new ImageView(image);
+                enlargedImageView.setFitWidth(width);
+                enlargedImageView.setFitHeight(height);
+                enlargedImageView.setPreserveRatio(true);
+                Scene scene = new Scene(new Pane(enlargedImageView));
+                imageScene.setScene(scene);
+                imageScene.show();
+            }
+        });
+    }
+
+    public Pair <BorderPane, ImageView> getBackgroundEditInterface(MessageCash messageCash)  {
         BorderPane editInterfaceBackground = new BorderPane();
-        ImageView editImage = new ImageView(new Image(Objects.requireNonNull(GoLink.class.getResourceAsStream("/img/editTXT.png"))));
-        editImage.setFitWidth(30);
-        editImage.setFitHeight(30);
-        editImage.setStyle("-fx-padding: 0 0 0 10 0");
+        ImageView editImage = new ImageView();
+        editImage.setFitWidth(40);
+        editImage.setFitHeight(40);
         BorderPane editMessageProperty = new BorderPane();
         Text redact = new Text("Редактирование");
         redact.setFont(Font.font(17));
         redact.setFill(Paint.valueOf("WHITE"));
         redact.prefWidth(766);
         redact.prefHeight(22);
-        TextField editableText = new TextField(messageText);
+        TextField editableText = new TextField();
+        if (messageCash.getMessage().getMessage() != null) {
+            editableText.setText(messageCash.getMessage().getMessage());
+        }
+        if (messageCash.getImage() == null) {
+            editImage.setImage(new Image(Objects.requireNonNull(GoLink.class.getResourceAsStream("/img/editTXT.png"))));
+        } else {
+            editImage.setImage(messageCash.getImage());
+        }
         editableText.setPrefWidth(806);
         editableText.setPrefHeight(29);
         editableText.setEditable(false);
@@ -582,11 +592,15 @@ public class GUIPatterns {
         editMessageProperty.setTop(redact);
         editInterfaceBackground.setCenter(editMessageProperty);
         editInterfaceBackground.setLeft(editImage);
-        return editInterfaceBackground;
+        BorderPane.setMargin(editableText, new Insets(0, 0, 0, -5));
+        BorderPane.setMargin(editMessageProperty, new Insets(0, 0, 0, 10));
+        BorderPane.setMargin(editImage, new Insets(5, 0, 0, 5));
+        return new Pair<> (editInterfaceBackground, editImage);
     }
 
     public ImageView getCancelButton () {
         ImageView cancel = new ImageView(new Image(Objects.requireNonNull(GoLink.class.getResourceAsStream("/img/cancel.png"))));
+        cancel.setCursor(Cursor.HAND);
         cancel.setFitWidth(30);
         cancel.setFitHeight(30);
         return cancel;

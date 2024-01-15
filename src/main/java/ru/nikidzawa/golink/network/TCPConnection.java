@@ -115,6 +115,9 @@ public class TCPConnection {
     public void FILE_POST (Long receiverID, Long chatID, Long messageID, MessageType messageType, String message, byte[] metadata) {
         sendFile("POST:" + receiverID + ":" + chatID + ":" + messageID + ":" + messageType.name() + ":" + message, metadata);
     }
+    public void FILE_EDIT (Long receiverID, Long chatID, Long messageID, MessageType messageType, String message, byte[] metadata) {
+        sendFile("EDIT:" + receiverID + ":" + chatID + ":" + messageID + ":" + messageType + ":" + message, metadata);
+    }
 
     @SneakyThrows
     public synchronized void disconnect() {

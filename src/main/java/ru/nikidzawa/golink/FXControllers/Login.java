@@ -106,7 +106,9 @@ public class Login {
         goLink.setContext(context);
 
         Stage stage = new Stage();
+        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/img/logo.png"))));
         stage.initStyle(StageStyle.UNDECORATED);
+        stage.setTitle("GoLink");
         stage.setScene(scene);
         stage.show();
     }
@@ -121,6 +123,8 @@ public class Login {
         registerController.setContext(context);
 
         Stage stage = new Stage();
+        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/img/logo.png"))));
+        stage.setTitle("GoLink");
         stage.initStyle(StageStyle.UNDECORATED);
         stage.setScene(new Scene(root));
         stage.show();

@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.springframework.boot.SpringApplication;
@@ -11,6 +12,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.ConfigurableApplicationContext;
 import ru.nikidzawa.golink.FXControllers.Register;
+
+import java.util.Objects;
 
 @SpringBootApplication
 public class Starter extends Application {
@@ -28,9 +31,10 @@ public class Starter extends Application {
     }
     @Override
     public void start(Stage stage) {
+        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/img/logo.png"))));
         stage.initStyle(StageStyle.UNDECORATED);
         stage.setScene(new Scene(rootNode, 1200, 1200));
-        stage.setTitle("Регистрация");
+        stage.setTitle("GoLink");
         stage.show();
     }
     public static void main(String[] args) {

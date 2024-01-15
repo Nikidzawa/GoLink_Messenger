@@ -1,18 +1,21 @@
 package ru.nikidzawa.golink.FXControllers.cash;
 
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import lombok.Getter;
 import lombok.Setter;
+import ru.nikidzawa.golink.store.MessageType;
 import ru.nikidzawa.golink.store.entities.ChatEntity;
 import ru.nikidzawa.golink.store.entities.MessageEntity;
 import ru.nikidzawa.golink.store.entities.PersonalChat;
 import ru.nikidzawa.golink.store.entities.UserEntity;
 import ru.nikidzawa.golink.store.repositories.PersonalChatRepository;
 
+import java.io.ByteArrayInputStream;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -66,14 +69,14 @@ public class ContactCash {
         newMessagesCount.setText(String.valueOf(Integer.parseInt(newMessagesCount.getText()) + 1));
     }
 
-    public void addMessageOnCashAndPutLastMessage (HBox hBox, MessageEntity message) {
-        cashedMessageInformation.put(message.getId(), new MessageCash(hBox, message));
-        chat.getMessages().add(message);
-        putLastMessage(message);
+    public void addMessageOnCashAndPutLastMessage (MessageCash messageCash) {
+        cashedMessageInformation.put(messageCash.getMessage().getId(), messageCash);
+        chat.getMessages().add(messageCash.getMessage());
+        putLastMessage(messageCash.getMessage());
     }
 
-    public void addMessageOnCash (HBox hBox, MessageEntity message) {
-        cashedMessageInformation.put(message.getId(), new MessageCash(hBox, message));
+    public void addMessageOnCash (MessageCash messageCash) {
+        cashedMessageInformation.put(messageCash.getMessage().getId(), messageCash);
     }
 
     public void putLastMessage (MessageEntity message) {
@@ -87,10 +90,19 @@ public class ContactCash {
         date.setText(message.getDate().format(DateTimeFormatter.ofPattern("HH:mm")));
     }
 
-    public void editMessage (MessageEntity message, String messageText) {
+    public void editMessage (MessageCash messageCash, String messageText) {
+        messageCash.changeText(messageText);
+        messageCash.getMessage().setHasBeenChanged(true);
+        messageCash.getMessage().setMessage(messageText);
+        isLastMessage(messageCash.getMessage());
+    }
+    public void editMessageAndFile (MessageCash messageCash, MessageEntity message) {
+        String text = message.getMessage();
+        if (!text.isEmpty()) {
+            messageCash.changeText(message.getMessage());
+        }
+        messageCash.setImage(message.getMetadata());
         message.setHasBeenChanged(true);
-        cashedMessageInformation.get(message.getId()).changeText(messageText);
-        message.setMessage(messageText);
         isLastMessage(message);
     }
 
@@ -104,6 +116,27 @@ public class ContactCash {
             MessageEntity message = chat.getMessages().stream().filter(msg -> Objects.equals(msg.getId(), messageId)).findFirst().orElseThrow();
             message.setHasBeenChanged(true);
             message.setMessage(messageText);
+            isLastMessage(message);
+        }
+    }
+
+    public void editMessage (Long messageId, String messageText, byte[] content, MessageType messageType) {
+        if (cashedMessageInformation.containsKey(messageId)) {
+            MessageCash messageCash = cashedMessageInformation.get(messageId);
+            messageCash.setImage(content);
+            if (!messageText.isEmpty()) {
+                messageCash.changeText(messageText);
+            }
+            MessageEntity message = messageCash.getMessage();
+            message.setMessageType(messageType);
+            messageCash.getMessage().setHasBeenChanged(true);
+            isLastMessage(messageCash.getMessage());
+        } else {
+            MessageEntity message = chat.getMessages().stream().filter(msg -> Objects.equals(msg.getId(), messageId)).findFirst().orElseThrow();
+            message.setHasBeenChanged(true);
+            message.setMessage(messageText);
+            message.setMetadata(content);
+            message.setMessageType(messageType);
             isLastMessage(message);
         }
     }
@@ -152,7 +185,7 @@ public class ContactCash {
         chat.getMessages().remove(indexMessage);
         cashedMessageInformation.remove(messageId);
         isNewMessage(messageCash.getMessage());
-        return messageCash.getGUI();
+        return messageCash.getMessageBackground();
     }
 
     private void isNewMessage(MessageEntity message) {

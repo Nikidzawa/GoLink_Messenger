@@ -64,6 +64,7 @@ public class Server implements ServerListener {
         try {
             switch (command) {
                 case "POST" -> connections.get(userId).sendFile(command + ":" + strings[2], content);
+                case "EDIT" -> connections.get(userId).sendFile(command + ":" + strings[2], content);
             }
         } catch (NullPointerException ex) {
             System.out.println("Получатель не в сети");

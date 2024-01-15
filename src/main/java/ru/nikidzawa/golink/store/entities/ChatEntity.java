@@ -17,8 +17,8 @@ public class ChatEntity {
     private Long id;
 
     @OneToMany(mappedBy = "chat", fetch = FetchType.EAGER)
-    private List<MessageEntity> messages;
+    private List<MessageEntity> messages = new ArrayList<>();
 
     @OneToMany(mappedBy = "chat", fetch = FetchType.EAGER)
-    private List<PersonalChat> personalChats;
+    private List<PersonalChat> personalChats = new ArrayList<>();
 }

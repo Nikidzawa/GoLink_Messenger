@@ -87,7 +87,7 @@
          <center>
             <ScrollPane fx:id="scrollPane" hbarPolicy="NEVER" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #001933; -fx-border-color: black; -fx-border-width: 1 0 1 1;" BorderPane.alignment="CENTER">
                <content>
-                  <VBox fx:id="chatField" prefHeight="1027.0" prefWidth="876.0" style="-fx-background-color: #001933;">
+                  <VBox fx:id="chatField" prefHeight="1027.0" prefWidth="876.0" style="-fx-background-color: #001933; -fx-spacing: 10;">
                      <children>
                         <AnchorPane prefHeight="382.0" prefWidth="876.0" />
                         <TextField alignment="CENTER" editable="false" prefHeight="32.0" prefWidth="855.0" style="-fx-text-fill: white; -fx-background-color: #001933;" text="Выберите, кому хотели бы написать">
@@ -110,7 +110,7 @@
                         <Insets left="10.0" />
                      </BorderPane.margin>
                      <cursor>
-                        <Cursor fx:constant="HAND" />
+                        <Cursor fx:constant="TEXT" />
                      </cursor>
                   </TextField>
                </center>
@@ -130,7 +130,7 @@
                <right>
                   <BorderPane prefHeight="45.0" prefWidth="100.0" BorderPane.alignment="CENTER">
                      <right>
-                        <ImageView fx:id="send" fitHeight="35.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" visible="false" BorderPane.alignment="CENTER">
+                        <ImageView fx:id="sendButton" fitHeight="35.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" visible="false" BorderPane.alignment="CENTER">
                            <image>
                               <Image url="@/img/sendMessageIcon.png" />
                            </image>

@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 import ru.nikidzawa.golink.FXControllers.helpers.GUIPatterns;
-import ru.nikidzawa.golink.services.smsAuthenticate.SMSAuthenticate;
+import ru.nikidzawa.golink.services.SMSAuthenticate.SMSAuthenticate;
 import ru.nikidzawa.golink.store.repositories.UserRepository;
 
 import java.util.Objects;
@@ -116,7 +116,9 @@ public class Register {
         loginController.setContext(context);
 
         Stage stage = new Stage();
+        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/img/logo.png"))));
         stage.initStyle(StageStyle.UNDECORATED);
+        stage.setTitle("GoLink");
         stage.setScene(new Scene(root));
         stage.show();
     }
@@ -138,7 +140,9 @@ public class Register {
         verifyNumber.setCode(code);
 
         Stage stage = new Stage();
+        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/img/logo.png"))));
         stage.initStyle(StageStyle.UNDECORATED);
+        stage.setTitle("GoLink");
         stage.setScene(new Scene(root));
         stage.show();
     }
