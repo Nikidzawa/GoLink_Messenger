@@ -4,33 +4,22 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="39e914f0-8438-4975-ae5e-804deeb44919" name="Changes" comment="Create audio player, add receive audio files">
-      <change afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/Configurations/SendMessageConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/img/addImage.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/img/logo.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/img/reloadImage.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="39e914f0-8438-4975-ae5e-804deeb44919" name="Changes" comment="add edit all type messages, change gui">
+      <change afterPath="$PROJECT_DIR$/src/main/resources/img/i.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/img/logoIcon.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.MD" beforeDir="false" afterPath="$PROJECT_DIR$/README.MD" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/Configurations/ScrollConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/Configurations/ScrollConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/Configurations/SendMessageConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/Configurations/SendMessageConfig.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/GoLink.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/GoLink.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/Login.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/Login.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/Register.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/Register.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/SelectAvatar.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/SelectAvatar.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/VerifyNumber.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/VerifyNumber.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/cash/ContactCash.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/cash/ContactCash.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/cash/MessageCash.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/cash/MessageCash.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/helpers/GUIPatterns.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/helpers/GUIPatterns.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/Starter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/Starter.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/network/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/network/Server.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/network/TCPConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/network/TCPConnection.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/smsAuthenticate/SMSAuthenticate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/SMSAuthenticate/SMSAuthenticate.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/store/entities/ChatEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/store/entities/ChatEntity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/img/ava.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/store/MessageType.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/store/MessageType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/store/entities/MessageEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/store/entities/MessageEntity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/ru/nikidzawa/golink/FXControllers/login.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/ru/nikidzawa/golink/FXControllers/login.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/ru/nikidzawa/golink/FXControllers/menu.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/ru/nikidzawa/golink/FXControllers/menu.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/ru/nikidzawa/golink/FXControllers/verify.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/ru/nikidzawa/golink/FXControllers/verify.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/ru/nikidzawa/golink/register.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/ru/nikidzawa/golink/register.fxml" afterDir="false" />
     </list>
     <list id="4cc47031-8ec7-43a8-bbd2-4836398b378c" name="Changes by Nikidzawa" comment="" />
@@ -86,7 +75,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "Spring Boot.Starter.executor": "Debug",
+    "Spring Boot.Starter.executor": "Run",
     "WebServerToolWindowFactoryState": "false",
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "database.data.extractors.current.export.id": "Comma-separated (CSV)_id",
@@ -115,8 +104,9 @@
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\Nikidzawa\IdeaProjects\goLink\src\main\resources\ru\nikidzawa\golink\FXControllers" />
-      <recent name="C:\Users\Nikidzawa\IdeaProjects\goLink\src\main\resources" />
+      <recent name="C:\Users\Nikidzawa\IdeaProjects\goLink\src\main\resources\img" />
       <recent name="C:\Users\Nikidzawa\IdeaProjects\goLink\src\main\resources\ru\nikidzawa\golink" />
+      <recent name="C:\Users\Nikidzawa\IdeaProjects\goLink\src\main\resources" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\Nikidzawa\IdeaProjects\goLink\src\main\resources\img" />
@@ -212,7 +202,7 @@
       <workItem from="1703672410779" duration="106238000" />
       <workItem from="1704118704631" duration="218987000" />
       <workItem from="1704884034955" duration="65229000" />
-      <workItem from="1705108552700" duration="109197000" />
+      <workItem from="1705108552700" duration="138638000" />
     </task>
     <task id="LOCAL-00001" summary="Create messenger">
       <option name="closed" value="true" />
@@ -390,7 +380,15 @@
       <option name="project" value="LOCAL" />
       <updated>1705169424096</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="add edit all type messages, change gui">
+      <option name="closed" value="true" />
+      <created>1705345003739</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1705345003739</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -429,7 +427,8 @@
     <MESSAGE value="update GUI, make default avatar creator" />
     <MESSAGE value="changing the structure of the messenger, create message cashing, added sorting of contacts, tracking changing messages, optimization, update README" />
     <MESSAGE value="Create audio player, add receive audio files" />
-    <option name="LAST_COMMIT_MESSAGE" value="Create audio player, add receive audio files" />
+    <MESSAGE value="add edit all type messages, change gui" />
+    <option name="LAST_COMMIT_MESSAGE" value="add edit all type messages, change gui" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -442,6 +441,89 @@
           <properties class="java.lang.NullPointerException" package="java.lang" />
           <option name="timeStamp" value="20" />
         </breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/cash/ContactCash.java</url>
+          <line>119</line>
+          <option name="timeStamp" value="140" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/cash/ContactCash.java</url>
+          <line>120</line>
+          <option name="timeStamp" value="141" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/cash/ContactCash.java</url>
+          <line>121</line>
+          <option name="timeStamp" value="142" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/cash/ContactCash.java</url>
+          <line>123</line>
+          <option name="timeStamp" value="147" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/cash/ContactCash.java</url>
+          <line>124</line>
+          <option name="timeStamp" value="149" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/cash/ContactCash.java</url>
+          <line>125</line>
+          <option name="timeStamp" value="150" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/cash/ContactCash.java</url>
+          <line>126</line>
+          <option name="timeStamp" value="151" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/cash/ContactCash.java</url>
+          <line>128</line>
+          <option name="timeStamp" value="152" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/cash/ContactCash.java</url>
+          <line>127</line>
+          <properties>
+            <option name="lambda-ordinal" value="-1" />
+          </properties>
+          <option name="timeStamp" value="153" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/cash/ContactCash.java</url>
+          <line>129</line>
+          <option name="timeStamp" value="154" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/cash/ContactCash.java</url>
+          <line>130</line>
+          <option name="timeStamp" value="155" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/cash/ContactCash.java</url>
+          <line>131</line>
+          <option name="timeStamp" value="156" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/cash/ContactCash.java</url>
+          <line>132</line>
+          <option name="timeStamp" value="157" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/cash/ContactCash.java</url>
+          <line>122</line>
+          <option name="timeStamp" value="169" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/cash/MessageCash.java</url>
+          <line>44</line>
+          <option name="timeStamp" value="174" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/cash/MessageCash.java</url>
+          <line>43</line>
+          <option name="timeStamp" value="175" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
     <watches-manager>

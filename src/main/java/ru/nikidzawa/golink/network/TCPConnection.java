@@ -83,8 +83,14 @@ public class TCPConnection {
         try {
             out.writeInt(100);
             out.writeUTF(protocol);
-            out.writeInt(metadata.length);
-            out.write(metadata);
+            try {
+                out.writeInt(metadata.length);
+                out.write(metadata);
+            } catch (NullPointerException ex) {
+                metadata = new byte[0];
+                out.writeInt(metadata.length);
+                out.write(metadata);
+            }
             out.flush();
         } catch (IOException ex) {
             disconnect();
@@ -100,22 +106,16 @@ public class TCPConnection {
         sendMessage("CREATE_NEW_CHAT_ROOM:" + receiverID + ":" + participantPersonalChatId);
     }
 
-    public void POST(Long receiverID, Long chatID, Long messageID, String message) {
-        sendMessage("POST:" + receiverID + ":" + chatID + ":" + messageID + ":" + message);
-    }
-
-    public void EDIT (Long receiverID, Long chatID, Long messageID, String message) {
-        sendMessage("EDIT:" + receiverID + ":" + chatID + ":" + messageID + ":" + message);
-    }
 
     public void DELETE (Long receiverID, Long chatID, Long messageID) {
         sendMessage("DELETE:" + receiverID + ":" + chatID + ":" + messageID);
     }
 
-    public void FILE_POST (Long receiverID, Long chatID, Long messageID, MessageType messageType, String message, byte[] metadata) {
+    public void POST (Long receiverID, Long chatID, Long messageID, MessageType messageType, String message, byte[] metadata) {
         sendFile("POST:" + receiverID + ":" + chatID + ":" + messageID + ":" + messageType.name() + ":" + message, metadata);
     }
-    public void FILE_EDIT (Long receiverID, Long chatID, Long messageID, MessageType messageType, String message, byte[] metadata) {
+
+    public void EDIT (Long receiverID, Long chatID, Long messageID, MessageType messageType, String message, byte[] metadata) {
         sendFile("EDIT:" + receiverID + ":" + chatID + ":" + messageID + ":" + messageType + ":" + message, metadata);
     }
 

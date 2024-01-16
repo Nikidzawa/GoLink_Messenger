@@ -19,7 +19,7 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1200.0" prefWidth="1200.0" style="-fx-background-color: #001933;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.nikidzawa.golink.FXControllers.Login">
    <children>
-      <Text fill="WHITE" layoutX="420.0" layoutY="490.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Вход" textAlignment="CENTER" wrappingWidth="261.13671875">
+      <Text fill="WHITE" layoutX="420.0" layoutY="450.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Вход" textAlignment="CENTER" wrappingWidth="261.13671875">
          <font>
             <Font name="Arial Bold" size="40.0" />
          </font>

@@ -42,11 +42,11 @@ public class MessageCash {
 
     public void setImage (byte[] imageBytes) {
         message.setMetadata(imageBytes);
-        GUIPatterns.setImageConfig(new Image(new ByteArrayInputStream(imageBytes)), imageView);
+        GUIPatterns.setImageConfig(imageBytes, imageView, GUI);
     }
 
     public void changeText (String newMessageText) {
-        message.setMessage(newMessageText);
+        message.setText(newMessageText);
         date.setText("изменено " + message.getDate().format(DateTimeFormatter.ofPattern("HH:mm")));
         messageText.setText(newMessageText);
     }

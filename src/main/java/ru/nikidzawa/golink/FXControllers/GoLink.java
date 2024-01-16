@@ -143,6 +143,7 @@ public class GoLink implements ServerListener {
                     sendMessageConfig.sendMessageConfiguration();
                 }
                 if (keyEvent.getCode() == KeyCode.ESCAPE) {
+                    scrollPane.setStyle("-fx-background: #001933; -fx-background-color: #001933; -fx-border-width: 1 0 1 1; -fx-border-color: black;");
                     selectedContact = null;
                     setVisibleChatContent(false);
                     sendMessageConfig.disable();
@@ -231,6 +232,8 @@ public class GoLink implements ServerListener {
     @SneakyThrows
     private void openChat (ChatEntity chat, PersonalChat personalChat, UserEntity interlocutor, ContactCash contactCash) {
             if (selectedContact == null || !Objects.equals(selectedContact.getChat().getId(), chat.getId())) {
+                scrollPane.setStyle("-fx-background: transparent; -fx-background-color: transparent; -fx-background-image: url('img/backgroundChatImage.jpg'); -fx-border-width: 1 0 1 1; -fx-border-color: black;");
+                chatField.setStyle("-fx-background: transparent; -fx-background-color: transparent; -fx-spacing: 10");
                 selectedContact = contactCash;
                 sendMessageConfig.setSelectedContact(selectedContact);
                 scrollConfig.startScrollEvent();
@@ -249,8 +252,9 @@ public class GoLink implements ServerListener {
     @SneakyThrows
     public void printMessages() {
         chatField.getChildren().clear();
-        List<MessageEntity> messages = selectedContact.getChat().getMessages().stream().sorted(Comparator.comparing(MessageEntity::getDate)).toList();
-        if (!messages.isEmpty()) {
+        List<MessageEntity> messages = selectedContact.getChat().getMessages();
+        if (messages != null && !messages.isEmpty()) {
+            messages = messages.stream().sorted(Comparator.comparing(MessageEntity::getDate)).toList();
             messages.forEach(message -> {
                 if (selectedContact.cashedMessageInformation.containsKey(message.getId())) {
                     chatField.getChildren().add(selectedContact.cashedMessageInformation.get(message.getId()).getMessageBackground());
@@ -258,7 +262,7 @@ public class GoLink implements ServerListener {
                     boolean isMyMessage = message.getSender().getId().equals(userEntity.getId());
                     MessageCash messageCash = null;
                     switch (message.getMessageType()) {
-                        case IMAGE, TEXT, IMAGE_AND_TEXT -> messageCash = isMyMessage ? GUIPatterns.makeMyMessageGUIAndGetCash(message) : GUIPatterns.makeForeignMessageGUIAndGetCash(message);
+                        case MESSAGE -> messageCash = isMyMessage ? GUIPatterns.makeMyMessageGUIAndGetCash(message) : GUIPatterns.makeForeignMessageGUIAndGetCash(message);
                         case AUDIO, DOCUMENT -> messageCash = isMyMessage ? GUIPatterns.printMyAudioGUIAndGetCash(message, AudioHelper.convertBytesToAudio(message.getMetadata())) : GUIPatterns.printForeignAudioGUIAndGetCash(message, AudioHelper.convertBytesToAudio(message.getMetadata()));
                     }
                     MessageCash finalMessageCash = messageCash;
@@ -330,7 +334,6 @@ public class GoLink implements ServerListener {
         String command = strings[0];
         String value;
         String value2;
-        String value3;
         try {
             value = strings[1];
         } catch (ArrayIndexOutOfBoundsException ex) {
@@ -341,37 +344,7 @@ public class GoLink implements ServerListener {
         } catch (ArrayIndexOutOfBoundsException ex) {
             value2 = null;
         }
-        try {
-            value3 = strings[3];
-        } catch (ArrayIndexOutOfBoundsException ex) {
-            value3 = null;
-        }
         switch (command) {
-            case "POST" -> {
-                long chatId = Long.parseLong(value);
-                ContactCash contactCash = contacts.get(chatId);
-                ChatEntity chatEntity = contactCash.getChat();
-                UserEntity interlocutor = contactCash.getInterlocutor();
-                writeReceivedMessage(MessageEntity.builder()
-                        .date(LocalDateTime.now())
-                        .chat(chatEntity)
-                        .messageType(MessageType.TEXT)
-                        .id(Long.parseLong(value2))
-                        .sender(interlocutor)
-                        .message(value3)
-                        .build(), contactCash, chatId);
-
-                Platform.runLater(() -> {
-                    contactsField.getChildren().remove(contactCash.getGUI());
-                    contactsField.getChildren().add(0, contactCash.getGUI());
-                });
-            }
-            case "EDIT" -> {
-                long chatId = Long.parseLong(value);
-                long messageId = Long.parseLong(value2);
-                ContactCash contactCash = contacts.get(chatId);
-                contactCash.editMessage(messageId, value3);
-            }
             case "DELETE" -> {
                 long messageId = Long.parseLong(value2);
                 long chatId = Long.parseLong(value);
@@ -401,7 +374,7 @@ public class GoLink implements ServerListener {
         try {
             value4 = strings[4];
         } catch (ArrayIndexOutOfBoundsException ex) {
-            value4 = null;
+            value4 = "";
         }
         switch (command) {
             case "POST" -> {
@@ -416,15 +389,12 @@ public class GoLink implements ServerListener {
                         .id(Long.parseLong(value2))
                         .sender(interlocutor)
                         .messageType(messageType)
+                        .text(value4)
                         .metadata(content)
                         .build();
 
                 switch (messageType) {
-                    case IMAGE -> writeReceivedMessage(messageEntity, contactCash, chatId);
-                    case IMAGE_AND_TEXT -> {
-                        messageEntity.setMessage(strings[4]);
-                        writeReceivedMessage(messageEntity, contactCash, chatId);
-                    }
+                    case MESSAGE -> writeReceivedMessage(messageEntity, contactCash, chatId);
                     case AUDIO -> writeReceivedAudio(messageEntity, contactCash, chatId);
                 }
                 Platform.runLater(() -> {

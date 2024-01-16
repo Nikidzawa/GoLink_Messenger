@@ -82,25 +82,21 @@ public class ContactCash {
     public void putLastMessage (MessageEntity message) {
         date.setVisible(true);
         switch (message.getMessageType()) {
-            case TEXT, IMAGE_AND_TEXT -> lastMessageText.setText(Objects.equals(message.getSender().getId(), interlocutor.getId()) ? message.getMessage() : "Вы: " + message.getMessage());
-            case IMAGE ->  lastMessageText.setText(Objects.equals(message.getSender().getId(), interlocutor.getId()) ? "Фотография" : "Вы: " + "фотография");
-            case AUDIO -> lastMessageText.setText(Objects.equals(message.getSender().getId(), interlocutor.getId()) ? "Аудиофайл" : "Вы: " + "аудиофайл");
-            case DOCUMENT -> lastMessageText.setText(Objects.equals(message.getSender().getId(), interlocutor.getId()) ? "Файл" : "Вы: " + "файл");
+            case MESSAGE -> {
+                if (message.getText().isEmpty()) {
+                    lastMessageText.setText(Objects.equals(message.getSender().getId(), interlocutor.getId()) ? "Фотография" : "Вы: " + "фотография");
+                }
+                else {
+                    lastMessageText.setText(Objects.equals(message.getSender().getId(), interlocutor.getId()) ? message.getText() : "Вы: " + message.getText());
+                }
+            }
+            case AUDIO -> lastMessageText.setText(Objects.equals(message.getSender().getId(), interlocutor.getId()) ? "Голосовое сообщение" : "Вы: " + "голосовое сообщение");
+            case DOCUMENT -> lastMessageText.setText(Objects.equals(message.getSender().getId(), interlocutor.getId()) ? "Документ" : "Вы: " + "документ");
         }
         date.setText(message.getDate().format(DateTimeFormatter.ofPattern("HH:mm")));
     }
-
-    public void editMessage (MessageCash messageCash, String messageText) {
-        messageCash.changeText(messageText);
-        messageCash.getMessage().setHasBeenChanged(true);
-        messageCash.getMessage().setMessage(messageText);
-        isLastMessage(messageCash.getMessage());
-    }
     public void editMessageAndFile (MessageCash messageCash, MessageEntity message) {
-        String text = message.getMessage();
-        if (!text.isEmpty()) {
-            messageCash.changeText(message.getMessage());
-        }
+        messageCash.changeText(message.getText());
         messageCash.setImage(message.getMetadata());
         message.setHasBeenChanged(true);
         isLastMessage(message);
@@ -115,7 +111,7 @@ public class ContactCash {
         } else {
             MessageEntity message = chat.getMessages().stream().filter(msg -> Objects.equals(msg.getId(), messageId)).findFirst().orElseThrow();
             message.setHasBeenChanged(true);
-            message.setMessage(messageText);
+            message.setText(messageText);
             isLastMessage(message);
         }
     }
@@ -124,17 +120,14 @@ public class ContactCash {
         if (cashedMessageInformation.containsKey(messageId)) {
             MessageCash messageCash = cashedMessageInformation.get(messageId);
             messageCash.setImage(content);
-            if (!messageText.isEmpty()) {
-                messageCash.changeText(messageText);
-            }
+            messageCash.changeText(messageText);
             MessageEntity message = messageCash.getMessage();
-            message.setMessageType(messageType);
             messageCash.getMessage().setHasBeenChanged(true);
             isLastMessage(messageCash.getMessage());
         } else {
             MessageEntity message = chat.getMessages().stream().filter(msg -> Objects.equals(msg.getId(), messageId)).findFirst().orElseThrow();
             message.setHasBeenChanged(true);
-            message.setMessage(messageText);
+            message.setText(messageText);
             message.setMetadata(content);
             message.setMessageType(messageType);
             isLastMessage(message);

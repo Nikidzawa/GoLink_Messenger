@@ -170,18 +170,28 @@ public class GUIPatterns {
         lastMessageInfo.setStyle("-fx-background-color: #001933; -fx-text-fill: white");
         lastMessageInfo.setDisable(true);
         nameAndLastMessage.setLeft(lastMessageInfo);
-        List<MessageEntity> messages = contactCash.getChat().getMessages().stream().sorted(Comparator.comparing(MessageEntity::getDate).reversed()).toList();
+        BorderPane.setMargin(lastMessageInfo, new Insets(0, 0, 0, -8));
+        List<MessageEntity> messages = contactCash.getChat().getMessages();
         nameAndLastMessage.setPadding(new Insets(0, 0, 0, 10));
         borderPane.setCenter(nameAndLastMessage);
         VBox vBox = new VBox();
         vBox.setSpacing(5);
         Text date = new Text();
-        if (!messages.isEmpty()) {
+        if (messages != null && !messages.isEmpty()) {
+            messages = messages.stream().sorted(Comparator.comparing(MessageEntity::getDate).reversed()).toList();
+
             MessageEntity lastMessage = messages.get(0);
+
             switch (lastMessage.getMessageType()) {
-                case IMAGE -> lastMessageInfo.setText(lastMessage.getSender().getId().equals(myAccount.getId()) ? "Вы: фотография" : "Фотография");
-                case TEXT, IMAGE_AND_TEXT -> lastMessageInfo.setText((lastMessage.getSender().getId().equals(myAccount.getId()) ? "Вы: " : " ") + lastMessage.getMessage());
-                case AUDIO -> lastMessageInfo.setText(lastMessage.getSender().getId().equals(myAccount.getId()) ? "Вы: аудиофайл" : "Аудиофайл");
+                case MESSAGE -> {
+                    if (lastMessage.getText().isEmpty()) {
+                        lastMessageInfo.setText(lastMessage.getSender().getId().equals(myAccount.getId()) ? "Вы: фотография" : "Фотография");
+                    } else {
+                        lastMessageInfo.setText((lastMessage.getSender().getId().equals(myAccount.getId()) ? "Вы: " : " ") + lastMessage.getText());
+                    }
+                }
+                case AUDIO -> lastMessageInfo.setText(lastMessage.getSender().getId().equals(myAccount.getId()) ? "Вы: голосовое сообщение" : "Голосовое сообщение");
+                case DOCUMENT -> lastMessageInfo.setText(lastMessage.getSender().getId().equals(myAccount.getId()) ? "Вы: документ" : "Документ");
             }
             date.setText(lastMessage.getDate().format(DateTimeFormatter.ofPattern("HH:mm")));
             contactCash.setLastMessage(lastMessage);
@@ -357,15 +367,14 @@ public class GUIPatterns {
         VBox vBox = new VBox();
         vBox.setStyle("-fx-background-color:  #18314D; -fx-border-color: black; -fx-spacing: 5");
 
-        vBox.getChildren().add(copy);
-        vBox.getChildren().add(delete);
         double finalHeight = delete.getPrefHeight();
         if (edit != null && copy != null) {
             finalHeight += copy.getPrefHeight();
             finalHeight += edit.getPrefHeight();
+            vBox.getChildren().add(copy);
             vBox.getChildren().add(edit);
         }
-
+        vBox.getChildren().add(delete);
         Scene scene = new Scene(vBox, 154, finalHeight);
         messageStage.setScene(scene);
 
@@ -484,18 +493,13 @@ public class GUIPatterns {
 
         ImageView imageView = new ImageView();
         borderPane.setTop(imageView);
-
-        switch (message.getMessageType()) {
-            case TEXT -> messageText.setText(message.getMessage());
-            case IMAGE -> {
-                textFlow.setVisible(false);
-                setImageConfig(new Image(new ByteArrayInputStream(message.getMetadata())), imageView);
-            }
-            case IMAGE_AND_TEXT -> {
-                messageText.setText(message.getMessage());
-                setImageConfig(new Image(new ByteArrayInputStream(message.getMetadata())), imageView);
-            }
+        if (message.getMetadata() != null) {
+            setImageConfig(message.getMetadata(), imageView, borderPane);
         }
+        if (!message.getText().isEmpty()) {
+            messageText.setText(message.getText());
+        }
+
         return new MessageCash(hBox, borderPane, message, imageView, messageText, date);
     }
 
@@ -524,44 +528,72 @@ public class GUIPatterns {
         ImageView imageView = new ImageView();
         borderPane.setTop(imageView);
 
-        switch (message.getMessageType()) {
-            case TEXT -> messageText.setText(message.getMessage());
-            case IMAGE -> setImageConfig(new Image(new ByteArrayInputStream(message.getMetadata())), imageView);
-            case IMAGE_AND_TEXT -> {
-                messageText.setText(message.getMessage());
-                setImageConfig(new Image(new ByteArrayInputStream(message.getMetadata())), imageView);
-            }
+        if (message.getMetadata() != null) {
+            setImageConfig(message.getMetadata(), imageView, borderPane);
         }
+        if (!message.getText().isEmpty()) {
+            messageText.setText(message.getText());
+        }
+
         return new MessageCash(hBox, borderPane, message, imageView, messageText, date);
     }
 
-    public static void setImageConfig(Image image, ImageView imageView) {
-        double width = image.getWidth();
-        double height = image.getHeight();
-        if (width > 750) {
-            imageView.setFitWidth(750);
+    public static void setImageConfig(byte[] imageBytes, ImageView imageView, BorderPane borderPane) {
+        if (imageBytes == null || imageBytes.length == 0) {
+            Platform.runLater(() -> {
+                borderPane.setTop(null);
+                imageView.setImage(null);
+            });
         } else {
-            imageView.setFitWidth(width);
+            Platform.runLater(() -> {
+                borderPane.setTop(imageView);
+                Image image = new Image(new ByteArrayInputStream(imageBytes));
+                double width = image.getWidth();
+                double height = image.getHeight();
+                if (width > 750) {
+                    imageView.setFitWidth(750);
+                } else {
+                    imageView.setFitWidth(width);
+                }
+                if (height > 600) {
+                    imageView.setFitHeight(600);
+                } else {
+                    imageView.setFitHeight(height);
+                }
+                imageView.setImage(image);
+                imageView.setOnMouseClicked(mouseEvent -> {
+                    if (mouseEvent.getButton() != MouseButton.SECONDARY) {
+                        Stage imageScene = new Stage();
+                        ImageView enlargedImageView = new ImageView(image);
+                        enlargedImageView.setFitWidth(width);
+                        enlargedImageView.setFitHeight(height);
+                        enlargedImageView.setPreserveRatio(true);
+                        Scene scene = new Scene(new Pane(enlargedImageView));
+                        imageScene.setScene(scene);
+                        imageScene.show();
+                    }
+                });
+            });
         }
-        if (height > 600) {
-            imageView.setFitHeight(600);
-        }
-        else {
-            imageView.setFitHeight(height);
-        }
-        imageView.setImage(image);
-        imageView.setOnMouseClicked(mouseEvent -> {
-            if (mouseEvent.getButton() != MouseButton.SECONDARY) {
-                Stage imageScene = new Stage();
-                ImageView enlargedImageView = new ImageView(image);
-                enlargedImageView.setFitWidth(width);
-                enlargedImageView.setFitHeight(height);
-                enlargedImageView.setPreserveRatio(true);
-                Scene scene = new Scene(new Pane(enlargedImageView));
-                imageScene.setScene(scene);
-                imageScene.show();
-            }
-        });
+    }
+
+    public Pair<BorderPane, ImageView> getBackgroundSelectImageInterface ()  {
+        BorderPane GUI = new BorderPane();
+        ImageView selectedImage = new ImageView();
+        selectedImage.setFitWidth(40);
+        selectedImage.setFitHeight(40);
+        BorderPane editMessageProperty = new BorderPane();
+        Text redact = new Text("Добавить подпись");
+        redact.setFont(Font.font(17));
+        redact.setFill(Paint.valueOf("WHITE"));
+        redact.prefWidth(766);
+        redact.prefHeight(22);
+        editMessageProperty.setCenter(redact);
+        GUI.setCenter(editMessageProperty);
+        GUI.setLeft(selectedImage);
+        BorderPane.setMargin(editMessageProperty, new Insets(0, 0, 0, 10));
+        BorderPane.setMargin(selectedImage, new Insets(5, 0, 5, 5));
+        return new Pair<>(GUI, selectedImage);
     }
 
     public Pair <BorderPane, ImageView> getBackgroundEditInterface(MessageCash messageCash)  {
@@ -576,8 +608,10 @@ public class GUIPatterns {
         redact.prefWidth(766);
         redact.prefHeight(22);
         TextField editableText = new TextField();
-        if (messageCash.getMessage().getMessage() != null) {
-            editableText.setText(messageCash.getMessage().getMessage());
+        if (!messageCash.getMessage().getText().isEmpty()) {
+            editableText.setText(messageCash.getMessage().getText());
+        } else {
+            editableText.setText("вы можете добавить подпись");
         }
         if (messageCash.getImage() == null) {
             editImage.setImage(new Image(Objects.requireNonNull(GoLink.class.getResourceAsStream("/img/editTXT.png"))));

@@ -41,6 +41,7 @@ public class SendMessageConfig {
 
     private final ImageView sendButton;
     private final ImageView sendImageButton;
+    private final ImageView microphoneButton;
     private final Scene scene;
     private final TextField input;
 
@@ -65,6 +66,7 @@ public class SendMessageConfig {
         this.userEntity = userEntity;
         this.scene = scene;
         this.sendImageButton = sendImageButton;
+        this.microphoneButton = microphoneButton;
         this.sendButton = sendButton;
         this.contactsField = contactsField;
         this.chatField = chatField;
@@ -93,13 +95,19 @@ public class SendMessageConfig {
                         .build();
                 MessageCash messageCash = GUIPatterns.printMyAudioGUIAndGetCash(messageEntity, AudioHelper.getFile());
                 messageRepository.save(messageEntity);
-                TCPConnection.FILE_POST(selectedContact.getInterlocutor().getId(), selectedContact.getChat().getId(), messageEntity.getId(), MessageType.AUDIO, null, metadata);
+                TCPConnection.POST(selectedContact.getInterlocutor().getId(), selectedContact.getChat().getId(), messageEntity.getId(), MessageType.AUDIO, null, metadata);
                 selectedContact.addMessageOnCashAndPutLastMessage(messageCash);
                 chatField.getChildren().add(messageCash.getMessageBackground());
+
                 scrollConfig.scrolling();
 
                 contactsField.getChildren().remove(selectedContact.getGUI());
                 contactsField.getChildren().add(0, selectedContact.getGUI());
+
+                messageCash.getMessageBackground().setOnMouseClicked(mouseEvent -> {
+                    if (mouseEvent.getButton() == MouseButton.SECONDARY) {setMessageFunctions(messageCash, mouseEvent);}
+                });
+
             } catch (IOException | UnsupportedAudioFileException e) {
                 throw new RuntimeException(e);
             }
@@ -107,122 +115,55 @@ public class SendMessageConfig {
     }
 
     public void sendMessageConfiguration() {
-        String text = input.getText().trim();
-            if (isEditMessageStage) {
-                MessageEntity messageEntity = messageCash.getMessage();
-                switch (messageEntity.getMessageType()) {
-                    case TEXT -> processEditTextMessage(messageEntity, text);
-                    case IMAGE -> processEditImageMessage(messageEntity, text);
-                    case IMAGE_AND_TEXT -> processEditImageAndTextMessage(messageEntity, text);
-                }
+        String text = input.getText();
+        if (!text.isEmpty()) {
+            text = text.trim();
+        }
+        if (isEditMessageStage) {
+            MessageEntity messageEntity = messageCash.getMessage();
+            boolean isEdited = false;
+            if (selectedImage == null && text.isEmpty()) {
+                deleteMessageFunction(messageEntity);
                 disable();
-            } else {
-                if (!input.getText().isEmpty()) {
-                    MessageEntity messageEntity = MessageEntity.builder()
-                            .message(text)
-                            .date(LocalDateTime.now())
-                            .sender(userEntity)
-                            .chat(selectedContact.getChat())
-                            .messageType(MessageType.TEXT)
-                            .build();
-                    messageRepository.save(messageEntity);
-
-                    TCPConnection.POST(selectedContact.getInterlocutor().getId(), selectedContact.getChat().getId(), messageEntity.getId(), text);
-                    chatField.getChildren().add(addMessageToGlobalCash(GUIPatterns.makeMyMessageGUIAndGetCash(messageEntity)));
-
-                    scrollConfig.scrolling();
-
-                    contactsField.getChildren().remove(selectedContact.getGUI());
-                    contactsField.getChildren().add(0, selectedContact.getGUI());
-                }
+                return;
             }
-            input.clear();
-
-    }
-    private void processEditTextMessage(MessageEntity messageEntity, String text) {
-        if (selectedImage == null) {
-            if (text.isEmpty()) {
-                deleteMessageFunction(messageEntity);
-            } else if (!messageEntity.getMessage().equals(text)) {
-                saveMessageText(messageEntity, text);
-            }
-        } else {
-            messageEntity.setMetadata(selectedImage);
-            if (text.isEmpty()) {
-                messageEntity.setMessageType(MessageType.IMAGE);
-            } else {
-                messageEntity.setMessageType(MessageType.IMAGE_AND_TEXT);
-                if (!messageEntity.getMessage().equals(text)) {
-                    messageEntity.setMessage(text);
-                }
-            }
-            saveTextAndFile(messageEntity);
-        }
-    }
-
-    private void saveMessageText (MessageEntity messageEntity, String text) {
-        selectedContact.editMessage(messageCash, text);
-        messageRepository.save(messageEntity);
-        TCPConnection.EDIT(selectedContact.getInterlocutor().getId(), selectedContact.getChat().getId(), messageEntity.getId(), text);
-    }
-
-    private void saveTextAndFile (MessageEntity messageEntity) {
-        selectedContact.editMessageAndFile(messageCash, messageEntity);
-        messageRepository.save(messageEntity);
-        TCPConnection.FILE_EDIT(selectedContact.getInterlocutor().getId(), selectedContact.getChat().getId(), messageEntity.getId(), messageEntity.getMessageType(), messageEntity.getMessage(), selectedImage);
-    }
-
-    private void processEditImageMessage(MessageEntity messageEntity, String text) {
-        boolean isEdited = false;
-        if (selectedImage == null) {
-            if (!text.isEmpty()) {
-                messageEntity.setMessage(text);
-                messageEntity.setMessageType(MessageType.TEXT);
+            if (messageEntity.getMetadata() != selectedImage) {
                 isEdited = true;
-            } else {
-                deleteMessageFunction(messageEntity);
-            }
-        } else {
-            if (selectedImage != messageEntity.getMetadata()) {
                 messageEntity.setMetadata(selectedImage);
-                isEdited = true;
             }
-            if (!text.isEmpty()) {
-                messageEntity.setMessage(text);
-                messageEntity.setMessageType(MessageType.IMAGE_AND_TEXT);
+            if (!messageEntity.getText().equals(text)) {
                 isEdited = true;
+                messageEntity.setText(text);
             }
-        }
-        if (isEdited) {saveTextAndFile(messageEntity);}
-    }
-
-    private void processEditImageAndTextMessage(MessageEntity messageEntity, String text) {
-        boolean isEdited = false;
-        if (selectedImage == null) {
-            if (!text.isEmpty()) {
-                messageEntity.setMessage(text);
-                messageEntity.setMessageType(MessageType.TEXT);
-                isEdited = true;
-            } else {
-                deleteMessageFunction(messageEntity);
+            if (isEdited) {
+                selectedContact.editMessageAndFile(messageCash, messageEntity);
+                messageRepository.save(messageEntity);
+                TCPConnection.EDIT(selectedContact.getInterlocutor().getId(), selectedContact.getChat().getId(), messageEntity.getId(), MessageType.MESSAGE, messageEntity.getText(), selectedImage);
             }
+            disable();
         } else {
-            if (selectedImage != messageEntity.getMetadata()) {
-                messageEntity.setMetadata(selectedImage);
-                isEdited = true;
-            }
-            if (!text.isEmpty()) {
-                if (!Objects.equals(messageEntity.getMessage(), text)) {
-                    messageEntity.setMessage(text);
-                    isEdited = true;
-                }
-            } else {
-                messageEntity.setMessage(null);
-                messageEntity.setMessageType(MessageType.IMAGE);
-                isEdited = true;
+            if (!input.getText().isEmpty() || selectedImage != null) {
+                MessageEntity messageEntity = MessageEntity.builder()
+                        .text(text)
+                        .date(LocalDateTime.now())
+                        .sender(userEntity)
+                        .chat(selectedContact.getChat())
+                        .metadata(selectedImage)
+                        .messageType(MessageType.MESSAGE)
+                        .build();
+                messageRepository.save(messageEntity);
+                TCPConnection.POST(selectedContact.getInterlocutor().getId(), selectedContact.getChat().getId(), messageEntity.getId(), MessageType.MESSAGE, text, selectedImage);
+                MessageCash messageCash = GUIPatterns.makeMyMessageGUIAndGetCash(messageEntity);
+                chatField.getChildren().add(addMessageToGlobalCash(messageCash));
+
+                scrollConfig.scrolling();
+
+                contactsField.getChildren().remove(selectedContact.getGUI());
+                contactsField.getChildren().add(0, selectedContact.getGUI());
+                disable();
             }
         }
-        if (isEdited) {saveTextAndFile(messageEntity);}
+        input.clear();
     }
 
     public void sendImageConfig () {
@@ -234,30 +175,30 @@ public class SendMessageConfig {
             File selectedFile = fileChooser.showOpenDialog(scene.getWindow());
 
             if (selectedFile != null) {
-                byte[] imageBytes;
                 try {
-                    imageBytes = Files.readAllBytes(selectedFile.toPath());
+                    if (isEditMessageStage) {
+                        imageView.setImage(new Image(selectedFile.toURI().toString()));
+                        selectedImage = Files.readAllBytes(selectedFile.toPath());
+                        sendImageButton.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/img/reloadImage.png"))));
+                    } else {
+                        Pair<BorderPane, ImageView> pair = GUIPatterns.getBackgroundSelectImageInterface();
+                        imageView = pair.getValue();
+                        imageView.setImage(new Image(selectedFile.toURI().toString()));
+                        BorderPane borderPane = pair.getKey();
+                        ImageView cancelButton = GUIPatterns.getCancelButton();
+                        BorderPane.setMargin(cancelButton, new Insets(10, 10, 0 , 0));
+                        cancelButton.setOnMouseClicked(mouseEvent -> disable());
+                        borderPane.setRight(cancelButton);
+                        sendZone.setTop(borderPane);
+
+                        selectedImage = Files.readAllBytes(selectedFile.toPath());
+                        imageView.setFitWidth(40);
+                        imageView.setFitHeight(40);
+                        microphoneButton.setVisible(false);
+                        sendImageButton.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/img/reloadImage.png"))));
+                    }
                 } catch (IOException e) {
                     throw new RuntimeException(e);
-                }
-                if (isEditMessageStage) {
-                    selectedImage = imageBytes;
-                    imageView.setFitWidth(40);
-                    imageView.setFitHeight(40);
-                    imageView.setImage(new Image(selectedFile.getPath()));
-                } else {
-                    MessageEntity messageEntity = MessageEntity.builder()
-                            .metadata(imageBytes)
-                            .sender(userEntity)
-                            .chat(selectedContact.getChat())
-                            .messageType(MessageType.IMAGE)
-                            .date(LocalDateTime.now())
-                            .build();
-                    messageRepository.saveAndFlush(messageEntity);
-
-                    TCPConnection.FILE_POST(selectedContact.getInterlocutor().getId(), selectedContact.getChat().getId(), messageEntity.getId(), MessageType.IMAGE, null, imageBytes);
-                    chatField.getChildren().add(addMessageToGlobalCash(GUIPatterns.makeMyMessageGUIAndGetCash(messageEntity)));
-                    scrollConfig.scrolling();
                 }
             }
         });
@@ -274,7 +215,6 @@ public class SendMessageConfig {
     public void setMessageFunctions(MessageCash messageCash, MouseEvent clickOnMessage) {
         Stage messageStage = new Stage();
         this.messageCash = messageCash;
-
         scene.setOnMouseClicked(mouseEvent -> {
             if (messageStage.isShowing()) {
                 messageStage.close();
@@ -290,18 +230,18 @@ public class SendMessageConfig {
         });
 
         switch (messageCash.getMessage().getMessageType()) {
-            case TEXT, IMAGE, IMAGE_AND_TEXT -> {
+            case MESSAGE -> {
                 BorderPane editButton = GUIPatterns.editeMessageButton();
                 editButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
                     editFunction(messageCash);
-                    input.setText(messageCash.getMessage().getMessage());
+                    input.setText(messageCash.getMessage().getText());
                     messageStage.close();
                     GUIPatterns.setMessageStage(null);
                 });
 
                 BorderPane copyButton = GUIPatterns.copyMessageButton();
                 copyButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
-                    copyMessageFunction(messageCash.getMessage().getMessage());
+                    copyMessageFunction(messageCash.getMessage().getText());
                     messageStage.close();
                     GUIPatterns.setMessageStage(null);
                 });
@@ -327,11 +267,19 @@ public class SendMessageConfig {
 
     private void editFunction (MessageCash messageCash) {
         isEditMessageStage = true;
+        microphoneButton.setVisible(false);
         ImageView cancelButton = GUIPatterns.getCancelButton();
         Pair <BorderPane, ImageView> pair = GUIPatterns.getBackgroundEditInterface(messageCash);
         BorderPane backgroundEditeInterface = pair.getKey();
         imageView = pair.getValue();
-        selectedImage = messageCash.getMessage().getMetadata();
+        MessageEntity messageEntity = messageCash.getMessage();
+        if (messageEntity.getMetadata() != null && messageEntity.getMetadata().length > 1) {
+            sendImageButton.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/img/reloadImage.png"))));
+        } else {
+            sendImageButton.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/img/addImage.png"))));
+        }
+        selectedImage = messageEntity.getMetadata();
+
 
         imageView.setOnMouseClicked(mouseEvent -> {
             if (mouseEvent.getButton() == MouseButton.SECONDARY && selectedImage != null) {
@@ -343,12 +291,12 @@ public class SendMessageConfig {
                 int index = chatField.getChildren().indexOf(messageCash.getMessageBackground());
                 scrollConfig.showElement(index);
                 chatField.getChildren().get(index).requestFocus();
-                messageCash.getMessageBackground().setStyle("-fx-background-color: #18314D");;
+                messageCash.getMessageBackground().setStyle("-fx-background-color: rgba(24, 49, 77, 0.5);");
                 Timer destructionTimer = new Timer();
                 destructionTimer.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        Platform.runLater(() -> messageCash.getMessageBackground().setStyle("-fx-background-color: #001933"));
+                        Platform.runLater(() -> messageCash.getMessageBackground().setStyle("-fx-background-color: transparent"));
                     }
                 }, 1500);
             }
@@ -360,10 +308,13 @@ public class SendMessageConfig {
     }
 
     public void disable () {
+        microphoneButton.setVisible(true);
+        sendImageButton.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/img/img.png"))));
         isEditMessageStage = false;
         selectedImage = null;
         imageView = null;
         sendZone.setTop(null);
         messageCash = null;
+        input.clear();
     }
 }

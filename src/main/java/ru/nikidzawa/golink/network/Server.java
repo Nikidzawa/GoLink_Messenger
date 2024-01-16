@@ -45,8 +45,6 @@ public class Server implements ServerListener {
         int userId = Integer.parseInt(strings[1]);
         try {
             switch (command) {
-                case "POST" -> connections.get(userId).sendMessage(command + ":" + strings[2]);
-                case "EDIT" -> connections.get(userId).sendMessage(command + ":" + strings[2]);
                 case "DELETE" -> connections.get(userId).sendMessage(command + ":" + strings[2]);
                 case "CHANGE_USER_STATUS" -> tcpConnection.sendMessage(command + ":" + connections.containsKey(userId));
                 case "CREATE_NEW_CHAT_ROOM" -> connections.get(userId).sendMessage(command + ":" + strings[2]);

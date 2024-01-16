@@ -85,7 +85,7 @@
             </AnchorPane>
          </top>
          <center>
-            <ScrollPane fx:id="scrollPane" hbarPolicy="NEVER" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #001933; -fx-border-color: black; -fx-border-width: 1 0 1 1;" BorderPane.alignment="CENTER">
+            <ScrollPane fx:id="scrollPane" hbarPolicy="NEVER" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #001933; -fx-border-width: 1 0 1 1; -fx-border-color: black;" BorderPane.alignment="CENTER">
                <content>
                   <VBox fx:id="chatField" prefHeight="1027.0" prefWidth="876.0" style="-fx-background-color: #001933; -fx-spacing: 10;">
                      <children>
@@ -95,7 +95,8 @@
                               <Font size="17.0" />
                            </font>
                         </TextField>
-                     </children></VBox>
+                     </children>
+                  </VBox>
                </content>
             </ScrollPane>
          </center>

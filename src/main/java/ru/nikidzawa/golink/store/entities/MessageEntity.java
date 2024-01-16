@@ -17,7 +17,7 @@ public class MessageEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String message;
+    private String text;
 
     private byte[] metadata;
 

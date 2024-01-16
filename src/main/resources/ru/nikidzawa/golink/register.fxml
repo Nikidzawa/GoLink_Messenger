@@ -40,7 +40,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Text>
-      <Text fill="WHITE" layoutX="420.0" layoutY="490.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Регистрация" textAlignment="CENTER" wrappingWidth="274.13671875">
+      <Text fill="WHITE" layoutX="420.0" layoutY="450.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Регистрация" textAlignment="CENTER" wrappingWidth="274.13671875">
          <font>
             <Font name="Arial Bold" size="40.0" />
          </font>
