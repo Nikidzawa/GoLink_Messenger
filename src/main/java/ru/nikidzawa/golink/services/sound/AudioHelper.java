@@ -19,7 +19,7 @@ public class AudioHelper {
     private static final AudioFileFormat.Type fileType = AudioFileFormat.Type.WAVE;
     private static final int MONO = 1;
     private static final AudioFormat format = new AudioFormat(
-            AudioFormat.Encoding.PCM_SIGNED, 48000, 16,  MONO, 2, 48000, true);
+            AudioFormat.Encoding.PCM_SIGNED, 48000, 16, MONO, 2, 48000, true);
     private static TargetDataLine mike;
 
     public static void startRecording() {
@@ -66,7 +66,7 @@ public class AudioHelper {
         mike.close();
     }
 
-    public static byte[] convertAudioToBytes (File audioFile) throws IOException, UnsupportedAudioFileException {
+    public static byte[] convertAudioToBytes(File audioFile) throws IOException, UnsupportedAudioFileException {
         AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(audioFile);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
@@ -84,7 +84,7 @@ public class AudioHelper {
     }
 
     @SneakyThrows
-    public static File convertBytesToAudio (byte[] audioBytes) {
+    public static File convertBytesToAudio(byte[] audioBytes) {
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(audioBytes);
         AudioInputStream audioInputStream = new AudioInputStream(byteArrayInputStream, format, audioBytes.length / format.getFrameSize());
 

@@ -12,7 +12,9 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.*;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -123,7 +125,7 @@ public class GUIPatterns {
         }
     }
 
-    public void setConfig (TextField phone) {
+    public void setConfig(TextField phone) {
         final int maxLength = 12;
 
         phone.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -190,34 +192,38 @@ public class GUIPatterns {
                         lastMessageInfo.setText((lastMessage.getSender().getId().equals(myAccount.getId()) ? "Вы: " : " ") + lastMessage.getText());
                     }
                 }
-                case AUDIO -> lastMessageInfo.setText(lastMessage.getSender().getId().equals(myAccount.getId()) ? "Вы: голосовое сообщение" : "Голосовое сообщение");
-                case DOCUMENT -> lastMessageInfo.setText(lastMessage.getSender().getId().equals(myAccount.getId()) ? "Вы: документ" : "Документ");
+                case AUDIO ->
+                        lastMessageInfo.setText(lastMessage.getSender().getId().equals(myAccount.getId()) ? "Вы: голосовое сообщение" : "Голосовое сообщение");
+                case DOCUMENT ->
+                        lastMessageInfo.setText(lastMessage.getSender().getId().equals(myAccount.getId()) ? "Вы: документ" : "Документ");
             }
             date.setText(lastMessage.getDate().format(DateTimeFormatter.ofPattern("HH:mm")));
             contactCash.setLastMessage(lastMessage);
 
-        } else {lastMessageInfo.setText("Чат пуст"); }
-            date.setFill(Paint.valueOf("white"));
-            vBox.getChildren().add(date);
-            Translate translate = new Translate();
-            translate.setX(-7);
-            vBox.getTransforms().add(translate);
+        } else {
+            lastMessageInfo.setText("Чат пуст");
+        }
+        date.setFill(Paint.valueOf("white"));
+        vBox.getChildren().add(date);
+        Translate translate = new Translate();
+        translate.setX(-7);
+        vBox.getTransforms().add(translate);
 
-            int newMessages = personalChat.getNewMessagesCount();
+        int newMessages = personalChat.getNewMessagesCount();
 
-            StackPane newMessagesVisualize = new StackPane();
-            Circle circle = new Circle();
-            circle.setRadius(12);
-            circle.setFill(Paint.valueOf("#80c3ff"));
-            circle.setStroke(Paint.valueOf("black"));
-            Text newMessageCount = new Text(newMessages >= 100 ? "99+" : String.valueOf(newMessages));
-            newMessagesVisualize.getChildren().add(circle);
-            newMessagesVisualize.getChildren().add(newMessageCount);
-            vBox.getChildren().add(newMessagesVisualize);
-            if (newMessages == 0) {
-                newMessagesVisualize.setVisible(false);
-            }
-            borderPane.setRight(vBox);
+        StackPane newMessagesVisualize = new StackPane();
+        Circle circle = new Circle();
+        circle.setRadius(12);
+        circle.setFill(Paint.valueOf("#80c3ff"));
+        circle.setStroke(Paint.valueOf("black"));
+        Text newMessageCount = new Text(newMessages >= 100 ? "99+" : String.valueOf(newMessages));
+        newMessagesVisualize.getChildren().add(circle);
+        newMessagesVisualize.getChildren().add(newMessageCount);
+        vBox.getChildren().add(newMessagesVisualize);
+        if (newMessages == 0) {
+            newMessagesVisualize.setVisible(false);
+        }
+        borderPane.setRight(vBox);
 
         borderPane.setOnMouseEntered(mouseEvent -> {
             lastMessageInfo.setStyle("-fx-background-color: #34577F; -fx-text-fill: white");
@@ -384,7 +390,7 @@ public class GUIPatterns {
     }
 
     @SneakyThrows
-    public MessageCash printMyAudioGUIAndGetCash (MessageEntity message, File file) {
+    public MessageCash printMyAudioGUIAndGetCash(MessageEntity message, File file) {
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER_RIGHT);
         hBox.setPadding(new Insets(0, 15, 0, 0));
@@ -426,7 +432,7 @@ public class GUIPatterns {
         return new MessageCash(hBox, borderPane, message);
     }
 
-    public MessageCash printForeignAudioGUIAndGetCash (MessageEntity message, File file) {
+    public MessageCash printForeignAudioGUIAndGetCash(MessageEntity message, File file) {
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER_LEFT);
 
@@ -469,7 +475,7 @@ public class GUIPatterns {
         return new MessageCash(hBox, borderPane, message);
     }
 
-    public MessageCash makeForeignMessageGUIAndGetCash (MessageEntity message) {
+    public MessageCash makeForeignMessageGUIAndGetCash(MessageEntity message) {
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER_LEFT);
         hBox.setPadding(new Insets(0, 0, 0, 10));
@@ -484,26 +490,28 @@ public class GUIPatterns {
         dateFlow.setTextAlignment(TextAlignment.LEFT);
         borderPane.setBottom(dateFlow);
 
-        Text messageText = new Text();
-        TextFlow textFlow = new TextFlow(messageText);
-        textFlow.setStyle("-fx-font-family: Arial; -fx-font-size: 14px;");
-        textFlow.setPadding(new Insets(5, 10, 3, 10));
-        borderPane.setCenter(textFlow);
-        hBox.getChildren().add(borderPane);
-
         ImageView imageView = new ImageView();
-        borderPane.setTop(imageView);
         if (message.getMetadata() != null) {
             setImageConfig(message.getMetadata(), imageView, borderPane);
         }
+
+        Text messageText = new Text();
         if (!message.getText().isEmpty()) {
             messageText.setText(message.getText());
+
+            TextFlow textFlow = new TextFlow(messageText);
+            textFlow.setStyle("-fx-font-family: Arial; -fx-font-size: 14px;");
+            textFlow.setPadding(new Insets(5, 10, 3, 10));
+
+            borderPane.setCenter(textFlow);
         }
+
+        hBox.getChildren().add(borderPane);
 
         return new MessageCash(hBox, borderPane, message, imageView, messageText, date);
     }
 
-    public MessageCash makeMyMessageGUIAndGetCash (MessageEntity message) {
+    public MessageCash makeMyMessageGUIAndGetCash(MessageEntity message) {
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER_RIGHT);
         hBox.setPadding(new Insets(0, 15, 0, 0));
@@ -518,22 +526,24 @@ public class GUIPatterns {
         dateFlow.setTextAlignment(TextAlignment.RIGHT);
         borderPane.setBottom(dateFlow);
 
-        Text messageText = new Text();
-        TextFlow textFlow = new TextFlow(messageText);
-        textFlow.setStyle("-fx-color: rgb(239, 242, 255); -fx-font-family: Arial; -fx-font-size: 14px;");
-        textFlow.setPadding(new Insets(5, 10, 5, 10));
-        messageText.setFill(Color.color(0.934, 0.925, 0.996));
-        borderPane.setCenter(textFlow);
-        hBox.getChildren().add(borderPane);
         ImageView imageView = new ImageView();
-        borderPane.setTop(imageView);
-
         if (message.getMetadata() != null) {
             setImageConfig(message.getMetadata(), imageView, borderPane);
         }
+
+        Text messageText = new Text();
+        messageText.setFill(Color.WHITE);
         if (!message.getText().isEmpty()) {
             messageText.setText(message.getText());
+
+            TextFlow textFlow = new TextFlow(messageText);
+            textFlow.setStyle("-fx-font-family: Arial; -fx-font-size: 14px;");
+            textFlow.setPadding(new Insets(5, 10, 3, 10));
+
+            borderPane.setCenter(textFlow);
         }
+
+        hBox.getChildren().add(borderPane);
 
         return new MessageCash(hBox, borderPane, message, imageView, messageText, date);
     }
@@ -550,13 +560,13 @@ public class GUIPatterns {
                 Image image = new Image(new ByteArrayInputStream(imageBytes));
                 double width = image.getWidth();
                 double height = image.getHeight();
-                if (width > 750) {
-                    imageView.setFitWidth(750);
+                if (width > 400) {
+                    imageView.setFitWidth(400);
                 } else {
                     imageView.setFitWidth(width);
                 }
-                if (height > 600) {
-                    imageView.setFitHeight(600);
+                if (height > 400) {
+                    imageView.setFitHeight(400);
                 } else {
                     imageView.setFitHeight(height);
                 }
@@ -577,7 +587,7 @@ public class GUIPatterns {
         }
     }
 
-    public Pair<BorderPane, ImageView> getBackgroundSelectImageInterface ()  {
+    public Pair<BorderPane, ImageView> getBackgroundSelectImageInterface() {
         BorderPane GUI = new BorderPane();
         ImageView selectedImage = new ImageView();
         selectedImage.setFitWidth(40);
@@ -596,7 +606,7 @@ public class GUIPatterns {
         return new Pair<>(GUI, selectedImage);
     }
 
-    public Pair <BorderPane, ImageView> getBackgroundEditInterface(MessageCash messageCash)  {
+    public Pair<BorderPane, ImageView> getBackgroundEditInterface(MessageCash messageCash) {
         BorderPane editInterfaceBackground = new BorderPane();
         ImageView editImage = new ImageView();
         editImage.setFitWidth(40);
@@ -629,10 +639,10 @@ public class GUIPatterns {
         BorderPane.setMargin(editableText, new Insets(0, 0, 0, -5));
         BorderPane.setMargin(editMessageProperty, new Insets(0, 0, 0, 10));
         BorderPane.setMargin(editImage, new Insets(5, 0, 0, 5));
-        return new Pair<> (editInterfaceBackground, editImage);
+        return new Pair<>(editInterfaceBackground, editImage);
     }
 
-    public ImageView getCancelButton () {
+    public ImageView getCancelButton() {
         ImageView cancel = new ImageView(new Image(Objects.requireNonNull(GoLink.class.getResourceAsStream("/img/cancel.png"))));
         cancel.setCursor(Cursor.HAND);
         cancel.setFitWidth(30);
@@ -640,7 +650,7 @@ public class GUIPatterns {
         return cancel;
     }
 
-    public void setEmptyChatConfiguration (VBox chat) {
+    public void setEmptyChatConfiguration(VBox chat) {
         chat.getChildren().clear();
         AnchorPane anchorPane = new AnchorPane();
         anchorPane.setPrefWidth(876);

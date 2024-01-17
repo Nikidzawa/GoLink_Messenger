@@ -99,7 +99,7 @@ public class SelectAvatar {
                 firstNameSymbol.setText("");
             } else {
                 camera.setVisible(false);
-                firstNameSymbol.setText(name.getText().substring(0,1).toUpperCase());
+                firstNameSymbol.setText(name.getText().substring(0, 1).toUpperCase());
             }
         });
 
@@ -115,8 +115,7 @@ public class SelectAvatar {
             if (keyEvent.getCode() == KeyCode.ENTER) {
                 if (name.getText().isEmpty()) {
                     name.requestFocus();
-                }
-                else if (imageMetadata == null) selectImage();
+                } else if (imageMetadata == null) selectImage();
                 else registration();
             }
         });
@@ -124,7 +123,7 @@ public class SelectAvatar {
         enter.setOnAction(actionEvent -> registration());
     }
 
-    private void selectImage () {
+    private void selectImage() {
         Platform.runLater(() -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.getExtensionFilters().addAll(
@@ -135,8 +134,8 @@ public class SelectAvatar {
             if (selectedFile != null) {
                 firstNameSymbol.setVisible(false);
                 image.setImage(new Image(selectedFile.getAbsolutePath()));
-            try {
-                imageMetadata = Files.readAllBytes(selectedFile.toPath());
+                try {
+                    imageMetadata = Files.readAllBytes(selectedFile.toPath());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -145,14 +144,15 @@ public class SelectAvatar {
     }
 
     @SneakyThrows
-    private void registration () {
+    private void registration() {
         String userName = name.getText();
         String userNickname = nickname.getText().toLowerCase();
         if (userName.isEmpty()) exception("Введите имя");
         else if (userNickname.isEmpty()) exception("Введите никнейм");
         else if (userName.length() > 35) exception("Ограничение на длину имени составляет 35 символов");
         else if (userNickname.length() > 35) exception("Ограничение на длину никнейма составляет 35 символов");
-        else if (userRepository.findFirstByNickname(userNickname).isPresent()) exception("Пользователь с таким никнеймом уже существует");
+        else if (userRepository.findFirstByNickname(userNickname).isPresent())
+            exception("Пользователь с таким никнеймом уже существует");
         else {
             UserEntity userEntity = UserEntity.builder()
                     .name(userName)
@@ -169,7 +169,7 @@ public class SelectAvatar {
     }
 
     @SneakyThrows
-    private void load (UserEntity user) {
+    private void load(UserEntity user) {
         enter.getScene().getWindow().hide();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("menu.fxml"));
         loader.setControllerFactory(context::getBean);
@@ -178,8 +178,8 @@ public class SelectAvatar {
         Scene scene = new Scene(root);
 
         GoLink goLink = loader.getController();
-        goLink.setUserEntity(user);
-        goLink.setScene(scene);
+        goLink.userEntity = user;
+        goLink.scene = scene;
         goLink.setContext(context);
 
         Stage stage = new Stage();
@@ -190,7 +190,7 @@ public class SelectAvatar {
         stage.show();
     }
 
-    private void exception (String message) {
+    private void exception(String message) {
         GUIPatterns.createExceptionMessage(new Image(Objects.requireNonNull(getClass().getResource("/img/exception.png")).toExternalForm()),
                 message, menuItem);
     }

@@ -1,6 +1,5 @@
 package ru.nikidzawa.golink.FXControllers;
 
-import jakarta.annotation.PostConstruct;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -25,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 import ru.nikidzawa.golink.FXControllers.helpers.GUIPatterns;
-import ru.nikidzawa.golink.store.entities.UserEntity;
 import ru.nikidzawa.golink.store.repositories.UserRepository;
 
 import java.util.Objects;
@@ -87,10 +85,10 @@ public class VerifyNumber {
             textField.setFont(Font.font(20));
             int finalI = i;
             textField.textProperty().addListener((observable, oldValue, newValue) -> {
-                        if (newValue.length() > maxLength) {
-                            textField.setText(newValue.substring(newValue.length() - 1));
-                        }
-                    });
+                if (newValue.length() > maxLength) {
+                    textField.setText(newValue.substring(newValue.length() - 1));
+                }
+            });
             textField.addEventHandler(KeyEvent.KEY_RELEASED, event -> handleInput(textField, finalI, event));
             textField.addEventHandler(KeyEvent.KEY_PRESSED, event -> handleBackspace(textField, finalI, event));
             textField.addEventFilter(KeyEvent.KEY_TYPED, event -> {
@@ -102,6 +100,7 @@ public class VerifyNumber {
         }
         Platform.runLater(() -> area.getChildren().get(0).requestFocus());
     }
+
     private void handleInput(TextField currentTextField, int index, KeyEvent event) {
         String input = event.getText();
         if (input.length() == 1) {
@@ -124,6 +123,7 @@ public class VerifyNumber {
             }
         }
     }
+
     @SneakyThrows
     private void fxAvatar() {
         area.getScene().getWindow().hide();
@@ -141,6 +141,7 @@ public class VerifyNumber {
         stage.setScene(new Scene(root));
         stage.show();
     }
+
     private void handleBackspace(TextField currentTextField, int index, KeyEvent event) {
         if (event.getCode() == KeyCode.BACK_SPACE && currentTextField.getCaretPosition() == 0) {
             int prevIndex = index - 1;
@@ -151,8 +152,9 @@ public class VerifyNumber {
             }
         }
     }
+
     @SneakyThrows
-    private void goBack () {
+    private void goBack() {
         goBack.getScene().getWindow().hide();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/ru/nikidzawa/goLink/register.fxml"));
         loader.setControllerFactory(context::getBean);

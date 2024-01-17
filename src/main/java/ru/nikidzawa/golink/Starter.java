@@ -9,7 +9,6 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.ConfigurableApplicationContext;
 import ru.nikidzawa.golink.FXControllers.Register;
 
@@ -29,6 +28,7 @@ public class Starter extends Application {
         Register register = loader.getController();
         register.setContext(context);
     }
+
     @Override
     public void start(Stage stage) {
         stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/img/logo.png"))));
@@ -37,9 +37,11 @@ public class Starter extends Application {
         stage.setTitle("GoLink");
         stage.show();
     }
+
     public static void main(String[] args) {
         launch(args);
     }
+
     @Override
     public void stop() {
         context.close();

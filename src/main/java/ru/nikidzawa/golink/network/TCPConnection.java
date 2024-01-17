@@ -4,7 +4,9 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import ru.nikidzawa.golink.store.MessageType;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.Socket;
 
 public class TCPConnection {
@@ -38,7 +40,7 @@ public class TCPConnection {
     }
 
     @SneakyThrows
-    private void setUserId () {
+    private void setUserId() {
         out.writeUTF(userId);
         out.flush();
     }
@@ -48,16 +50,16 @@ public class TCPConnection {
             listener.onConnectionReady(TCPConnection.this);
             while (!Thread.interrupted()) {
                 try {
-                switch (in.readInt()) {
-                    case 50 -> listener.onReceiveMessage(TCPConnection.this, in.readUTF());
-                    case 100 -> {
-                        String protocol = in.readUTF();
-                        int length = in.readInt();
-                        byte[] file = new byte[length];
-                        in.readFully(file);
-                        listener.onReceiveFile(TCPConnection.this, protocol, file);
+                    switch (in.readInt()) {
+                        case 50 -> listener.onReceiveMessage(TCPConnection.this, in.readUTF());
+                        case 100 -> {
+                            String protocol = in.readUTF();
+                            int length = in.readInt();
+                            byte[] file = new byte[length];
+                            in.readFully(file);
+                            listener.onReceiveFile(TCPConnection.this, protocol, file);
+                        }
                     }
-                }
                 } catch (Exception e) {
                     break;
                 }
@@ -67,7 +69,7 @@ public class TCPConnection {
         thread.start();
     }
 
-    public synchronized void sendMessage (String protocol){
+    public synchronized void sendMessage(String protocol) {
         try {
             if (protocol != null) {
                 out.writeInt(50);
@@ -79,7 +81,8 @@ public class TCPConnection {
             throw new RuntimeException(ex);
         }
     }
-    public synchronized void sendFile (String protocol, byte[] metadata) {
+
+    public synchronized void sendFile(String protocol, byte[] metadata) {
         try {
             out.writeInt(100);
             out.writeUTF(protocol);
@@ -98,24 +101,24 @@ public class TCPConnection {
         }
     }
 
-    public void CHECK_USER_STATUS (Long receiverID) {
+    public void CHECK_USER_STATUS(Long receiverID) {
         sendMessage("CHANGE_USER_STATUS:" + receiverID);
     }
 
-    public void CREATE_NEW_CHAT_ROOM (Long receiverID, Long participantPersonalChatId) {
+    public void CREATE_NEW_CHAT_ROOM(Long receiverID, Long participantPersonalChatId) {
         sendMessage("CREATE_NEW_CHAT_ROOM:" + receiverID + ":" + participantPersonalChatId);
     }
 
 
-    public void DELETE (Long receiverID, Long chatID, Long messageID) {
+    public void DELETE(Long receiverID, Long chatID, Long messageID) {
         sendMessage("DELETE:" + receiverID + ":" + chatID + ":" + messageID);
     }
 
-    public void POST (Long receiverID, Long chatID, Long messageID, MessageType messageType, String message, byte[] metadata) {
+    public void POST(Long receiverID, Long chatID, Long messageID, MessageType messageType, String message, byte[] metadata) {
         sendFile("POST:" + receiverID + ":" + chatID + ":" + messageID + ":" + messageType.name() + ":" + message, metadata);
     }
 
-    public void EDIT (Long receiverID, Long chatID, Long messageID, MessageType messageType, String message, byte[] metadata) {
+    public void EDIT(Long receiverID, Long chatID, Long messageID, MessageType messageType, String message, byte[] metadata) {
         sendFile("EDIT:" + receiverID + ":" + chatID + ":" + messageID + ":" + messageType + ":" + message, metadata);
     }
 

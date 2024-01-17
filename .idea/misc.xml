@@ -6,6 +6,9 @@
     </writeAnnotations>
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="FrameworkDetectionExcludesConfiguration">
+    <file type="web" url="file://$PROJECT_DIR$/GoLinkNetworkAPI" />
+  </component>
   <component name="MavenProjectsManager">
     <option name="originalFiles">
       <list>

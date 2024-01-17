@@ -16,7 +16,10 @@ public class Server implements ServerListener {
     public ServerSocket serverSocket;
 
     @SneakyThrows
-    public static void main(String[] args) {new Server();}
+    public static void main(String[] args) {
+        new Server();
+    }
+
     @SneakyThrows
     public Server() {
         System.out.println("Сервер запущен");
@@ -36,7 +39,9 @@ public class Server implements ServerListener {
     }
 
     @Override
-    public void onConnectionReady(TCPConnection tcpConnection) {connections.put(Integer.parseInt(tcpConnection.getUserId()), tcpConnection);}
+    public void onConnectionReady(TCPConnection tcpConnection) {
+        connections.put(Integer.parseInt(tcpConnection.getUserId()), tcpConnection);
+    }
 
     @Override
     public void onReceiveMessage(TCPConnection tcpConnection, String string) {
@@ -45,9 +50,9 @@ public class Server implements ServerListener {
         int userId = Integer.parseInt(strings[1]);
         try {
             switch (command) {
-                case "DELETE" -> connections.get(userId).sendMessage(command + ":" + strings[2]);
+                case "DELETE", "CREATE_NEW_CHAT_ROOM" ->
+                        connections.get(userId).sendMessage(command + ":" + strings[2]);
                 case "CHANGE_USER_STATUS" -> tcpConnection.sendMessage(command + ":" + connections.containsKey(userId));
-                case "CREATE_NEW_CHAT_ROOM" -> connections.get(userId).sendMessage(command + ":" + strings[2]);
             }
         } catch (NullPointerException ex) {
             System.out.println("Получатель не в сети");
@@ -61,8 +66,7 @@ public class Server implements ServerListener {
         int userId = Integer.parseInt(strings[1]);
         try {
             switch (command) {
-                case "POST" -> connections.get(userId).sendFile(command + ":" + strings[2], content);
-                case "EDIT" -> connections.get(userId).sendFile(command + ":" + strings[2], content);
+                case "POST", "EDIT" -> connections.get(userId).sendFile(command + ":" + strings[2], content);
             }
         } catch (NullPointerException ex) {
             System.out.println("Получатель не в сети");
@@ -70,5 +74,7 @@ public class Server implements ServerListener {
     }
 
     @Override
-    public void onDisconnect(TCPConnection tcpConnection) {connections.remove(Integer.parseInt(tcpConnection.getUserId()));}
+    public void onDisconnect(TCPConnection tcpConnection) {
+        connections.remove(Integer.parseInt(tcpConnection.getUserId()));
+    }
 }

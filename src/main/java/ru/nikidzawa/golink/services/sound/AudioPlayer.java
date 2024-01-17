@@ -69,8 +69,7 @@ public class AudioPlayer {
                 mediaPlayer.seek(Duration.ZERO);
                 isStopped = false;
                 mediaPlayer.play();
-            }
-            else {
+            } else {
                 imageView.setImage(new Image(Objects.requireNonNull(playingImage)));
                 mediaPlayer.pause();
                 isPaused = true;

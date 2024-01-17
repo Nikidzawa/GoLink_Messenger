@@ -16,7 +16,7 @@ import java.util.TimerTask;
 public class ScrollConfig {
     private static final long SCROLLBAR_HIDE_DELAY = 2500;
     private final ScrollPane scrollPane;
-    private  final VBox chatField;
+    private final VBox chatField;
     private Timer timer;
     private final ScrollBar vBar;
     private final Node thumb;
@@ -32,7 +32,7 @@ public class ScrollConfig {
         setConfig();
     }
 
-    private void setConfig () {
+    private void setConfig() {
         scrollPane.addEventFilter(ScrollEvent.SCROLL, event -> {
             showVBar();
             startTimer();
@@ -68,12 +68,12 @@ public class ScrollConfig {
         timer = new Timer(true);
     }
 
-    public void startScrollEvent () {
+    public void startScrollEvent() {
         showVBar();
         startTimer();
     }
 
-    public void showElement (int elementIndex) {
+    public void showElement(int elementIndex) {
         double totalHeight = 0;
         double spacing = chatField.getSpacing();
 
@@ -89,15 +89,15 @@ public class ScrollConfig {
         scrollPane.setVvalue(vValue);
     }
 
-    private void showVBar () {
+    private void showVBar() {
         thumb.setStyle("-fx-background-color: #002b54;");
     }
 
-    private void hideScrollPane () {
+    private void hideScrollPane() {
         thumb.setStyle("-fx-background-color: transparent;");
     }
 
-    public void scrolling () {
+    public void scrolling() {
         PauseTransition pauseTransition = new PauseTransition(Duration.millis(20));
         pauseTransition.setOnFinished(event -> scrollPane.setVvalue(1));
         pauseTransition.play();

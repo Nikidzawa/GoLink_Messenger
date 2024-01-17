@@ -2,7 +2,6 @@ package ru.nikidzawa.golink.FXControllers.Configurations;
 
 import javafx.application.Platform;
 import javafx.geometry.Insets;
-import javafx.scene.Scene;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -17,39 +16,36 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import lombok.Setter;
+import ru.nikidzawa.golink.FXControllers.GoLink;
 import ru.nikidzawa.golink.FXControllers.cash.ContactCash;
 import ru.nikidzawa.golink.FXControllers.cash.MessageCash;
 import ru.nikidzawa.golink.FXControllers.helpers.GUIPatterns;
-import ru.nikidzawa.golink.network.TCPConnection;
 import ru.nikidzawa.golink.services.sound.AudioHelper;
 import ru.nikidzawa.golink.store.MessageType;
 import ru.nikidzawa.golink.store.entities.MessageEntity;
-import ru.nikidzawa.golink.store.entities.UserEntity;
-import ru.nikidzawa.golink.store.repositories.MessageRepository;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collections;
+import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class SendMessageConfig {
 
     private final VBox contactsField;
     private final VBox chatField;
 
-    private final ImageView sendButton;
     private final ImageView sendImageButton;
     private final ImageView microphoneButton;
-    private final Scene scene;
     private final TextField input;
+    private final GoLink goLink;
 
-    private final TCPConnection TCPConnection;
     private final ScrollConfig scrollConfig;
-    private final MessageRepository messageRepository;
     private final BorderPane sendZone;
-    private final UserEntity userEntity;
 
     GUIPatterns GUIPatterns = new GUIPatterns();
 
@@ -62,26 +58,22 @@ public class SendMessageConfig {
     private byte[] selectedImage;
     private ImageView imageView;
 
-    public SendMessageConfig(UserEntity userEntity, Scene scene, ImageView sendImageButton, ImageView microphoneButton, ImageView sendButton, VBox contactsField, VBox chatField, TextField input, TCPConnection tcpConnection, ScrollConfig scrollConfig, MessageRepository messageRepository, BorderPane sendZone) {
-        this.userEntity = userEntity;
-        this.scene = scene;
+    public SendMessageConfig(GoLink goLink, ImageView sendImageButton, ImageView microphoneButton, ImageView sendButton, VBox contactsField, VBox chatField, TextField input, ScrollConfig scrollConfig, BorderPane sendZone) {
+        this.goLink = goLink;
         this.sendImageButton = sendImageButton;
         this.microphoneButton = microphoneButton;
-        this.sendButton = sendButton;
         this.contactsField = contactsField;
         this.chatField = chatField;
         this.input = input;
-        this.TCPConnection = tcpConnection;
         this.scrollConfig = scrollConfig;
-        this.messageRepository = messageRepository;
         this.sendZone = sendZone;
         microphoneButton.setOnMousePressed(mouseEvent -> AudioHelper.startRecording());
         microphoneButton.setOnMouseReleased(mouseEvent -> sendAudi0Configuration());
-        sendImageButton.setOnMouseClicked(mouseEvent -> sendMessageConfiguration());
+        sendImageButton.setOnMouseClicked(mouseEvent -> sendImageConfig());
         sendButton.setOnMouseClicked(mouseEvent -> sendMessageConfiguration());
     }
 
-    public void sendAudi0Configuration () {
+    public void sendAudi0Configuration() {
         if (selectedContact != null) {
             AudioHelper.stopRecording();
             try {
@@ -89,13 +81,13 @@ public class SendMessageConfig {
                 MessageEntity messageEntity = MessageEntity.builder()
                         .messageType(MessageType.AUDIO)
                         .metadata(metadata)
-                        .sender(userEntity)
+                        .sender(goLink.userEntity)
                         .date(LocalDateTime.now())
                         .chat(selectedContact.getChat())
                         .build();
                 MessageCash messageCash = GUIPatterns.printMyAudioGUIAndGetCash(messageEntity, AudioHelper.getFile());
-                messageRepository.save(messageEntity);
-                TCPConnection.POST(selectedContact.getInterlocutor().getId(), selectedContact.getChat().getId(), messageEntity.getId(), MessageType.AUDIO, null, metadata);
+                goLink.messageRepository.save(messageEntity);
+                goLink.TCPConnection.POST(selectedContact.getInterlocutor().getId(), selectedContact.getChat().getId(), messageEntity.getId(), MessageType.AUDIO, null, metadata);
                 selectedContact.addMessageOnCashAndPutLastMessage(messageCash);
                 chatField.getChildren().add(messageCash.getMessageBackground());
 
@@ -105,7 +97,9 @@ public class SendMessageConfig {
                 contactsField.getChildren().add(0, selectedContact.getGUI());
 
                 messageCash.getMessageBackground().setOnMouseClicked(mouseEvent -> {
-                    if (mouseEvent.getButton() == MouseButton.SECONDARY) {setMessageFunctions(messageCash, mouseEvent);}
+                    if (mouseEvent.getButton() == MouseButton.SECONDARY) {
+                        setMessageFunctions(messageCash, mouseEvent);
+                    }
                 });
 
             } catch (IOException | UnsupportedAudioFileException e) {
@@ -137,8 +131,8 @@ public class SendMessageConfig {
             }
             if (isEdited) {
                 selectedContact.editMessageAndFile(messageCash, messageEntity);
-                messageRepository.save(messageEntity);
-                TCPConnection.EDIT(selectedContact.getInterlocutor().getId(), selectedContact.getChat().getId(), messageEntity.getId(), MessageType.MESSAGE, messageEntity.getText(), selectedImage);
+                goLink.messageRepository.save(messageEntity);
+                goLink.TCPConnection.EDIT(selectedContact.getInterlocutor().getId(), selectedContact.getChat().getId(), messageEntity.getId(), MessageType.MESSAGE, messageEntity.getText(), selectedImage);
             }
             disable();
         } else {
@@ -146,13 +140,13 @@ public class SendMessageConfig {
                 MessageEntity messageEntity = MessageEntity.builder()
                         .text(text)
                         .date(LocalDateTime.now())
-                        .sender(userEntity)
+                        .sender(goLink.userEntity)
                         .chat(selectedContact.getChat())
                         .metadata(selectedImage)
                         .messageType(MessageType.MESSAGE)
                         .build();
-                messageRepository.save(messageEntity);
-                TCPConnection.POST(selectedContact.getInterlocutor().getId(), selectedContact.getChat().getId(), messageEntity.getId(), MessageType.MESSAGE, text, selectedImage);
+                goLink.messageRepository.save(messageEntity);
+                goLink.TCPConnection.POST(selectedContact.getInterlocutor().getId(), selectedContact.getChat().getId(), messageEntity.getId(), MessageType.MESSAGE, text, selectedImage);
                 MessageCash messageCash = GUIPatterns.makeMyMessageGUIAndGetCash(messageEntity);
                 chatField.getChildren().add(addMessageToGlobalCash(messageCash));
 
@@ -166,13 +160,13 @@ public class SendMessageConfig {
         input.clear();
     }
 
-    public void sendImageConfig () {
+    public void sendImageConfig() {
         Platform.runLater(() -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.getExtensionFilters().addAll(
                     new FileChooser.ExtensionFilter("Изображения", "*.jpg", "*.png", "*.jpeg")
             );
-            File selectedFile = fileChooser.showOpenDialog(scene.getWindow());
+            File selectedFile = fileChooser.showOpenDialog(goLink.scene.getWindow());
 
             if (selectedFile != null) {
                 try {
@@ -186,7 +180,7 @@ public class SendMessageConfig {
                         imageView.setImage(new Image(selectedFile.toURI().toString()));
                         BorderPane borderPane = pair.getKey();
                         ImageView cancelButton = GUIPatterns.getCancelButton();
-                        BorderPane.setMargin(cancelButton, new Insets(10, 10, 0 , 0));
+                        BorderPane.setMargin(cancelButton, new Insets(10, 10, 0, 0));
                         cancelButton.setOnMouseClicked(mouseEvent -> disable());
                         borderPane.setRight(cancelButton);
                         sendZone.setTop(borderPane);
@@ -204,7 +198,7 @@ public class SendMessageConfig {
         });
     }
 
-    private HBox addMessageToGlobalCash (MessageCash messageCash) {
+    private HBox addMessageToGlobalCash(MessageCash messageCash) {
         selectedContact.addMessageOnCashAndPutLastMessage(messageCash);
         messageCash.getGUI().setOnMouseClicked(clickOnMessage -> {
             if (clickOnMessage.getButton() == MouseButton.SECONDARY) setMessageFunctions(messageCash, clickOnMessage);
@@ -215,7 +209,7 @@ public class SendMessageConfig {
     public void setMessageFunctions(MessageCash messageCash, MouseEvent clickOnMessage) {
         Stage messageStage = new Stage();
         this.messageCash = messageCash;
-        scene.setOnMouseClicked(mouseEvent -> {
+        goLink.scene.setOnMouseClicked(mouseEvent -> {
             if (messageStage.isShowing()) {
                 messageStage.close();
                 GUIPatterns.setMessageStage(null);
@@ -245,31 +239,32 @@ public class SendMessageConfig {
                     messageStage.close();
                     GUIPatterns.setMessageStage(null);
                 });
-                Platform.runLater( () -> GUIPatterns.openMessageWindow(messageCash.getMessage(), clickOnMessage, messageStage, copyButton, editButton, deleteButton));
+                Platform.runLater(() -> GUIPatterns.openMessageWindow(messageCash.getMessage(), clickOnMessage, messageStage, copyButton, editButton, deleteButton));
             }
-            case AUDIO, DOCUMENT -> Platform.runLater(() -> GUIPatterns.openMessageWindow(messageCash.getMessage(), clickOnMessage, messageStage, null, null, deleteButton));
+            case AUDIO, DOCUMENT ->
+                    Platform.runLater(() -> GUIPatterns.openMessageWindow(messageCash.getMessage(), clickOnMessage, messageStage, null, null, deleteButton));
         }
     }
 
-    private void copyMessageFunction (String messageText) {
+    private void copyMessageFunction(String messageText) {
         Clipboard clipboard = Clipboard.getSystemClipboard();
         ClipboardContent content = new ClipboardContent();
         content.putString(messageText);
         clipboard.setContent(content);
     }
 
-    private void deleteMessageFunction (MessageEntity message) {
-        messageRepository.deleteAllInBatch(Collections.singletonList(message));
+    private void deleteMessageFunction(MessageEntity message) {
+        goLink.messageRepository.deleteAllInBatch(Collections.singletonList(message));
         selectedContact.deleteMessage(message);
-        TCPConnection.DELETE(selectedContact.getInterlocutor().getId(), selectedContact.getChat().getId(), message.getId());
+        goLink.TCPConnection.DELETE(selectedContact.getInterlocutor().getId(), selectedContact.getChat().getId(), message.getId());
         chatField.getChildren().remove(messageCash.getMessageBackground());
     }
 
-    private void editFunction (MessageCash messageCash) {
+    private void editFunction(MessageCash messageCash) {
         isEditMessageStage = true;
         microphoneButton.setVisible(false);
         ImageView cancelButton = GUIPatterns.getCancelButton();
-        Pair <BorderPane, ImageView> pair = GUIPatterns.getBackgroundEditInterface(messageCash);
+        Pair<BorderPane, ImageView> pair = GUIPatterns.getBackgroundEditInterface(messageCash);
         BorderPane backgroundEditeInterface = pair.getKey();
         imageView = pair.getValue();
         MessageEntity messageEntity = messageCash.getMessage();
@@ -303,11 +298,11 @@ public class SendMessageConfig {
         });
         backgroundEditeInterface.setRight(cancelButton);
         sendZone.setTop(backgroundEditeInterface);
-        BorderPane.setMargin(cancelButton, new Insets(10, 10, 0 , 0));
+        BorderPane.setMargin(cancelButton, new Insets(10, 10, 0, 0));
         cancelButton.setOnMouseClicked(mouseEvent -> disable());
     }
 
-    public void disable () {
+    public void disable() {
         microphoneButton.setVisible(true);
         sendImageButton.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/img/img.png"))));
         isEditMessageStage = false;

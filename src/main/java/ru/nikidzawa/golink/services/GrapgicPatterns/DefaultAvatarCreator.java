@@ -23,8 +23,9 @@ import java.util.Objects;
 @Component
 public class DefaultAvatarCreator {
     private final Image defaultAvatar = new Image(Objects.requireNonNull(getClass().getResource("/img/defaultAvatar.jpg")).toExternalForm());
+
     @SneakyThrows
-    public byte[] createAvatar (String firstNameSymbol) {
+    public byte[] createAvatar(String firstNameSymbol) {
         Canvas canvas = new Canvas(600, 600);
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.setFontSmoothingType(FontSmoothingType.LCD);

@@ -101,8 +101,8 @@ public class Login {
         Scene scene = new Scene(root);
 
         GoLink goLink = loader.getController();
-        goLink.setUserEntity(user);
-        goLink.setScene(scene);
+        goLink.userEntity = user;
+        goLink.scene = scene;
         goLink.setContext(context);
 
         Stage stage = new Stage();
@@ -112,8 +112,9 @@ public class Login {
         stage.setScene(scene);
         stage.show();
     }
+
     @SneakyThrows
-    private void fxRegister () {
+    private void fxRegister() {
         register.getScene().getWindow().hide();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/ru/nikidzawa/goLink/register.fxml"));
         loader.setControllerFactory(context::getBean);
@@ -129,8 +130,9 @@ public class Login {
         stage.setScene(new Scene(root));
         stage.show();
     }
-    private void exception () {
-            GUIPatterns.createExceptionMessage(new Image(Objects.requireNonNull(getClass().getResource("/img/exception.png")).toExternalForm()),
-                    " Неверный никнейм или пароль. Попробуйте ещё раз   ", menuItem);
+
+    private void exception() {
+        GUIPatterns.createExceptionMessage(new Image(Objects.requireNonNull(getClass().getResource("/img/exception.png")).toExternalForm()),
+                " Неверный никнейм или пароль. Попробуйте ещё раз   ", menuItem);
     }
 }

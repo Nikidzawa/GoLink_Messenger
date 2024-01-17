@@ -101,12 +101,13 @@ public class Register {
 
         if (password.getText().length() < 6) exception("Минимальный размер пароля должен составлять 6 символов");
         else if (password.getText().length() > 35) exception("Придумайте пароль покороче");
-        else if (userRepository.findFirstByPhone(inputNumber).isPresent()) exception("Номер телефона уже зарегистрирован");
+        else if (userRepository.findFirstByPhone(inputNumber).isPresent())
+            exception("Номер телефона уже зарегистрирован");
         else loadAuth(inputNumber);
     }
 
     @SneakyThrows
-    private void fxLogin () {
+    private void fxLogin() {
         login.getScene().getWindow().hide();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("login.fxml"));
         loader.setControllerFactory(context::getBean);
@@ -146,13 +147,14 @@ public class Register {
         stage.setScene(new Scene(root));
         stage.show();
     }
-    private String generateCode () {
+
+    private String generateCode() {
         Random random = new Random();
         int randomNumber = random.nextInt(999999) + 1;
         return String.format("%06d", randomNumber);
     }
 
-    private void exception (String message) {
+    private void exception(String message) {
         GUIPatterns.createExceptionMessage(new Image(Objects.requireNonNull(getClass().getResource("/img/exception.png")).toExternalForm()),
                 message, menuItem);
     }

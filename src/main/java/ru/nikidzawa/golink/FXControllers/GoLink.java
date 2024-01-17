@@ -1,7 +1,6 @@
 package ru.nikidzawa.golink.FXControllers;
 
 import io.github.gleidson28.GNAvatarView;
-import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -11,35 +10,47 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.*;
-import javafx.scene.layout.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.util.Duration;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
+import ru.nikidzawa.golink.FXControllers.Configurations.ScrollConfig;
+import ru.nikidzawa.golink.FXControllers.Configurations.SearchConfig;
 import ru.nikidzawa.golink.FXControllers.Configurations.SendMessageConfig;
 import ru.nikidzawa.golink.FXControllers.cash.ContactCash;
 import ru.nikidzawa.golink.FXControllers.cash.MessageCash;
 import ru.nikidzawa.golink.FXControllers.helpers.GUIPatterns;
-import ru.nikidzawa.golink.FXControllers.Configurations.ScrollConfig;
-import ru.nikidzawa.golink.services.sound.AudioHelper;
 import ru.nikidzawa.golink.network.ServerListener;
 import ru.nikidzawa.golink.network.TCPConnection;
+import ru.nikidzawa.golink.services.sound.AudioHelper;
 import ru.nikidzawa.golink.services.sound.SongPlayer;
 import ru.nikidzawa.golink.store.MessageType;
-import ru.nikidzawa.golink.store.entities.*;
-import ru.nikidzawa.golink.store.repositories.*;
+import ru.nikidzawa.golink.store.entities.ChatEntity;
+import ru.nikidzawa.golink.store.entities.MessageEntity;
+import ru.nikidzawa.golink.store.entities.PersonalChat;
+import ru.nikidzawa.golink.store.entities.UserEntity;
+import ru.nikidzawa.golink.store.repositories.ChatRepository;
+import ru.nikidzawa.golink.store.repositories.MessageRepository;
+import ru.nikidzawa.golink.store.repositories.PersonalChatRepository;
+import ru.nikidzawa.golink.store.repositories.UserRepository;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
 
 @Controller
 public class GoLink implements ServerListener {
@@ -99,28 +110,26 @@ public class GoLink implements ServerListener {
 
     @Setter
     private ConfigurableApplicationContext context;
-    private TCPConnection TCPConnection;
+    public TCPConnection TCPConnection;
 
     @Autowired
-    UserRepository userRepository;
+    public UserRepository userRepository;
     @Autowired
-    ChatRepository chatRepository;
+    public ChatRepository chatRepository;
     @Autowired
-    MessageRepository messageRepository;
+    public MessageRepository messageRepository;
     @Autowired
-    PersonalChatRepository personalChatRepository;
+    public PersonalChatRepository personalChatRepository;
     @Autowired
-    GUIPatterns GUIPatterns;
+    public GUIPatterns GUIPatterns;
 
-    HashMap<Long, ContactCash> contacts = new HashMap<>();
-    ContactCash selectedContact;
-    ScrollConfig scrollConfig;
-    SendMessageConfig sendMessageConfig;
+    public HashMap<Long, ContactCash> contacts = new HashMap<>();
+    public UserEntity userEntity;
+    public Scene scene;
+    private ContactCash selectedContact;
 
-    @Setter
-    private UserEntity userEntity;
-    @Setter
-    private Scene scene;
+    private ScrollConfig scrollConfig;
+    private SendMessageConfig sendMessageConfig;
 
     @FXML
     @SneakyThrows
@@ -134,10 +143,11 @@ public class GoLink implements ServerListener {
             }
             GUIPatterns.setBaseWindowTitleCommands(titleBar, minimizeButton, scaleButton, closeButton, TCPConnection);
             scrollConfig = new ScrollConfig(scrollPane, chatField);
-            sendMessageConfig = new SendMessageConfig(userEntity, scene, sendImageButton, microphone, sendButton, contactsField, chatField, input, TCPConnection, scrollConfig, messageRepository, sendZone);
+            sendMessageConfig = new SendMessageConfig(this, sendImageButton, microphone, sendButton, contactsField, chatField, input, scrollConfig, sendZone);
+            new SearchConfig(this, contactsField, searchPanel);
 
             setUserConfig();
-            sendImageButton.setOnMouseClicked(mouseEvent -> sendMessageConfig.sendImageConfig());
+
             scene.setOnKeyPressed(keyEvent -> {
                 if (keyEvent.getCode() == KeyCode.ENTER && selectedContact != null) {
                     sendMessageConfig.sendMessageConfiguration();
@@ -145,22 +155,19 @@ public class GoLink implements ServerListener {
                 if (keyEvent.getCode() == KeyCode.ESCAPE) {
                     scrollPane.setStyle("-fx-background: #001933; -fx-background-color: #001933; -fx-border-width: 1 0 1 1; -fx-border-color: black;");
                     selectedContact = null;
-                    setVisibleChatContent(false);
                     sendMessageConfig.disable();
+                    setVisibleChatContent(false);
                     GUIPatterns.setEmptyChatConfiguration(chatField);
                 }
             });
 
             settingsButton.setOnMouseClicked(mouseEvent -> openSettings());
 
-            PauseTransition pause = new PauseTransition(Duration.millis(1000));
-            searchPanel.textProperty().addListener((observable, oldValue, newValue) -> setSearchConfig(newValue, pause));
-
             loadChatRooms();
         });
     }
 
-    private void setVisibleChatContent (boolean visible) {
+    private void setVisibleChatContent(boolean visible) {
         status.setVisible(visible);
         sendImageButton.setVisible(visible);
         sendButton.setVisible(visible);
@@ -169,7 +176,7 @@ public class GoLink implements ServerListener {
         chatRoomName.setVisible(visible);
     }
 
-    public void setUserConfig () {
+    public void setUserConfig() {
         myAvatar.setImage((new Image(new ByteArrayInputStream(userEntity.getAvatar()))));
         profileName.setText(userEntity.getName());
     }
@@ -194,7 +201,7 @@ public class GoLink implements ServerListener {
         stage.show();
     }
 
-    private void loadChatRooms () {
+    private void loadChatRooms() {
         contactsField.getChildren().clear();
         List<PersonalChat> personalChats = userEntity.getUserChats();
         if (personalChats != null && !personalChats.isEmpty()) {
@@ -203,7 +210,7 @@ public class GoLink implements ServerListener {
         writeSortedContacts();
     }
 
-    private void writeSortedContacts () {
+    private void writeSortedContacts() {
         contactsField.getChildren().clear();
         List<ContactCash> GUI = contacts.values()
                 .stream()
@@ -215,12 +222,7 @@ public class GoLink implements ServerListener {
         GUI.forEach(contactCash -> contactsField.getChildren().add(contactCash.getGUI()));
     }
 
-    private void loadContactsFromCash () {
-        contactsField.getChildren().clear();
-        contacts.values().forEach(contactCash -> contactsField.getChildren().add(contactCash.getGUI()));
-    }
-
-    private ContactCash createContact (UserEntity interlocutor, ChatEntity chat, PersonalChat personalChat) {
+    public ContactCash createContact(UserEntity interlocutor, ChatEntity chat, PersonalChat personalChat) {
         ContactCash contactCash = new ContactCash(interlocutor, chat, personalChat, personalChatRepository);
         BorderPane GUIContact = GUIPatterns.newChatBuilder(userEntity, contactCash, personalChat);
         GUIContact.setOnMouseClicked(e -> openChat(chat, personalChat, interlocutor, contactCash));
@@ -230,23 +232,25 @@ public class GoLink implements ServerListener {
     }
 
     @SneakyThrows
-    private void openChat (ChatEntity chat, PersonalChat personalChat, UserEntity interlocutor, ContactCash contactCash) {
-            if (selectedContact == null || !Objects.equals(selectedContact.getChat().getId(), chat.getId())) {
-                scrollPane.setStyle("-fx-background: transparent; -fx-background-color: transparent; -fx-background-image: url('img/backgroundChatImage.jpg'); -fx-border-width: 1 0 1 1; -fx-border-color: black;");
-                chatField.setStyle("-fx-background: transparent; -fx-background-color: transparent; -fx-spacing: 10");
-                selectedContact = contactCash;
-                sendMessageConfig.setSelectedContact(selectedContact);
-                scrollConfig.startScrollEvent();
-                setVisibleChatContent(true);
+    public void openChat(ChatEntity chat, PersonalChat personalChat, UserEntity interlocutor, ContactCash contactCash) {
+        if (selectedContact == null || !Objects.equals(selectedContact.getChat().getId(), chat.getId())) {
+            scrollPane.setStyle("-fx-background: transparent; -fx-background-color: transparent; -fx-background-image: url('img/backgroundChatImage.jpg'); -fx-border-width: 1 0 1 1; -fx-border-color: black;");
+            chatField.setStyle("-fx-background: transparent; -fx-background-color: transparent; -fx-spacing: 10");
+            selectedContact = contactCash;
+            sendMessageConfig.setSelectedContact(selectedContact);
+            scrollConfig.startScrollEvent();
+            setVisibleChatContent(true);
 
-                if (personalChat.getNewMessagesCount() > 0) {contactCash.resetNotificationCount();}
-
-                new Thread(() -> TCPConnection.CHECK_USER_STATUS(interlocutor.getId())).start();
-
-                chatRoomName.setText(interlocutor.getName());
-                printMessages();
-                scrollConfig.scrolling();
+            if (personalChat.getNewMessagesCount() > 0) {
+                contactCash.resetNotificationCount();
             }
+
+            new Thread(() -> TCPConnection.CHECK_USER_STATUS(interlocutor.getId())).start();
+
+            chatRoomName.setText(interlocutor.getName());
+            printMessages();
+            scrollConfig.scrolling();
+        }
     }
 
     @SneakyThrows
@@ -262,71 +266,27 @@ public class GoLink implements ServerListener {
                     boolean isMyMessage = message.getSender().getId().equals(userEntity.getId());
                     MessageCash messageCash = null;
                     switch (message.getMessageType()) {
-                        case MESSAGE -> messageCash = isMyMessage ? GUIPatterns.makeMyMessageGUIAndGetCash(message) : GUIPatterns.makeForeignMessageGUIAndGetCash(message);
-                        case AUDIO, DOCUMENT -> messageCash = isMyMessage ? GUIPatterns.printMyAudioGUIAndGetCash(message, AudioHelper.convertBytesToAudio(message.getMetadata())) : GUIPatterns.printForeignAudioGUIAndGetCash(message, AudioHelper.convertBytesToAudio(message.getMetadata()));
+                        case MESSAGE ->
+                                messageCash = isMyMessage ? GUIPatterns.makeMyMessageGUIAndGetCash(message) : GUIPatterns.makeForeignMessageGUIAndGetCash(message);
+                        case AUDIO, DOCUMENT ->
+                                messageCash = isMyMessage ? GUIPatterns.printMyAudioGUIAndGetCash(message, AudioHelper.convertBytesToAudio(message.getMetadata())) : GUIPatterns.printForeignAudioGUIAndGetCash(message, AudioHelper.convertBytesToAudio(message.getMetadata()));
                     }
                     MessageCash finalMessageCash = messageCash;
 
                     selectedContact.addMessageOnCash(finalMessageCash);
                     chatField.getChildren().add(finalMessageCash.getMessageBackground());
                     finalMessageCash.getGUI().setOnMouseClicked(clickOnMessage -> {
-                        if (clickOnMessage.getButton() == MouseButton.SECONDARY) sendMessageConfig.setMessageFunctions(finalMessageCash, clickOnMessage);
+                        if (clickOnMessage.getButton() == MouseButton.SECONDARY)
+                            sendMessageConfig.setMessageFunctions(finalMessageCash, clickOnMessage);
                     });
                 }
             });
         }
     }
-    
-    private void setSearchConfig(String newValue, PauseTransition pause) {
-        pause.stop();
-        pause.playFromStart();
-        pause.setOnFinished(event -> {
-            contactsField.getChildren().clear();
-            userRepository.findFirstByNickname(newValue).ifPresent(interlocutor -> {
-                BorderPane contact = GUIPatterns.newChatBuilder(interlocutor);
-                contactsField.getChildren().add(contact);
-                contact.setOnMouseClicked(mouseEvent -> {
-                    searchPanel.clear();
-                    contacts.values().stream()
-                            .filter(contactCash1 -> Objects.equals(contactCash1.getInterlocutor().getId(), interlocutor.getId()))
-                            .findFirst().ifPresentOrElse(existingContactCash -> {
-                                openChat(existingContactCash.getChat(), existingContactCash.getPersonalChat(), existingContactCash.getInterlocutor(), existingContactCash);
-                                loadContactsFromCash();}, () -> createNewChatRoom(interlocutor));
-                });
-            });
-            if (searchPanel.getText().isEmpty()) loadContactsFromCash();
-        });
-    }
-
-    private void createNewChatRoom(UserEntity interlocutor) {
-        ChatEntity newChat = ChatEntity.builder().build();
-        chatRepository.saveAndFlush(newChat);
-        PersonalChat myPersonalChat = PersonalChat.builder()
-                .chat(newChat)
-                .user(userEntity)
-                .interlocutor(interlocutor)
-                .build();
-
-        PersonalChat participantPersonalChat = PersonalChat.builder()
-                .chat(newChat)
-                .user(interlocutor)
-                .interlocutor(userEntity)
-                .build();
-
-        personalChatRepository.saveAndFlush(myPersonalChat);
-        personalChatRepository.saveAndFlush(participantPersonalChat);
-
-        newChat.setPersonalChats(List.of(myPersonalChat, participantPersonalChat));
-        chatRepository.saveAndFlush(newChat);
-        loadContactsFromCash();
-        ContactCash newContactCash = createContact (interlocutor, newChat, myPersonalChat);
-        openChat(newChat, myPersonalChat, interlocutor, newContactCash);
-        TCPConnection.CREATE_NEW_CHAT_ROOM(interlocutor.getId(), participantPersonalChat.getId());
-        userEntity.getUserChats().add(myPersonalChat);
-    }
 
     @Override
-    public void onConnectionReady(TCPConnection tcpConnection) {}
+    public void onConnectionReady(TCPConnection tcpConnection) {
+    }
 
     @Override
     public void onReceiveMessage(TCPConnection tcpConnection, String string) {
@@ -350,8 +310,7 @@ public class GoLink implements ServerListener {
                 long chatId = Long.parseLong(value);
                 if (selectedContact != null && selectedContact.getChat().getId() == chatId) {
                     Platform.runLater(() -> chatField.getChildren().remove(selectedContact.deleteMessage(messageId)));
-                }
-                else contacts.get(chatId).deleteMessageDefault(messageId);
+                } else contacts.get(chatId).deleteMessageDefault(messageId);
             }
             case "CREATE_NEW_CHAT_ROOM" -> {
                 PersonalChat personalChat = personalChatRepository.findById(Long.parseLong(value)).orElseThrow();
@@ -410,7 +369,8 @@ public class GoLink implements ServerListener {
             }
         }
     }
-    private void writeReceivedAudio (MessageEntity message, ContactCash contactCash, Long chatId) {
+
+    private void writeReceivedAudio(MessageEntity message, ContactCash contactCash, Long chatId) {
         MessageCash messageCash = GUIPatterns.printForeignAudioGUIAndGetCash(message, AudioHelper.convertBytesToAudio(message.getMetadata()));
         contactCash.addMessageOnCashAndPutLastMessage(messageCash);
         if (selectedContact != null && Objects.equals(selectedContact.getChat().getId(), chatId)) {
@@ -426,7 +386,7 @@ public class GoLink implements ServerListener {
         }
     }
 
-    private void writeReceivedMessage (MessageEntity message, ContactCash contactCash, Long chatId) {
+    private void writeReceivedMessage(MessageEntity message, ContactCash contactCash, Long chatId) {
         MessageCash messageCash = GUIPatterns.makeForeignMessageGUIAndGetCash(message);
         contactCash.addMessageOnCashAndPutLastMessage(messageCash);
         if (selectedContact != null && Objects.equals(selectedContact.getChat().getId(), chatId)) {
@@ -443,5 +403,8 @@ public class GoLink implements ServerListener {
     }
 
     @Override
-    public void onDisconnect(TCPConnection tcpConnection) {Platform.exit();}
+    public void onDisconnect(TCPConnection tcpConnection) {
+        Platform.exit();
+    }
+
 }

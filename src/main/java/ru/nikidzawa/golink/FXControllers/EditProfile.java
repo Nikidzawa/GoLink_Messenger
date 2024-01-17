@@ -13,7 +13,6 @@ import javafx.scene.layout.VBox;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.nikidzawa.golink.FXControllers.helpers.ExitListener;
 import ru.nikidzawa.golink.FXControllers.helpers.GUIPatterns;
 import ru.nikidzawa.golink.store.entities.UserEntity;
 import ru.nikidzawa.golink.store.repositories.UserRepository;
@@ -82,7 +81,7 @@ public class EditProfile {
             enter.setOnAction(actionEvent -> {
                 if (updateUserEntity()) {
                     userRepository.saveAndFlush(userEntity);
-                    goLink.setUserEntity(userEntity);
+                    goLink.userEntity = userEntity;
                     goLink.setUserConfig();
                 }
                 scene.getWindow().hide();
@@ -128,7 +127,8 @@ public class EditProfile {
 
         return isEdited;
     }
-    private void exception (String exMessage) {
+
+    private void exception(String exMessage) {
         System.out.println(exMessage);
     }
 }

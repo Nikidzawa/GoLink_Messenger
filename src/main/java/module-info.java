@@ -6,7 +6,6 @@ module ru.nikidzawa.golink {
     requires javafx.base;
     requires javafx.graphics;
     requires javafx.swing;
-    requires com.gluonhq.charm.glisten;
     requires GNAvatarView;
     requires spring.beans;
     requires spring.core;
@@ -34,7 +33,6 @@ module ru.nikidzawa.golink {
     requires org.slf4j;
     requires spring.boot.starter.logging;
     requires jul.to.slf4j;
-    requires JavaFXEmojiTextFlow.emojitwo;
     requires libphonenumber;
     requires spring.orm;
     requires javafx.graphicsEmpty;

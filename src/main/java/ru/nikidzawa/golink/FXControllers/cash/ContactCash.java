@@ -1,7 +1,6 @@
 package ru.nikidzawa.golink.FXControllers.cash;
 
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -15,7 +14,6 @@ import ru.nikidzawa.golink.store.entities.PersonalChat;
 import ru.nikidzawa.golink.store.entities.UserEntity;
 import ru.nikidzawa.golink.store.repositories.PersonalChatRepository;
 
-import java.io.ByteArrayInputStream;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,8 +25,8 @@ import java.util.Objects;
 public class ContactCash {
     //GUI
     public HashMap<Long, MessageCash> cashedMessageInformation = new HashMap<>();
-    public List <MessageEntity> newMessages = new ArrayList<>();
-    
+    public List<MessageEntity> newMessages = new ArrayList<>();
+
     private BorderPane GUI;
     private Text date;
     private BorderPane nameAndLastMessage;
@@ -49,7 +47,8 @@ public class ContactCash {
         this.personalChat = personalChat;
         this.personalChatRepository = personalChatRepository;
     }
-    private void setTextIfMessagesIsEmpty () {
+
+    private void setTextIfMessagesIsEmpty() {
         lastMessageText.setText("Чат пуст");
         date.setVisible(false);
     }
@@ -62,47 +61,54 @@ public class ContactCash {
         newMessagesCount.setText("0");
     }
 
-    public void addNotification (MessageEntity message) {
+    public void addNotification(MessageEntity message) {
         newMessages.add(message);
         personalChat.setNewMessagesCount(personalChat.getNewMessagesCount() + 1);
         newMessagesBlock.setVisible(true);
         newMessagesCount.setText(String.valueOf(Integer.parseInt(newMessagesCount.getText()) + 1));
     }
 
-    public void addMessageOnCashAndPutLastMessage (MessageCash messageCash) {
+    public void addMessageOnCashAndPutLastMessage(MessageCash messageCash) {
         cashedMessageInformation.put(messageCash.getMessage().getId(), messageCash);
-        chat.getMessages().add(messageCash.getMessage());
+        try {
+            chat.getMessages().add(messageCash.getMessage());
+        } catch (NullPointerException ex) {
+            chat.setMessages(new ArrayList<>());
+            chat.getMessages().add(messageCash.getMessage());
+        }
         putLastMessage(messageCash.getMessage());
     }
 
-    public void addMessageOnCash (MessageCash messageCash) {
+    public void addMessageOnCash(MessageCash messageCash) {
         cashedMessageInformation.put(messageCash.getMessage().getId(), messageCash);
     }
 
-    public void putLastMessage (MessageEntity message) {
+    public void putLastMessage(MessageEntity message) {
         date.setVisible(true);
         switch (message.getMessageType()) {
             case MESSAGE -> {
                 if (message.getText().isEmpty()) {
                     lastMessageText.setText(Objects.equals(message.getSender().getId(), interlocutor.getId()) ? "Фотография" : "Вы: " + "фотография");
-                }
-                else {
+                } else {
                     lastMessageText.setText(Objects.equals(message.getSender().getId(), interlocutor.getId()) ? message.getText() : "Вы: " + message.getText());
                 }
             }
-            case AUDIO -> lastMessageText.setText(Objects.equals(message.getSender().getId(), interlocutor.getId()) ? "Голосовое сообщение" : "Вы: " + "голосовое сообщение");
-            case DOCUMENT -> lastMessageText.setText(Objects.equals(message.getSender().getId(), interlocutor.getId()) ? "Документ" : "Вы: " + "документ");
+            case AUDIO ->
+                    lastMessageText.setText(Objects.equals(message.getSender().getId(), interlocutor.getId()) ? "Голосовое сообщение" : "Вы: " + "голосовое сообщение");
+            case DOCUMENT ->
+                    lastMessageText.setText(Objects.equals(message.getSender().getId(), interlocutor.getId()) ? "Документ" : "Вы: " + "документ");
         }
         date.setText(message.getDate().format(DateTimeFormatter.ofPattern("HH:mm")));
     }
-    public void editMessageAndFile (MessageCash messageCash, MessageEntity message) {
+
+    public void editMessageAndFile(MessageCash messageCash, MessageEntity message) {
         messageCash.changeText(message.getText());
         messageCash.setImage(message.getMetadata());
         message.setHasBeenChanged(true);
         isLastMessage(message);
     }
 
-    public void editMessage (Long messageId, String messageText) {
+    public void editMessage(Long messageId, String messageText) {
         if (cashedMessageInformation.containsKey(messageId)) {
             MessageCash messageCash = cashedMessageInformation.get(messageId);
             messageCash.changeText(messageText);
@@ -116,7 +122,7 @@ public class ContactCash {
         }
     }
 
-    public void editMessage (Long messageId, String messageText, byte[] content, MessageType messageType) {
+    public void editMessage(Long messageId, String messageText, byte[] content, MessageType messageType) {
         if (cashedMessageInformation.containsKey(messageId)) {
             MessageCash messageCash = cashedMessageInformation.get(messageId);
             messageCash.setImage(content);
@@ -134,7 +140,7 @@ public class ContactCash {
         }
     }
 
-    public void deleteMessage (MessageEntity message) {
+    public void deleteMessage(MessageEntity message) {
         int index = chat.getMessages().indexOf(message);
         if (index == chat.getMessages().size() - 1) {
             try {
@@ -148,7 +154,7 @@ public class ContactCash {
         isNewMessage(message);
     }
 
-    public void deleteMessageDefault (Long messageId) {
+    public void deleteMessageDefault(Long messageId) {
         List<MessageEntity> messageEntities = chat.getMessages();
         MessageEntity message = messageEntities.stream().filter(message1 -> Objects.equals(message1.getId(), messageId)).findFirst().orElseThrow();
         int indexMessage = messageEntities.indexOf(message);
@@ -164,7 +170,7 @@ public class ContactCash {
         chat.getMessages().remove(indexMessage);
     }
 
-    public HBox deleteMessage (Long messageId) {
+    public HBox deleteMessage(Long messageId) {
         MessageCash messageCash = cashedMessageInformation.get(messageId);
         List<MessageEntity> messageEntities = chat.getMessages();
         int indexMessage = messageEntities.indexOf(messageCash.getMessage());

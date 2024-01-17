@@ -3,7 +3,8 @@ package ru.nikidzawa.golink.store.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Builder
