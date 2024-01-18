@@ -33,22 +33,15 @@ module ru.nikidzawa.golink {
     requires org.slf4j;
     requires spring.boot.starter.logging;
     requires jul.to.slf4j;
-    requires libphonenumber;
     requires spring.orm;
     requires javafx.graphicsEmpty;
     requires javafx.mediaEmpty;
+    requires GoLinkNetworkAPI;
 
 
     opens ru.nikidzawa.golink to javafx.fxml, spring.core, org.hibernate.orm.core;
     exports ru.nikidzawa.golink;
     exports ru.nikidzawa.golink.FXControllers.helpers;
-    exports ru.nikidzawa.golink.store;
-    exports ru.nikidzawa.golink.store.entities;
-    opens ru.nikidzawa.golink.store.entities to javafx.fxml, org.hibernate.orm.core, spring.core;
-    exports ru.nikidzawa.golink.store.repositories;
-    opens ru.nikidzawa.golink.store.repositories to javafx.fxml, org.hibernate.orm.core, spring.core;
-    exports ru.nikidzawa.golink.network;
-    opens ru.nikidzawa.golink.network to javafx.fxml, org.hibernate.orm.core, spring.core;
     exports ru.nikidzawa.golink.FXControllers;
     opens ru.nikidzawa.golink.FXControllers to javafx.fxml, org.hibernate.orm.core, spring.core;
     opens img;

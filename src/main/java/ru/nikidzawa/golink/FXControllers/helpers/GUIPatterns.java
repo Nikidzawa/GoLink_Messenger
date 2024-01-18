@@ -36,11 +36,11 @@ import ru.nikidzawa.golink.FXControllers.GoLink;
 import ru.nikidzawa.golink.FXControllers.cash.ContactCash;
 import ru.nikidzawa.golink.FXControllers.cash.MessageCash;
 import ru.nikidzawa.golink.FXControllers.cash.MessageStage;
-import ru.nikidzawa.golink.network.TCPConnection;
 import ru.nikidzawa.golink.services.sound.AudioPlayer;
-import ru.nikidzawa.golink.store.entities.MessageEntity;
-import ru.nikidzawa.golink.store.entities.PersonalChat;
-import ru.nikidzawa.golink.store.entities.UserEntity;
+import ru.nikidzawa.networkAPI.network.TCPConnection;
+import ru.nikidzawa.networkAPI.store.entities.MessageEntity;
+import ru.nikidzawa.networkAPI.store.entities.PersonalChatEntity;
+import ru.nikidzawa.networkAPI.store.entities.UserEntity;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -140,7 +140,7 @@ public class GUIPatterns {
         });
     }
 
-    public BorderPane newChatBuilder(UserEntity myAccount, ContactCash contactCash, PersonalChat personalChat) {
+    public BorderPane newChatBuilder(UserEntity myAccount, ContactCash contactCash, PersonalChatEntity personalChatEntity) {
         BorderPane borderPane = new BorderPane();
         borderPane.setCursor(Cursor.HAND);
         StackPane stackImg = new StackPane();
@@ -209,7 +209,7 @@ public class GUIPatterns {
         translate.setX(-7);
         vBox.getTransforms().add(translate);
 
-        int newMessages = personalChat.getNewMessagesCount();
+        int newMessages = personalChatEntity.getNewMessagesCount();
 
         StackPane newMessagesVisualize = new StackPane();
         Circle circle = new Circle();

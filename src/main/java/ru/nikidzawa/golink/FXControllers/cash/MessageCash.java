@@ -10,7 +10,8 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import lombok.Getter;
 import ru.nikidzawa.golink.FXControllers.helpers.GUIPatterns;
-import ru.nikidzawa.golink.store.entities.MessageEntity;
+import ru.nikidzawa.networkAPI.store.entities.MessageEntity;
+
 
 import java.time.format.DateTimeFormatter;
 

@@ -29,19 +29,19 @@ import ru.nikidzawa.golink.FXControllers.Configurations.SendMessageConfig;
 import ru.nikidzawa.golink.FXControllers.cash.ContactCash;
 import ru.nikidzawa.golink.FXControllers.cash.MessageCash;
 import ru.nikidzawa.golink.FXControllers.helpers.GUIPatterns;
-import ru.nikidzawa.golink.network.ServerListener;
-import ru.nikidzawa.golink.network.TCPConnection;
 import ru.nikidzawa.golink.services.sound.AudioHelper;
 import ru.nikidzawa.golink.services.sound.SongPlayer;
-import ru.nikidzawa.golink.store.MessageType;
-import ru.nikidzawa.golink.store.entities.ChatEntity;
-import ru.nikidzawa.golink.store.entities.MessageEntity;
-import ru.nikidzawa.golink.store.entities.PersonalChat;
-import ru.nikidzawa.golink.store.entities.UserEntity;
-import ru.nikidzawa.golink.store.repositories.ChatRepository;
-import ru.nikidzawa.golink.store.repositories.MessageRepository;
-import ru.nikidzawa.golink.store.repositories.PersonalChatRepository;
-import ru.nikidzawa.golink.store.repositories.UserRepository;
+import ru.nikidzawa.networkAPI.network.ServerListener;
+import ru.nikidzawa.networkAPI.network.TCPConnection;
+import ru.nikidzawa.networkAPI.store.MessageType;
+import ru.nikidzawa.networkAPI.store.entities.ChatEntity;
+import ru.nikidzawa.networkAPI.store.entities.MessageEntity;
+import ru.nikidzawa.networkAPI.store.entities.PersonalChatEntity;
+import ru.nikidzawa.networkAPI.store.entities.UserEntity;
+import ru.nikidzawa.networkAPI.store.repositories.ChatRepository;
+import ru.nikidzawa.networkAPI.store.repositories.MessageRepository;
+import ru.nikidzawa.networkAPI.store.repositories.PersonalChatRepository;
+import ru.nikidzawa.networkAPI.store.repositories.UserRepository;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -136,7 +136,7 @@ public class GoLink implements ServerListener {
     void initialize() {
         Platform.runLater(() -> {
             try {
-                TCPConnection = new TCPConnection(new Socket("localhost", 8081), this, userEntity.getId().toString());
+                TCPConnection = new TCPConnection(new Socket("localhost", 8080), this, userEntity.getId().toString());
             } catch (IOException ex) {
                 Platform.exit();
                 throw new RuntimeException(ex);
@@ -203,9 +203,9 @@ public class GoLink implements ServerListener {
 
     private void loadChatRooms() {
         contactsField.getChildren().clear();
-        List<PersonalChat> personalChats = userEntity.getUserChats();
-        if (personalChats != null && !personalChats.isEmpty()) {
-            personalChats.forEach(personalChat -> createContact(personalChat.getInterlocutor(), personalChat.getChat(), personalChat));
+        List<PersonalChatEntity> personalChatEntities = userEntity.getUserChats();
+        if (personalChatEntities != null && !personalChatEntities.isEmpty()) {
+            personalChatEntities.forEach(personalChat -> createContact(personalChat.getInterlocutor(), personalChat.getChat(), personalChat));
         }
         writeSortedContacts();
     }
@@ -222,17 +222,17 @@ public class GoLink implements ServerListener {
         GUI.forEach(contactCash -> contactsField.getChildren().add(contactCash.getGUI()));
     }
 
-    public ContactCash createContact(UserEntity interlocutor, ChatEntity chat, PersonalChat personalChat) {
-        ContactCash contactCash = new ContactCash(interlocutor, chat, personalChat, personalChatRepository);
-        BorderPane GUIContact = GUIPatterns.newChatBuilder(userEntity, contactCash, personalChat);
-        GUIContact.setOnMouseClicked(e -> openChat(chat, personalChat, interlocutor, contactCash));
+    public ContactCash createContact(UserEntity interlocutor, ChatEntity chat, PersonalChatEntity personalChatEntity) {
+        ContactCash contactCash = new ContactCash(interlocutor, chat, personalChatEntity, personalChatRepository);
+        BorderPane GUIContact = GUIPatterns.newChatBuilder(userEntity, contactCash, personalChatEntity);
+        GUIContact.setOnMouseClicked(e -> openChat(chat, personalChatEntity, interlocutor, contactCash));
         contactCash.setGUI(GUIContact);
         contacts.put(chat.getId(), contactCash);
         return contactCash;
     }
 
     @SneakyThrows
-    public void openChat(ChatEntity chat, PersonalChat personalChat, UserEntity interlocutor, ContactCash contactCash) {
+    public void openChat(ChatEntity chat, PersonalChatEntity personalChatEntity, UserEntity interlocutor, ContactCash contactCash) {
         if (selectedContact == null || !Objects.equals(selectedContact.getChat().getId(), chat.getId())) {
             scrollPane.setStyle("-fx-background: transparent; -fx-background-color: transparent; -fx-background-image: url('img/backgroundChatImage.jpg'); -fx-border-width: 1 0 1 1; -fx-border-color: black;");
             chatField.setStyle("-fx-background: transparent; -fx-background-color: transparent; -fx-spacing: 10");
@@ -241,7 +241,7 @@ public class GoLink implements ServerListener {
             scrollConfig.startScrollEvent();
             setVisibleChatContent(true);
 
-            if (personalChat.getNewMessagesCount() > 0) {
+            if (personalChatEntity.getNewMessagesCount() > 0) {
                 contactCash.resetNotificationCount();
             }
 
@@ -313,10 +313,10 @@ public class GoLink implements ServerListener {
                 } else contacts.get(chatId).deleteMessageDefault(messageId);
             }
             case "CREATE_NEW_CHAT_ROOM" -> {
-                PersonalChat personalChat = personalChatRepository.findById(Long.parseLong(value)).orElseThrow();
-                UserEntity interlocutor = personalChat.getInterlocutor();
-                ChatEntity chatEntity = personalChat.getChat();
-                Platform.runLater(() -> createContact(interlocutor, chatEntity, personalChat));
+                PersonalChatEntity personalChatEntity = personalChatRepository.findById(Long.parseLong(value)).orElseThrow();
+                UserEntity interlocutor = personalChatEntity.getInterlocutor();
+                ChatEntity chatEntity = personalChatEntity.getChat();
+                Platform.runLater(() -> createContact(interlocutor, chatEntity, personalChatEntity));
             }
             case "CHANGE_USER_STATUS" -> status.setText(Boolean.parseBoolean(value) ? "В сети" : "Не в сети");
         }

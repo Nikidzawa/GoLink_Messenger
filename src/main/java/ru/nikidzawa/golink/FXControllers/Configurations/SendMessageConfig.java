@@ -15,14 +15,14 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Pair;
-import lombok.Setter;
 import ru.nikidzawa.golink.FXControllers.GoLink;
 import ru.nikidzawa.golink.FXControllers.cash.ContactCash;
 import ru.nikidzawa.golink.FXControllers.cash.MessageCash;
 import ru.nikidzawa.golink.FXControllers.helpers.GUIPatterns;
 import ru.nikidzawa.golink.services.sound.AudioHelper;
-import ru.nikidzawa.golink.store.MessageType;
-import ru.nikidzawa.golink.store.entities.MessageEntity;
+import ru.nikidzawa.networkAPI.store.MessageType;
+import ru.nikidzawa.networkAPI.store.entities.MessageEntity;
+import ru.nikidzawa.networkAPI.store.entities.PersonalChatEntity;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
@@ -49,11 +49,11 @@ public class SendMessageConfig {
 
     GUIPatterns GUIPatterns = new GUIPatterns();
 
-    @Setter
     private ContactCash selectedContact;
 
     private boolean isEditMessageStage;
     private MessageCash messageCash;
+    private PersonalChatEntity interlocutorPersonalChatEntity;
 
     private byte[] selectedImage;
     private ImageView imageView;
@@ -73,6 +73,11 @@ public class SendMessageConfig {
         sendButton.setOnMouseClicked(mouseEvent -> sendMessageConfiguration());
     }
 
+    public void setSelectedContact(ContactCash contactCash) {
+        selectedContact = contactCash;
+        interlocutorPersonalChatEntity = contactCash.getInterlocutor().getUserChats().stream().filter(personalChat -> Objects.equals(personalChat.getInterlocutor().getId(), goLink.userEntity.getId())).findFirst().orElseThrow();
+    }
+
     public void sendAudi0Configuration() {
         if (selectedContact != null) {
             AudioHelper.stopRecording();
@@ -87,7 +92,7 @@ public class SendMessageConfig {
                         .build();
                 MessageCash messageCash = GUIPatterns.printMyAudioGUIAndGetCash(messageEntity, AudioHelper.getFile());
                 goLink.messageRepository.save(messageEntity);
-                goLink.TCPConnection.POST(selectedContact.getInterlocutor().getId(), selectedContact.getChat().getId(), messageEntity.getId(), MessageType.AUDIO, null, metadata);
+                goLink.TCPConnection.POST(selectedContact.getInterlocutor().getId(), interlocutorPersonalChatEntity.getId(), selectedContact.getChat().getId(), messageEntity.getId(), ru.nikidzawa.networkAPI.store.MessageType.AUDIO, null, metadata);
                 selectedContact.addMessageOnCashAndPutLastMessage(messageCash);
                 chatField.getChildren().add(messageCash.getMessageBackground());
 
@@ -132,7 +137,7 @@ public class SendMessageConfig {
             if (isEdited) {
                 selectedContact.editMessageAndFile(messageCash, messageEntity);
                 goLink.messageRepository.save(messageEntity);
-                goLink.TCPConnection.EDIT(selectedContact.getInterlocutor().getId(), selectedContact.getChat().getId(), messageEntity.getId(), MessageType.MESSAGE, messageEntity.getText(), selectedImage);
+                goLink.TCPConnection.EDIT(selectedContact.getInterlocutor().getId(), selectedContact.getChat().getId(), messageEntity.getId(), ru.nikidzawa.networkAPI.store.MessageType.MESSAGE, messageEntity.getText(), selectedImage);
             }
             disable();
         } else {
@@ -146,7 +151,7 @@ public class SendMessageConfig {
                         .messageType(MessageType.MESSAGE)
                         .build();
                 goLink.messageRepository.save(messageEntity);
-                goLink.TCPConnection.POST(selectedContact.getInterlocutor().getId(), selectedContact.getChat().getId(), messageEntity.getId(), MessageType.MESSAGE, text, selectedImage);
+                goLink.TCPConnection.POST(selectedContact.getInterlocutor().getId(), interlocutorPersonalChatEntity.getId(), selectedContact.getChat().getId(), messageEntity.getId(), ru.nikidzawa.networkAPI.store.MessageType.MESSAGE, text, selectedImage);
                 MessageCash messageCash = GUIPatterns.makeMyMessageGUIAndGetCash(messageEntity);
                 chatField.getChildren().add(addMessageToGlobalCash(messageCash));
 

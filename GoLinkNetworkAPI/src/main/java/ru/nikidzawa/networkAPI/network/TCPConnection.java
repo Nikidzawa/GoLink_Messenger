@@ -1,8 +1,8 @@
-package ru.nikidzawa.golink.network;
+package ru.nikidzawa.networkAPI.network;
 
 import lombok.Getter;
 import lombok.SneakyThrows;
-import ru.nikidzawa.golink.store.MessageType;
+import ru.nikidzawa.networkAPI.store.MessageType;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -101,25 +101,24 @@ public class TCPConnection {
         }
     }
 
-    public void CHECK_USER_STATUS(Long receiverID) {
+    public void CHECK_USER_STATUS(long receiverID) {
         sendMessage("CHANGE_USER_STATUS:" + receiverID);
     }
 
-    public void CREATE_NEW_CHAT_ROOM(Long receiverID, Long participantPersonalChatId) {
-        sendMessage("CREATE_NEW_CHAT_ROOM:" + receiverID + ":" + participantPersonalChatId);
+    public void CREATE_NEW_CHAT_ROOM(long receiverID, long participantPersonalChatId) {
+        sendMessage(String.format("CREATE_NEW_CHAT_ROOM:%d:%d", receiverID, participantPersonalChatId));
     }
 
-
-    public void DELETE(Long receiverID, Long chatID, Long messageID) {
-        sendMessage("DELETE:" + receiverID + ":" + chatID + ":" + messageID);
+    public void DELETE(long receiverID, long chatID, long messageID) {
+        sendMessage(String.format("DELETE:%d:%d:%d", receiverID, chatID, messageID));
     }
 
-    public void POST(Long receiverID, Long chatID, Long messageID, MessageType messageType, String message, byte[] metadata) {
-        sendFile("POST:" + receiverID + ":" + chatID + ":" + messageID + ":" + messageType.name() + ":" + message, metadata);
+    public void POST(long receiverID, long interlocutorPersonalChatID, long chatID, long messageID, MessageType messageType, String message, byte[] metadata) {
+        sendFile(String.format("POST:%d:%d:%d:%d:%s:%s", receiverID, interlocutorPersonalChatID, chatID, messageID, messageType, message), metadata);
     }
 
-    public void EDIT(Long receiverID, Long chatID, Long messageID, MessageType messageType, String message, byte[] metadata) {
-        sendFile("EDIT:" + receiverID + ":" + chatID + ":" + messageID + ":" + messageType + ":" + message, metadata);
+    public void EDIT(long receiverID, long chatID, long messageID, MessageType messageType, String message, byte[] metadata) {
+        sendFile(String.format("EDIT:%d:%d:%d:%s:%s", receiverID, chatID, messageID, messageType, message), metadata);
     }
 
     @SneakyThrows

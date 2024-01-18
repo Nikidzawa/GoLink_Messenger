@@ -1,8 +1,8 @@
-package ru.nikidzawa.golink.store.entities;
+package ru.nikidzawa.networkAPI.store.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ru.nikidzawa.golink.store.MessageType;
+import ru.nikidzawa.networkAPI.store.MessageType;
 
 import java.time.LocalDateTime;
 

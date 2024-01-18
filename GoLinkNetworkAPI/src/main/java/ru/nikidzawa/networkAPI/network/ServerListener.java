@@ -1,4 +1,4 @@
-package ru.nikidzawa.golink.network;
+package ru.nikidzawa.networkAPI.network;
 
 public interface ServerListener {
     void onConnectionReady(TCPConnection TCPConnection);

@@ -7,12 +7,13 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import lombok.Getter;
 import lombok.Setter;
-import ru.nikidzawa.golink.store.MessageType;
-import ru.nikidzawa.golink.store.entities.ChatEntity;
-import ru.nikidzawa.golink.store.entities.MessageEntity;
-import ru.nikidzawa.golink.store.entities.PersonalChat;
-import ru.nikidzawa.golink.store.entities.UserEntity;
-import ru.nikidzawa.golink.store.repositories.PersonalChatRepository;
+
+import ru.nikidzawa.networkAPI.store.MessageType;
+import ru.nikidzawa.networkAPI.store.entities.ChatEntity;
+import ru.nikidzawa.networkAPI.store.entities.MessageEntity;
+import ru.nikidzawa.networkAPI.store.entities.PersonalChatEntity;
+import ru.nikidzawa.networkAPI.store.entities.UserEntity;
+import ru.nikidzawa.networkAPI.store.repositories.PersonalChatRepository;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -36,15 +37,15 @@ public class ContactCash {
 
     //Data base
     private PersonalChatRepository personalChatRepository;
-    private PersonalChat personalChat;
+    private PersonalChatEntity personalChatEntity;
     private UserEntity interlocutor;
     private ChatEntity chat;
     private MessageEntity lastMessage;
 
-    public ContactCash(UserEntity interlocutor, ChatEntity chat, PersonalChat personalChat, PersonalChatRepository personalChatRepository) {
+    public ContactCash(UserEntity interlocutor, ChatEntity chat, PersonalChatEntity personalChatEntity, PersonalChatRepository personalChatRepository) {
         this.interlocutor = interlocutor;
         this.chat = chat;
-        this.personalChat = personalChat;
+        this.personalChatEntity = personalChatEntity;
         this.personalChatRepository = personalChatRepository;
     }
 
@@ -55,15 +56,15 @@ public class ContactCash {
 
     public void resetNotificationCount() {
         newMessages.clear();
-        personalChat.setNewMessagesCount(0);
-        personalChatRepository.save(personalChat);
+        personalChatEntity.setNewMessagesCount(0);
+        personalChatRepository.save(personalChatEntity);
         newMessagesBlock.setVisible(false);
         newMessagesCount.setText("0");
     }
 
     public void addNotification(MessageEntity message) {
         newMessages.add(message);
-        personalChat.setNewMessagesCount(personalChat.getNewMessagesCount() + 1);
+        personalChatEntity.setNewMessagesCount(personalChatEntity.getNewMessagesCount() + 1);
         newMessagesBlock.setVisible(true);
         newMessagesCount.setText(String.valueOf(Integer.parseInt(newMessagesCount.getText()) + 1));
     }
@@ -190,13 +191,13 @@ public class ContactCash {
     private void isNewMessage(MessageEntity message) {
         if (newMessages.contains(message)) {
             newMessages.remove(message);
-            personalChat.setNewMessagesCount(personalChat.getNewMessagesCount() - 1);
-            newMessagesCount.setText(String.valueOf(personalChat.getNewMessagesCount()));
-            if (personalChat.getNewMessagesCount() == 0) {
+            personalChatEntity.setNewMessagesCount(personalChatEntity.getNewMessagesCount() - 1);
+            newMessagesCount.setText(String.valueOf(personalChatEntity.getNewMessagesCount()));
+            if (personalChatEntity.getNewMessagesCount() == 0) {
                 newMessagesBlock.setVisible(false);
                 newMessagesCount.setText("0");
             }
-            personalChatRepository.save(personalChat);
+            personalChatRepository.save(personalChatEntity);
         }
     }
 

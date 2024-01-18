@@ -1,4 +1,4 @@
-package ru.nikidzawa.golink.store.entities;
+package ru.nikidzawa.networkAPI.store.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -29,6 +29,6 @@ public class UserEntity {
 
     private byte[] avatar;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<PersonalChat> userChats = new ArrayList<>();
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<PersonalChatEntity> userChats = new ArrayList<>();
 }

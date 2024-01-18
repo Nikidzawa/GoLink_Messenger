@@ -1,4 +1,4 @@
-package ru.nikidzawa.golink.store.entities;
+package ru.nikidzawa.networkAPI.store.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,5 +21,5 @@ public class ChatEntity {
     private List<MessageEntity> messages = new ArrayList<>();
 
     @OneToMany(mappedBy = "chat", fetch = FetchType.EAGER)
-    private List<PersonalChat> personalChats = new ArrayList<>();
+    private List<PersonalChatEntity> personalChatEntities = new ArrayList<>();
 }

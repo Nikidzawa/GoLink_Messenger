@@ -22,7 +22,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 import ru.nikidzawa.golink.FXControllers.helpers.GUIPatterns;
 import ru.nikidzawa.golink.services.SMSAuthenticate.SMSAuthenticate;
-import ru.nikidzawa.golink.store.repositories.UserRepository;
+import ru.nikidzawa.networkAPI.store.repositories.UserRepository;
 
 import java.util.Objects;
 import java.util.Random;

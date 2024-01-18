@@ -24,8 +24,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 import ru.nikidzawa.golink.FXControllers.helpers.GUIPatterns;
 import ru.nikidzawa.golink.services.GrapgicPatterns.DefaultAvatarCreator;
-import ru.nikidzawa.golink.store.entities.UserEntity;
-import ru.nikidzawa.golink.store.repositories.UserRepository;
+import ru.nikidzawa.networkAPI.store.entities.UserEntity;
+import ru.nikidzawa.networkAPI.store.repositories.UserRepository;
 
 import java.io.File;
 import java.io.IOException;

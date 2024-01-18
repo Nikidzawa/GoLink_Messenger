@@ -1,4 +1,4 @@
-package ru.nikidzawa.golink.store;
+package ru.nikidzawa.networkAPI.store;
 
 public enum MessageType {
     MESSAGE,

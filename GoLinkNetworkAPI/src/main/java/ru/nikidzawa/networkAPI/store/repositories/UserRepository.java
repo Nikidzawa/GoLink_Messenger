@@ -1,10 +1,10 @@
-package ru.nikidzawa.golink.store.repositories;
+package ru.nikidzawa.networkAPI.store.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import ru.nikidzawa.golink.store.entities.UserEntity;
+import ru.nikidzawa.networkAPI.store.entities.UserEntity;
 
 import java.util.Optional;
 

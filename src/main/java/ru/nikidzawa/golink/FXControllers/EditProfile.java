@@ -14,8 +14,8 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.nikidzawa.golink.FXControllers.helpers.GUIPatterns;
-import ru.nikidzawa.golink.store.entities.UserEntity;
-import ru.nikidzawa.golink.store.repositories.UserRepository;
+import ru.nikidzawa.networkAPI.store.entities.UserEntity;
+import ru.nikidzawa.networkAPI.store.repositories.UserRepository;
 
 import java.io.ByteArrayInputStream;
 
@@ -56,8 +56,6 @@ public class EditProfile {
 
     @Autowired
     GUIPatterns GUIPatterns;
-    @Autowired
-    UserRepository userRepository;
 
     @Setter
     private GoLink goLink;
@@ -69,63 +67,64 @@ public class EditProfile {
 
     @FXML
     void initialize() {
-        Platform.runLater(() -> {
-            enter.requestFocus();
-//            GUIPatterns.setBaseWindowTitleCommands(titleBar, minimizeButton, scaleButton, closeButton);
-
-            name.setText(userEntity.getName());
-            nickname.setText("@" + userEntity.getNickname());
-            number.setText(userEntity.getPhone().toString());
-            avatar.setImage(new Image(new ByteArrayInputStream(userEntity.getAvatar())));
-
-            enter.setOnAction(actionEvent -> {
-                if (updateUserEntity()) {
-                    userRepository.saveAndFlush(userEntity);
-                    goLink.userEntity = userEntity;
-                    goLink.setUserConfig();
-                }
-                scene.getWindow().hide();
-            });
-
-            nickname.textProperty().addListener((observable, oldValue, newValue) -> {
-                if (newValue.isEmpty()) {
-                    nickname.setText("@");
-                }
-            });
-        });
-    }
-
-    private boolean updateUserEntity() {
-        boolean isEdited = false;
-
-        if (!userEntity.getName().equals(name.getText())) {
-            userEntity.setName(name.getText());
-            isEdited = true;
-        }
-
-        String newNickname = nickname.getText().substring(1);
-        if (!newNickname.equals(userEntity.getNickname())) {
-            if (userRepository.findFirstByNickname(newNickname).isEmpty()) {
-                userEntity.setNickname(newNickname);
-                isEdited = true;
-            } else {
-                exception("Никнейм уже занят");
-                return false;
-            }
-        }
-
-        if (!number.getText().equals(userEntity.getPhone().toString())) {
-            Long phone = Long.parseLong(number.getText());
-            if (userRepository.findFirstByPhone(phone).isEmpty()) {
-                userEntity.setPhone(phone);
-                isEdited = true;
-            } else {
-                exception("Номер телефона уже зарегистрирован");
-                return false;
-            }
-        }
-
-        return isEdited;
+//        Platform.runLater(() -> {
+//            enter.requestFocus();
+////            GUIPatterns.setBaseWindowTitleCommands(titleBar, minimizeButton, scaleButton, closeButton);
+//
+//            name.setText(userEntity.getName());
+//            nickname.setText("@" + userEntity.getNickname());
+//            number.setText(userEntity.getPhone().toString());
+//            avatar.setImage(new Image(new ByteArrayInputStream(userEntity.getAvatar())));
+//
+//            enter.setOnAction(actionEvent -> {
+//                if (updateUserEntity()) {
+//                    userRepository.saveAndFlush(userEntity);
+//                    goLink.userEntity = userEntity;
+//                    goLink.setUserConfig();
+//                }
+//                scene.getWindow().hide();
+//            });
+//
+//            nickname.textProperty().addListener((observable, oldValue, newValue) -> {
+//                if (newValue.isEmpty()) {
+//                    nickname.setText("@");
+//                }
+//            });
+//        });
+//    }
+//
+//    private boolean updateUserEntity() {
+//        boolean isEdited = false;
+//
+//        if (!userEntity.getName().equals(name.getText())) {
+//            userEntity.setName(name.getText());
+//            isEdited = true;
+//        }
+//
+//        String newNickname = nickname.getText().substring(1);
+//        if (!newNickname.equals(userEntity.getNickname())) {
+//            if (userRepository.findFirstByNickname(newNickname).isEmpty()) {
+//                userEntity.setNickname(newNickname);
+//                isEdited = true;
+//            } else {
+//                exception("Никнейм уже занят");
+//                return false;
+//            }
+//        }
+//
+//        if (!number.getText().equals(userEntity.getPhone().toString())) {
+//            Long phone = Long.parseLong(number.getText());
+//            if (userRepository.findFirstByPhone(phone).isEmpty()) {
+//                userEntity.setPhone(phone);
+//                isEdited = true;
+//            } else {
+//                exception("Номер телефона уже зарегистрирован");
+//                return false;
+//            }
+//        }
+//
+//        return isEdited;
+//    }
     }
 
     private void exception(String exMessage) {
