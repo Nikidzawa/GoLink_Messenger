@@ -1,242 +1,218 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import io.github.gleidson28.GNAvatarView?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.paint.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.paint.LinearGradient?>
+<?import javafx.scene.paint.Stop?>
 <?import javafx.scene.shape.Circle?>
-<?import javafx.scene.text.*?>
-<BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity"
-            minWidth="-Infinity" prefHeight="1200.0" prefWidth="1200.0"
-            style="-fx-background-color: #001933; -fx-border-color: black; -fx-border-width: 0 1 1 1;"
-            xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="ru.nikidzawa.golink.FXControllers.GoLink">
-    <left>
-        <BorderPane prefHeight="1201.0" prefWidth="322.0" style="-fx-background-color: #001933;"
-                    BorderPane.alignment="CENTER">
-            <top>
-                <AnchorPane prefHeight="77.0" prefWidth="322.0"
-                            style="-fx-border-color: black; -fx-border-width: 0 0 1 0 0;" BorderPane.alignment="CENTER">
-                    <children>
-                        <Text fx:id="profileName" fill="WHITE" layoutX="104.0" layoutY="45.0" strokeType="OUTSIDE"
-                              strokeWidth="0.0" text="Nikidzawa" wrappingWidth="138.13671875">
-                            <font>
-                                <Font name="System" size="20.0"/>
-                            </font>
-                        </Text>
-                        <StackPane layoutX="14.0" layoutY="6.0" prefHeight="67.0" prefWidth="75.0">
-                            <children>
-                                <GNAvatarView fx:id="myAvatar" prefHeight="71.0" prefWidth="104.0" stroke="#001933"
-                                              type="CIRCLE"/>
-                                <Circle cache="true" fill="GREEN" radius="9.0" stroke="BLACK" strokeType="INSIDE">
-                                    <StackPane.margin>
-                                        <Insets left="40.0" top="60.0"/>
-                                    </StackPane.margin>
-                                </Circle>
-                            </children>
-                        </StackPane>
-                        <Text fill="WHITE" layoutX="104.0" layoutY="61.0" strokeType="OUTSIDE" strokeWidth="0.0"
-                              text="В сети" wrappingWidth="118.13671875">
-                            <font>
-                                <Font name="System" size="12.0"/>
-                            </font>
-                        </Text>
-                        <ImageView fx:id="settingsButton" fitHeight="31.0" fitWidth="35.0" layoutX="275.0"
-                                   layoutY="41.0">
-                            <image>
-                                <Image url="@/img/settings.png"/>
-                            </image>
-                            <cursor>
-                                <Cursor fx:constant="HAND"/>
-                            </cursor>
-                        </ImageView>
-                    </children>
-                </AnchorPane>
-            </top>
-            <bottom>
-                <VBox fx:id="contactsField" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
-                      prefHeight="1031.0" prefWidth="321.0" spacing="10" BorderPane.alignment="CENTER"/>
-            </bottom>
-            <center>
-                <AnchorPane prefHeight="56.0" prefWidth="321.0" BorderPane.alignment="CENTER">
-                    <children>
-                        <TextField fx:id="searchPanel" layoutX="10.0" layoutY="11.0" prefHeight="25.0" prefWidth="302.0"
-                                   promptText="Найти"
-                                   style="-fx-background-color: #001933; -fx-border-color: blue; -fx-border-width: 0 0 2 0; -fx-text-fill: white;"/>
-                    </children>
-                </AnchorPane>
-            </center>
-        </BorderPane>
-    </left>
-    <center>
-        <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-            <top>
-                <AnchorPane prefHeight="85.0" prefWidth="887.0"
-                            style="-fx-border-color: black; -fx-border-width: 0 0 0 1 0;" BorderPane.alignment="CENTER">
-                    <children>
-                        <Text fx:id="chatRoomName" fill="WHITE" layoutX="14.0" layoutY="46.0" strokeType="OUTSIDE"
-                              strokeWidth="0.0" wrappingWidth="390.13671875">
-                            <font>
-                                <Font name="System" size="30.0"/>
-                            </font>
-                        </Text>
-                        <Text fx:id="status" fill="WHITE" layoutX="14.0" layoutY="66.0" strokeType="OUTSIDE"
-                              strokeWidth="0.0" visible="false" wrappingWidth="118.13671875"/>
-                    </children>
-                </AnchorPane>
-            </top>
-            <center>
-                <ScrollPane fx:id="scrollPane" hbarPolicy="NEVER" prefHeight="200.0" prefWidth="200.0"
-                            style="-fx-background-color: #001933; -fx-border-width: 1 0 1 1; -fx-border-color: black;"
-                            BorderPane.alignment="CENTER">
-                    <content>
-                        <VBox fx:id="chatField" prefHeight="1027.0" prefWidth="876.0"
-                              style="-fx-background-color: #001933; -fx-spacing: 10;">
-                            <children>
-                                <AnchorPane prefHeight="382.0" prefWidth="876.0"/>
-                                <TextField alignment="CENTER" editable="false" prefHeight="32.0" prefWidth="855.0"
-                                           style="-fx-text-fill: white; -fx-background-color: #001933;"
-                                           text="Выберите, кому хотели бы написать">
-                                    <font>
-                                        <Font size="17.0"/>
-                                    </font>
-                                </TextField>
-                            </children>
-                        </VBox>
-                    </content>
-                </ScrollPane>
-            </center>
-            <bottom>
-                <BorderPane fx:id="sendZone" prefHeight="45.0" prefWidth="878.0"
-                            style="-fx-border-color: black; -fx-border-width: 0 0  0 1 0;"
-                            BorderPane.alignment="CENTER">
-                    <center>
-                        <TextField fx:id="input" prefHeight="40.0" prefWidth="776.0" promptText="Введите сообщение..."
-                                   style="-fx-background-color: #001933; -fx-border-color: blue; -fx-border-width: 0 0 2 0; -fx-text-fill: white;"
-                                   visible="false" BorderPane.alignment="CENTER">
-                            <font>
-                                <Font size="15.0"/>
-                            </font>
-                            <BorderPane.margin>
-                                <Insets left="10.0"/>
-                            </BorderPane.margin>
-                            <cursor>
-                                <Cursor fx:constant="TEXT"/>
-                            </cursor>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1200.0" prefWidth="1200.0" style="-fx-background-color: #001933; -fx-border-color: black; -fx-border-width: 0 1 1 1;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.nikidzawa.golink.FXControllers.GoLink">
+   <left>
+      <BorderPane prefHeight="1201.0" prefWidth="322.0" style="-fx-background-color: #001933;" BorderPane.alignment="CENTER">
+         <top>
+            <AnchorPane prefHeight="77.0" prefWidth="322.0" style="-fx-border-color: black; -fx-border-width: 0 0 1 0 0;" BorderPane.alignment="CENTER">
+               <children>
+                  <Text fx:id="profileName" fill="WHITE" layoutX="104.0" layoutY="45.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Nikidzawa" wrappingWidth="138.13671875">
+                     <font>
+                        <Font name="System" size="20.0" />
+                     </font>
+                  </Text>
+                  <StackPane layoutX="14.0" layoutY="6.0" prefHeight="67.0" prefWidth="75.0">
+                     <children>
+                        <GNAvatarView fx:id="myAvatar" prefHeight="71.0" prefWidth="104.0" stroke="#001933" type="CIRCLE" />
+                        <Circle cache="true" fill="GREEN" radius="9.0" stroke="BLACK" strokeType="INSIDE">
+                           <StackPane.margin>
+                              <Insets left="40.0" top="60.0" />
+                           </StackPane.margin>
+                        </Circle>
+                     </children>
+                  </StackPane>
+                  <Text fill="WHITE" layoutX="104.0" layoutY="61.0" strokeType="OUTSIDE" strokeWidth="0.0" text="В сети" wrappingWidth="118.13671875">
+                     <font>
+                        <Font name="System" size="12.0" />
+                     </font>
+                  </Text>
+                  <ImageView fx:id="settingsButton" fitHeight="31.0" fitWidth="35.0" layoutX="275.0" layoutY="41.0">
+                     <image>
+                        <Image url="@/img/settings.png" />
+                     </image>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </ImageView>
+               </children>
+            </AnchorPane>
+         </top>
+         <bottom>
+            <VBox fx:id="contactsField" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="1031.0" prefWidth="321.0" spacing="10" BorderPane.alignment="CENTER" />
+         </bottom>
+         <center>
+            <AnchorPane prefHeight="56.0" prefWidth="321.0" BorderPane.alignment="CENTER">
+               <children>
+                  <TextField fx:id="searchPanel" focusTraversable="false" layoutX="10.0" layoutY="11.0" prefHeight="25.0" prefWidth="302.0" promptText="Найти" style="-fx-background-color: #001933; -fx-border-color: blue; -fx-border-width: 0 0 2 0; -fx-text-fill: white;" />
+               </children>
+            </AnchorPane>
+         </center>
+      </BorderPane>
+   </left>
+   <center>
+      <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <top>
+            <AnchorPane prefHeight="85.0" prefWidth="887.0" style="-fx-border-color: black; -fx-border-width: 0 0 0 1 0;" BorderPane.alignment="CENTER">
+               <children>
+                  <Text fx:id="chatRoomName" fill="WHITE" layoutX="14.0" layoutY="46.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="390.13671875">
+                     <font>
+                        <Font name="System" size="30.0" />
+                     </font>
+                  </Text>
+                  <Text fx:id="status" fill="WHITE" layoutX="14.0" layoutY="66.0" strokeType="OUTSIDE" strokeWidth="0.0" visible="false" wrappingWidth="118.13671875" />
+               </children>
+            </AnchorPane>
+         </top>
+         <center>
+            <ScrollPane fx:id="scrollPane" hbarPolicy="NEVER" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #001933; -fx-border-width: 1 0 1 1; -fx-border-color: black;" BorderPane.alignment="CENTER">
+               <content>
+                  <VBox fx:id="chatField" prefHeight="1027.0" prefWidth="876.0" style="-fx-background-color: #001933; -fx-spacing: 10;">
+                     <children>
+                        <AnchorPane prefHeight="382.0" prefWidth="876.0" />
+                        <TextField alignment="CENTER" editable="false" focusTraversable="false" prefHeight="32.0" prefWidth="855.0" style="-fx-text-fill: white; -fx-background-color: #001933;" text="Выберите, кому хотели бы написать">
+                           <font>
+                              <Font size="17.0" />
+                           </font>
                         </TextField>
-                    </center>
-                    <left>
-                        <ImageView fx:id="sendImageButton" fitHeight="35.0" fitWidth="40.0" pickOnBounds="true"
-                                   preserveRatio="true" visible="false" BorderPane.alignment="CENTER">
-                            <image>
-                                <Image url="@/img/img.png"/>
-                            </image>
-                            <BorderPane.margin>
-                                <Insets left="5.0"/>
-                            </BorderPane.margin>
-                            <cursor>
-                                <Cursor fx:constant="HAND"/>
-                            </cursor>
+                     </children>
+                  </VBox>
+               </content>
+            </ScrollPane>
+         </center>
+         <bottom>
+            <BorderPane fx:id="sendZone" prefHeight="45.0" prefWidth="878.0" style="-fx-border-color: black; -fx-border-width: 0 0  0 1 0;" BorderPane.alignment="CENTER">
+               <center>
+                  <TextField fx:id="input" prefHeight="40.0" prefWidth="776.0" promptText="Введите сообщение..." style="-fx-background-color: #001933; -fx-border-color: blue; -fx-border-width: 0 0 2 0; -fx-text-fill: white;" visible="false" BorderPane.alignment="CENTER">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                     <BorderPane.margin>
+                        <Insets left="10.0" />
+                     </BorderPane.margin>
+                     <cursor>
+                        <Cursor fx:constant="TEXT" />
+                     </cursor>
+                  </TextField>
+               </center>
+               <left>
+                  <ImageView fx:id="sendImageButton" fitHeight="35.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" visible="false" BorderPane.alignment="CENTER">
+                     <image>
+                        <Image url="@/img/img.png" />
+                     </image>
+                     <BorderPane.margin>
+                        <Insets left="5.0" />
+                     </BorderPane.margin>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </ImageView>
+               </left>
+               <right>
+                  <BorderPane prefHeight="45.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+                     <right>
+                        <ImageView fx:id="sendButton" fitHeight="35.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" visible="false" BorderPane.alignment="CENTER">
+                           <image>
+                              <Image url="@/img/sendMessageIcon.png" />
+                           </image>
+                           <BorderPane.margin>
+                              <Insets right="10.0" />
+                           </BorderPane.margin>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
                         </ImageView>
-                    </left>
-                    <right>
-                        <BorderPane prefHeight="45.0" prefWidth="100.0" BorderPane.alignment="CENTER">
-                            <right>
-                                <ImageView fx:id="sendButton" fitHeight="35.0" fitWidth="40.0" pickOnBounds="true"
-                                           preserveRatio="true" visible="false" BorderPane.alignment="CENTER">
-                                    <image>
-                                        <Image url="@/img/sendMessageIcon.png"/>
-                                    </image>
-                                    <BorderPane.margin>
-                                        <Insets right="10.0"/>
-                                    </BorderPane.margin>
-                                    <cursor>
-                                        <Cursor fx:constant="HAND"/>
-                                    </cursor>
-                                </ImageView>
-                            </right>
-                            <center>
-                                <ImageView fx:id="microphone" fitHeight="35.0" fitWidth="40.0" pickOnBounds="true"
-                                           preserveRatio="true" visible="false" BorderPane.alignment="CENTER">
-                                    <image>
-                                        <Image url="@/img/microphone.png"/>
-                                    </image>
-                                    <cursor>
-                                        <Cursor fx:constant="HAND"/>
-                                    </cursor>
-                                </ImageView>
-                            </center>
-                        </BorderPane>
-                    </right>
-                </BorderPane>
-            </bottom>
-        </BorderPane>
-    </center>
-    <top>
-        <HBox alignment="TOP_RIGHT" prefHeight="38.0" prefWidth="1200.0" style="-fx-background-color: #18314D;"
-              BorderPane.alignment="CENTER">
-            <children>
-                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="GoLink" wrappingWidth="80.13671875">
-                    <font>
-                        <Font name="System Bold" size="24.0"/>
-                    </font>
-                    <fill>
-                        <LinearGradient endX="1.0" endY="1.0">
-                            <stops>
-                                <Stop>
-                                    <color>
-                                        <Color red="0.2368421107530594" blue="0.7894737124443054"/>
-                                    </color>
-                                </Stop>
-                                <Stop offset="0.9966442953020134">
-                                    <color>
-                                        <Color red="1.0"/>
-                                    </color>
-                                </Stop>
-                                <Stop offset="1.0">
-                                    <color>
-                                        <Color red="1.0"/>
-                                    </color>
-                                </Stop>
-                            </stops>
-                        </LinearGradient>
-                    </fill>
-                    <HBox.margin>
-                        <Insets top="2.0"/>
-                    </HBox.margin>
-                </Text>
-                <Pane fx:id="titleBar" prefHeight="38.0" prefWidth="976.0"/>
-                <Button fx:id="minimizeButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false"
-                        prefHeight="35.0" prefWidth="45.0" style="-fx-background-color: #18314D;" text="—"
-                        textAlignment="CENTER" textFill="SILVER">
-                    <cursor>
-                        <Cursor fx:constant="HAND"/>
-                    </cursor>
-                </Button>
-                <Button fx:id="scaleButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false"
-                        prefHeight="35.0" prefWidth="45.0" style="-fx-background-color: #18314D;" text="☐"
-                        textAlignment="CENTER" textFill="SILVER">
-                    <font>
-                        <Font name="Yu Gothic UI Semibold" size="13.0"/>
-                    </font>
-                    <cursor>
-                        <Cursor fx:constant="HAND"/>
-                    </cursor>
-                </Button>
-                <Button fx:id="closeButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false"
-                        prefHeight="35.0" prefWidth="45.0" style="-fx-background-color: #18314D;" text="X"
-                        textAlignment="CENTER" textFill="SILVER">
-                    <font>
-                        <Font name="Arial" size="14.0"/>
-                    </font>
-                    <cursor>
-                        <Cursor fx:constant="HAND"/>
-                    </cursor>
-                </Button>
-            </children>
-        </HBox>
-    </top>
+                     </right>
+                     <center>
+                        <ImageView fx:id="microphone" fitHeight="35.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" visible="false" BorderPane.alignment="CENTER">
+                           <image>
+                              <Image url="@/img/microphone.png" />
+                           </image>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </ImageView>
+                     </center>
+                  </BorderPane>
+               </right>
+            </BorderPane>
+         </bottom>
+      </BorderPane>
+   </center>
+   <top>
+      <HBox alignment="TOP_RIGHT" prefHeight="38.0" prefWidth="1200.0" style="-fx-background-color: #18314D;" BorderPane.alignment="CENTER">
+         <children>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="GoLink" wrappingWidth="80.13671875">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+               <fill>
+                  <LinearGradient endX="1.0" endY="1.0">
+                     <stops>
+                        <Stop>
+                           <color>
+                              <Color red="0.2368421107530594" blue="0.7894737124443054" />
+                           </color>
+                        </Stop>
+                        <Stop offset="0.9966442953020134">
+                           <color>
+                              <Color red="1.0" />
+                           </color>
+                        </Stop>
+                        <Stop offset="1.0">
+                           <color>
+                              <Color red="1.0" />
+                           </color>
+                        </Stop>
+                     </stops>
+                  </LinearGradient>
+               </fill>
+               <HBox.margin>
+                  <Insets top="2.0" />
+               </HBox.margin>
+            </Text>
+            <Pane fx:id="titleBar" prefHeight="38.0" prefWidth="976.0" />
+            <Button fx:id="minimizeButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="35.0" prefWidth="45.0" style="-fx-background-color: #18314D;" text="—" textAlignment="CENTER" textFill="SILVER">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor></Button>
+            <Button fx:id="scaleButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="35.0" prefWidth="45.0" style="-fx-background-color: #18314D;" text="☐" textAlignment="CENTER" textFill="SILVER">
+               <font>
+                  <Font name="Yu Gothic UI Semibold" size="13.0" />
+               </font>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Button>
+            <Button fx:id="closeButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="35.0" prefWidth="45.0" style="-fx-background-color: #18314D;" text="X" textAlignment="CENTER" textFill="SILVER">
+               <font>
+                  <Font name="Arial" size="14.0" />
+               </font>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Button>
+         </children>
+      </HBox>
+   </top>
 </BorderPane>

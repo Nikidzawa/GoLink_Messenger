@@ -109,28 +109,14 @@ public class ContactCash {
         isLastMessage(message);
     }
 
-    public void editMessage(Long messageId, String messageText) {
-        if (cashedMessageInformation.containsKey(messageId)) {
-            MessageCash messageCash = cashedMessageInformation.get(messageId);
-            messageCash.changeText(messageText);
-            messageCash.getMessage().setHasBeenChanged(true);
-            isLastMessage(messageCash.getMessage());
-        } else {
-            MessageEntity message = chat.getMessages().stream().filter(msg -> Objects.equals(msg.getId(), messageId)).findFirst().orElseThrow();
-            message.setHasBeenChanged(true);
-            message.setText(messageText);
-            isLastMessage(message);
-        }
-    }
-
     public void editMessage(Long messageId, String messageText, byte[] content, MessageType messageType) {
         if (cashedMessageInformation.containsKey(messageId)) {
             MessageCash messageCash = cashedMessageInformation.get(messageId);
             messageCash.setImage(content);
             messageCash.changeText(messageText);
             MessageEntity message = messageCash.getMessage();
-            messageCash.getMessage().setHasBeenChanged(true);
-            isLastMessage(messageCash.getMessage());
+            message.setHasBeenChanged(true);
+            isLastMessage(message);
         } else {
             MessageEntity message = chat.getMessages().stream().filter(msg -> Objects.equals(msg.getId(), messageId)).findFirst().orElseThrow();
             message.setHasBeenChanged(true);

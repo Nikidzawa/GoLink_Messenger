@@ -9,7 +9,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import lombok.Getter;
-import ru.nikidzawa.golink.FXControllers.helpers.GUIPatterns;
+import ru.nikidzawa.golink.services.GUI.GUIPatterns;
 import ru.nikidzawa.networkAPI.store.entities.MessageEntity;
 
 
@@ -51,9 +51,8 @@ public class MessageCash {
     }
 
     public void changeText(String newMessageText) {
+        message.setText(newMessageText);
         Platform.runLater(() -> {
-            message.setText(newMessageText);
-            date.setText("изменено " + message.getDate().format(DateTimeFormatter.ofPattern("HH:mm")));
             if (newMessageText.isEmpty()) {
                 GUI.setCenter(null);
             } else if (messageText.getText().isEmpty()) {
@@ -62,6 +61,7 @@ public class MessageCash {
                 textFlow.setPadding(new Insets(5, 10, 3, 10));
                 GUI.setCenter(textFlow);
             }
+            date.setText("изменено " + message.getDate().format(DateTimeFormatter.ofPattern("HH:mm")));
             messageText.setText(newMessageText);
         });
     }

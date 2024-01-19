@@ -37,11 +37,12 @@ module ru.nikidzawa.golink {
     requires javafx.graphicsEmpty;
     requires javafx.mediaEmpty;
     requires GoLinkNetworkAPI;
-
+    requires javafx.controlsEmpty;
 
     opens ru.nikidzawa.golink to javafx.fxml, spring.core, org.hibernate.orm.core;
     exports ru.nikidzawa.golink;
     exports ru.nikidzawa.golink.FXControllers.helpers;
+    opens ru.nikidzawa.golink.services.GUI.TrayIcon to javafx.fxml;
     exports ru.nikidzawa.golink.FXControllers;
     opens ru.nikidzawa.golink.FXControllers to javafx.fxml, org.hibernate.orm.core, spring.core;
     opens img;
@@ -54,6 +55,8 @@ module ru.nikidzawa.golink {
     opens ru.nikidzawa.golink.services.sound to javafx.fxml, org.hibernate.orm.core, spring.core;
     exports ru.nikidzawa.golink.services.SMSAuthenticate;
     opens ru.nikidzawa.golink.services.SMSAuthenticate to javafx.fxml, org.hibernate.orm.core, spring.core;
-    exports ru.nikidzawa.golink.services.GrapgicPatterns;
-    opens ru.nikidzawa.golink.services.GrapgicPatterns to javafx.fxml, org.hibernate.orm.core, spring.core;
+    exports ru.nikidzawa.golink.services.GUI.GrapgicPatterns;
+    opens ru.nikidzawa.golink.services.GUI.GrapgicPatterns to javafx.fxml, org.hibernate.orm.core, spring.core;
+    exports ru.nikidzawa.golink.services.GUI;
+    opens ru.nikidzawa.golink.services.GUI to javafx.fxml, org.hibernate.orm.core, spring.core;
 }

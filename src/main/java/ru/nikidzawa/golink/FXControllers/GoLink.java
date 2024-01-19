@@ -1,12 +1,15 @@
 package ru.nikidzawa.golink.FXControllers;
 
+import io.github.gleidson28.AvatarType;
 import io.github.gleidson28.GNAvatarView;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -16,10 +19,12 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
+import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
+import org.controlsfx.control.Notifications;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
@@ -28,7 +33,8 @@ import ru.nikidzawa.golink.FXControllers.Configurations.SearchConfig;
 import ru.nikidzawa.golink.FXControllers.Configurations.SendMessageConfig;
 import ru.nikidzawa.golink.FXControllers.cash.ContactCash;
 import ru.nikidzawa.golink.FXControllers.cash.MessageCash;
-import ru.nikidzawa.golink.FXControllers.helpers.GUIPatterns;
+import ru.nikidzawa.golink.FXControllers.helpers.EmptyStage;
+import ru.nikidzawa.golink.services.GUI.GUIPatterns;
 import ru.nikidzawa.golink.services.sound.AudioHelper;
 import ru.nikidzawa.golink.services.sound.SongPlayer;
 import ru.nikidzawa.networkAPI.network.ServerListener;
@@ -55,62 +61,91 @@ import java.util.Objects;
 @Controller
 public class GoLink implements ServerListener {
     @FXML
-    private Button closeButton;
-
-    @FXML
-    private Button scaleButton;
-
-    @FXML
-    private Button minimizeButton;
-
-    @FXML
-    private VBox chatField;
-
-    @FXML
-    private VBox contactsField;
-
-    @FXML
-    private Text chatRoomName;
-
-    @FXML
-    private TextField input;
-
-    @FXML
-    private Text profileName;
-
-    @FXML
-    private TextField searchPanel;
-
-    @FXML
-    private ImageView sendButton;
-
-    @FXML
-    private BorderPane sendZone;
-
-    @FXML
-    private ImageView settingsButton;
-
-    @FXML
-    private javafx.scene.control.ScrollPane scrollPane;
-
-    @FXML
-    private Text status;
-
-    @FXML
+    @Getter
     private Pane titleBar;
 
     @FXML
+    @Getter
+    private Button closeButton;
+
+    @FXML
+    @Getter
+    private Button scaleButton;
+
+    @FXML
+    @Getter
+    private Button minimizeButton;
+
+    @FXML
+    @Getter
+    private VBox chatField;
+
+    @FXML
+    @Getter
+    private VBox contactsField;
+
+    @FXML
+    @Getter
+    private Text chatRoomName;
+
+    @FXML
+    @Getter
+    private TextField input;
+
+    @FXML
+    @Getter
+    private Text profileName;
+
+    @FXML
+    @Getter
+    private TextField searchPanel;
+
+    @FXML
+    @Getter
+    private ImageView sendButton;
+
+    @FXML
+    @Getter
+    private BorderPane sendZone;
+
+    @FXML
+    @Getter
+    private ImageView settingsButton;
+
+    @FXML
+    @Getter
+    private ScrollPane scrollPane;
+
+    @FXML
+    @Getter
+    private Text status;
+
+    @FXML
+    @Getter
     private ImageView sendImageButton;
 
     @FXML
+    @Getter
     private ImageView microphone;
 
     @FXML
+    @Getter
     private GNAvatarView myAvatar;
 
     @Setter
+    @Getter
     private ConfigurableApplicationContext context;
-    public TCPConnection TCPConnection;
+
+    @Getter
+    @Setter
+    private UserEntity userEntity;
+
+    @Getter
+    @Setter
+    private Scene scene;
+
+    @Getter
+    private TCPConnection TCPConnection;
 
     @Autowired
     public UserRepository userRepository;
@@ -124,12 +159,15 @@ public class GoLink implements ServerListener {
     public GUIPatterns GUIPatterns;
 
     public HashMap<Long, ContactCash> contacts = new HashMap<>();
-    public UserEntity userEntity;
-    public Scene scene;
     private ContactCash selectedContact;
 
+    @Getter
     private ScrollConfig scrollConfig;
+
     private SendMessageConfig sendMessageConfig;
+
+    @Setter
+    private boolean trayIconIsActive = false;
 
     @FXML
     @SneakyThrows
@@ -141,10 +179,14 @@ public class GoLink implements ServerListener {
                 Platform.exit();
                 throw new RuntimeException(ex);
             }
-            GUIPatterns.setBaseWindowTitleCommands(titleBar, minimizeButton, scaleButton, closeButton, TCPConnection);
+
+            scene.getWindow().setOnHidden(windowEvent -> trayIconIsActive = true);
+            scene.getWindow().setOnShowing(windowEvent -> trayIconIsActive = false);
+
+            GUIPatterns.setGoLinkBaseTitleCommands(this);
             scrollConfig = new ScrollConfig(scrollPane, chatField);
-            sendMessageConfig = new SendMessageConfig(this, sendImageButton, microphone, sendButton, contactsField, chatField, input, scrollConfig, sendZone);
-            new SearchConfig(this, contactsField, searchPanel);
+            sendMessageConfig = new SendMessageConfig(this);
+            new SearchConfig(this);
 
             setUserConfig();
 
@@ -152,19 +194,21 @@ public class GoLink implements ServerListener {
                 if (keyEvent.getCode() == KeyCode.ENTER && selectedContact != null) {
                     sendMessageConfig.sendMessageConfiguration();
                 }
-                if (keyEvent.getCode() == KeyCode.ESCAPE) {
-                    scrollPane.setStyle("-fx-background: #001933; -fx-background-color: #001933; -fx-border-width: 1 0 1 1; -fx-border-color: black;");
-                    selectedContact = null;
-                    sendMessageConfig.disable();
-                    setVisibleChatContent(false);
-                    GUIPatterns.setEmptyChatConfiguration(chatField);
-                }
+                if (keyEvent.getCode() == KeyCode.ESCAPE) exitChat();
             });
 
             settingsButton.setOnMouseClicked(mouseEvent -> openSettings());
 
             loadChatRooms();
         });
+    }
+
+    public void exitChat() {
+        scrollPane.setStyle("-fx-background: #001933; -fx-background-color: #001933; -fx-border-width: 1 0 1 1; -fx-border-color: black;");
+        selectedContact = null;
+        sendMessageConfig.disable();
+        setVisibleChatContent(false);
+        GUIPatterns.setEmptyChatConfiguration(chatField);
     }
 
     private void setVisibleChatContent(boolean visible) {
@@ -193,12 +237,7 @@ public class GoLink implements ServerListener {
         editProfile.setGoLink(this);
         editProfile.setScene(scene);
 
-        Stage stage = new Stage();
-        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/img/logo.png"))));
-        stage.initStyle(StageStyle.UNDECORATED);
-        stage.setTitle("GoLink");
-        stage.setScene(scene);
-        stage.show();
+        EmptyStage.getEmptyStage(scene).show();
     }
 
     private void loadChatRooms() {

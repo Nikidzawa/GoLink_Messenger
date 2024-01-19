@@ -1,4 +1,4 @@
-package ru.nikidzawa.golink.FXControllers.helpers;
+package ru.nikidzawa.golink.services.GUI;
 
 import io.github.gleidson28.AvatarType;
 import io.github.gleidson28.GNAvatarView;
@@ -36,6 +36,7 @@ import ru.nikidzawa.golink.FXControllers.GoLink;
 import ru.nikidzawa.golink.FXControllers.cash.ContactCash;
 import ru.nikidzawa.golink.FXControllers.cash.MessageCash;
 import ru.nikidzawa.golink.FXControllers.cash.MessageStage;
+import ru.nikidzawa.golink.services.GUI.TrayIcon.GoLinkTrayIcon;
 import ru.nikidzawa.golink.services.sound.AudioPlayer;
 import ru.nikidzawa.networkAPI.network.TCPConnection;
 import ru.nikidzawa.networkAPI.store.entities.MessageEntity;
@@ -46,6 +47,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.List;
 
 @Setter
 @Component
@@ -65,11 +67,11 @@ public class GUIPatterns {
         });
     }
 
-    public void setBaseWindowTitleCommands(Pane titleBar, Button minimizeButton, Button scaleButton, Button closeButton, TCPConnection tcpConnection) {
-        setWindowTitleButtons(titleBar, minimizeButton, scaleButton, closeButton);
-        closeButton.setOnAction(actionEvent -> {
-            tcpConnection.disconnect();
-            Platform.exit();
+    public void setGoLinkBaseTitleCommands(GoLink goLink) {
+        setWindowTitleButtons(goLink.getTitleBar(), goLink.getMinimizeButton(), goLink.getScaleButton(), goLink.getCloseButton());
+        goLink.getCloseButton().setOnAction(actionEvent -> {
+            new GoLinkTrayIcon(goLink.getScene(), goLink.getUserEntity(), goLink.getTCPConnection());
+            goLink.exitChat();
         });
     }
 
@@ -367,6 +369,7 @@ public class GUIPatterns {
         if (checkMessageWindowStatusBeforeOpen(message.getId(), messageStage)) {
             return;
         }
+
         messageStage.initStyle(StageStyle.UNDECORATED);
         checkMessageWindowStatusBeforeOpen(message.getId(), messageStage);
 
@@ -383,6 +386,7 @@ public class GUIPatterns {
         vBox.getChildren().add(delete);
         Scene scene = new Scene(vBox, 154, finalHeight);
         messageStage.setScene(scene);
+
 
         messageStage.setX(mouseX);
         messageStage.setY(mouseY);

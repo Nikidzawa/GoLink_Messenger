@@ -1,23 +1,18 @@
 package ru.nikidzawa.golink.FXControllers;
 
 import io.github.gleidson28.GNAvatarView;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.nikidzawa.golink.FXControllers.helpers.GUIPatterns;
+import ru.nikidzawa.golink.services.GUI.GUIPatterns;
 import ru.nikidzawa.networkAPI.store.entities.UserEntity;
-import ru.nikidzawa.networkAPI.store.repositories.UserRepository;
-
-import java.io.ByteArrayInputStream;
 
 @Component
 public class EditProfile {
@@ -125,7 +120,7 @@ public class EditProfile {
 //
 //        return isEdited;
 //    }
-    }
+}
 
     private void exception(String exMessage) {
         System.out.println(exMessage);

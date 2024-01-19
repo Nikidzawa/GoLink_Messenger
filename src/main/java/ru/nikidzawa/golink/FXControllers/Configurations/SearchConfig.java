@@ -10,6 +10,7 @@ import ru.nikidzawa.golink.FXControllers.cash.ContactCash;
 import ru.nikidzawa.networkAPI.store.entities.ChatEntity;
 import ru.nikidzawa.networkAPI.store.entities.PersonalChatEntity;
 import ru.nikidzawa.networkAPI.store.entities.UserEntity;
+import ru.nikidzawa.networkAPI.store.repositories.ChatRepository;
 
 import java.util.List;
 import java.util.Objects;
@@ -19,9 +20,9 @@ public class SearchConfig {
     private final VBox contactsField;
     private final TextField searchPanel;
 
-    public SearchConfig(GoLink goLink, VBox contactsField, TextField searchPanel) {
-        this.searchPanel = searchPanel;
-        this.contactsField = contactsField;
+    public SearchConfig(GoLink goLink) {
+        this.searchPanel = goLink.getSearchPanel();
+        this.contactsField = goLink.getContactsField();
         this.goLink = goLink;
         searchPanel.textProperty().addListener((observable, oldValue, newValue) -> setSearchConfig(newValue, new PauseTransition(Duration.millis(1000))));
     }
@@ -53,16 +54,17 @@ public class SearchConfig {
         goLink.chatRepository.saveAndFlush(newChat);
         PersonalChatEntity myPersonalChatEntity = PersonalChatEntity.builder()
                 .chat(newChat)
-                .owner(goLink.userEntity)
+                .owner(goLink.getUserEntity())
                 .interlocutor(interlocutor)
                 .build();
 
         PersonalChatEntity participantPersonalChatEntity = PersonalChatEntity.builder()
                 .chat(newChat)
                 .owner(interlocutor)
-                .interlocutor(goLink.userEntity)
+                .interlocutor(goLink.getUserEntity())
                 .build();
 
+        interlocutor.getUserChats().add(participantPersonalChatEntity);
         goLink.personalChatRepository.saveAndFlush(myPersonalChatEntity);
         goLink.personalChatRepository.saveAndFlush(participantPersonalChatEntity);
 
@@ -71,8 +73,8 @@ public class SearchConfig {
         loadContactsFromCash();
         ContactCash newContactCash = goLink.createContact(interlocutor, newChat, myPersonalChatEntity);
         goLink.openChat(newChat, myPersonalChatEntity, interlocutor, newContactCash);
-        goLink.TCPConnection.CREATE_NEW_CHAT_ROOM(interlocutor.getId(), participantPersonalChatEntity.getId());
-        goLink.userEntity.getUserChats().add(myPersonalChatEntity);
+        goLink.getTCPConnection().CREATE_NEW_CHAT_ROOM(interlocutor.getId(), participantPersonalChatEntity.getId());
+        goLink.getUserEntity().getUserChats().add(myPersonalChatEntity);
     }
 
     private void loadContactsFromCash() {

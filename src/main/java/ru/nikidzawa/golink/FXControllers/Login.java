@@ -20,7 +20,7 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
-import ru.nikidzawa.golink.FXControllers.helpers.GUIPatterns;
+import ru.nikidzawa.golink.services.GUI.GUIPatterns;
 import ru.nikidzawa.networkAPI.store.entities.UserEntity;
 import ru.nikidzawa.networkAPI.store.repositories.UserRepository;
 
@@ -101,8 +101,8 @@ public class Login {
         Scene scene = new Scene(root);
 
         GoLink goLink = loader.getController();
-        goLink.userEntity = user;
-        goLink.scene = scene;
+        goLink.setUserEntity(user);
+        goLink.setScene(scene);
         goLink.setContext(context);
 
         Stage stage = new Stage();

@@ -20,7 +20,7 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
-import ru.nikidzawa.golink.FXControllers.helpers.GUIPatterns;
+import ru.nikidzawa.golink.services.GUI.GUIPatterns;
 import ru.nikidzawa.golink.services.SMSAuthenticate.SMSAuthenticate;
 import ru.nikidzawa.networkAPI.store.repositories.UserRepository;
 

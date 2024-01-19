@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import io.github.gleidson28.GNAvatarView?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="184.0" prefWidth="288.0" style="-fx-background-color: #001933;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.nikidzawa.golink.services.GUI.TrayIcon.TrayIconController">
+   <children>
+      <BorderPane prefHeight="78.0" prefWidth="288.0">
+         <left>
+            <GNAvatarView fx:id="avatar" prefHeight="66.0" prefWidth="86.0" type="CIRCLE" BorderPane.alignment="CENTER">
+               <BorderPane.margin>
+                  <Insets bottom="5.0" top="5.0" />
+               </BorderPane.margin>
+            </GNAvatarView>
+         </left>
+         <center>
+            <TextField fx:id="name" editable="false" focusTraversable="false" prefHeight="39.0" prefWidth="220.0" style="-fx-background-color: transparent; -fx-text-fill: white;" text="Nikidzawa" BorderPane.alignment="CENTER">
+               <font>
+                  <Font size="18.0" />
+               </font>
+               <BorderPane.margin>
+                  <Insets />
+               </BorderPane.margin>
+               <padding>
+                  <Insets left="-1.0" />
+               </padding>
+            </TextField>
+         </center>
+      </BorderPane>
+      <BorderPane fx:id="openGoLink" prefHeight="38.0" prefWidth="321.0" style="-fx-background-color: #001933;">
+         <center>
+            <Text fill="WHITE" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="Открыть GoLink" wrappingWidth="257.13671875" BorderPane.alignment="CENTER">
+               <font>
+                  <Font name="Arial" size="14.0" />
+               </font>
+            </Text>
+         </center>
+      </BorderPane>
+      <BorderPane fx:id="notifications" prefHeight="38.0" prefWidth="321.0" style="-fx-background-color: #001933;">
+         <center>
+            <Text fx:id="notificationText" fill="WHITE" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="Выключить уведомления" wrappingWidth="257.13671875" BorderPane.alignment="CENTER">
+               <font>
+                  <Font name="Arial" size="14.0" />
+               </font>
+            </Text>
+         </center>
+      </BorderPane>
+      <BorderPane fx:id="closeGoLink" prefHeight="38.0" prefWidth="321.0" style="-fx-background-color: #001933;">
+         <center>
+            <Text fill="WHITE" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="Закрыть GoLink" wrappingWidth="257.13671875" BorderPane.alignment="CENTER">
+               <font>
+                  <Font name="Arial" size="14.0" />
+               </font>
+            </Text>
+         </center>
+      </BorderPane>
+   </children>
+</VBox>

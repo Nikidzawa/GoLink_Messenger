@@ -68,29 +68,29 @@ public class Server implements ServerListener {
 
     @Override
     public synchronized void onReceiveFile(TCPConnection tcpConnection, String protocol, byte[] content) {
-        String[] strings = protocol.split(":", 4);
+        String[] strings = protocol.split(":", 3);
         String command = strings[0];
         int userId = Integer.parseInt(strings[1]);
         try {
             switch (command) {
                 case "POST" -> {
+                    String[] strings2 = strings[2].split(":", 2);
                     try {
-                        connections.get(userId).sendFile(command + ":" + strings[3], content);
+                        connections.get(userId).sendFile(command + ":" + strings2[1], content);
                     } catch (NullPointerException ex) {
-                        sendNotificationAsync(strings[2]).thenAccept(responseStatus -> {
-                            if (responseStatus.isStatus())
-                                System.out.println ("Пользователь не в сети, уведомление успешно отправлено");
+                        sendNotificationAsync(strings[0]).thenAccept(responseStatus -> {
+                            if (responseStatus.isStatus()) System.out.println ("Пользователь не в сети, уведомление успешно отправлено");
                             else throw new RuntimeException ("Пользователь не в сети, ошибка при отправке уведомления " + responseStatus.getException());
                         });
                     }
                 }
-                case "EDIT" -> connections.get(userId).sendFile(command + ":" + strings[3], content);
+                case "EDIT" -> connections.get(userId).sendFile(command + ":" + strings[2], content);
             }
         } catch (NullPointerException ex) {System.out.println("Получатель не в сети");}
     }
 
     @Async
-    public synchronized CompletableFuture<ResponseStatus> sendNotificationAsync(String string) {
+    public synchronized CompletableFuture<ResponseStatus> sendNotificationAsync (String string) {
         try {
             PersonalChatEntity personalChatEntity = personalChatRepository.findById(Long.valueOf(string)).orElseThrow();
             personalChatEntity.setNewMessagesCount(personalChatEntity.getNewMessagesCount() + 1);
