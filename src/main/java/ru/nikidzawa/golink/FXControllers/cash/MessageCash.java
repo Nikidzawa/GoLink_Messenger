@@ -12,7 +12,6 @@ import lombok.Getter;
 import ru.nikidzawa.golink.services.GUI.GUIPatterns;
 import ru.nikidzawa.networkAPI.store.entities.MessageEntity;
 
-
 import java.time.format.DateTimeFormatter;
 
 public class MessageCash {

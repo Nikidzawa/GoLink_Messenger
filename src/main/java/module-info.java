@@ -59,4 +59,6 @@ module ru.nikidzawa.golink {
     opens ru.nikidzawa.golink.services.GUI.GrapgicPatterns to javafx.fxml, org.hibernate.orm.core, spring.core;
     exports ru.nikidzawa.golink.services.GUI;
     opens ru.nikidzawa.golink.services.GUI to javafx.fxml, org.hibernate.orm.core, spring.core;
+    exports ru.nikidzawa.golink.services.GUI.TrayIcon.notifications;
+    opens ru.nikidzawa.golink.services.GUI.TrayIcon.notifications to javafx.fxml, org.hibernate.orm.core, spring.core;
 }

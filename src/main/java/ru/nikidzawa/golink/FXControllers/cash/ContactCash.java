@@ -7,7 +7,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import lombok.Getter;
 import lombok.Setter;
-
 import ru.nikidzawa.networkAPI.store.MessageType;
 import ru.nikidzawa.networkAPI.store.entities.ChatEntity;
 import ru.nikidzawa.networkAPI.store.entities.MessageEntity;
@@ -29,8 +28,10 @@ public class ContactCash {
     public List<MessageEntity> newMessages = new ArrayList<>();
 
     private BorderPane GUI;
+    @Getter
     private Text date;
     private BorderPane nameAndLastMessage;
+    @Getter
     private TextField lastMessageText;
     private StackPane newMessagesBlock;
     private Text newMessagesCount;

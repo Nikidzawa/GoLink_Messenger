@@ -1,11 +1,9 @@
 package ru.nikidzawa.golink.FXControllers;
 
-import io.github.gleidson28.AvatarType;
 import io.github.gleidson28.GNAvatarView;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -19,12 +17,10 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
-import org.controlsfx.control.Notifications;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
@@ -33,8 +29,11 @@ import ru.nikidzawa.golink.FXControllers.Configurations.SearchConfig;
 import ru.nikidzawa.golink.FXControllers.Configurations.SendMessageConfig;
 import ru.nikidzawa.golink.FXControllers.cash.ContactCash;
 import ru.nikidzawa.golink.FXControllers.cash.MessageCash;
-import ru.nikidzawa.golink.FXControllers.helpers.EmptyStage;
+import ru.nikidzawa.golink.services.GUI.EmptyStage;
 import ru.nikidzawa.golink.services.GUI.GUIPatterns;
+import ru.nikidzawa.golink.services.GUI.TrayIcon.GoLinkTrayIcon;
+import ru.nikidzawa.golink.services.GUI.TrayIcon.notifications.Notification;
+import ru.nikidzawa.golink.services.GUI.TrayIcon.notifications.NotificationScene;
 import ru.nikidzawa.golink.services.sound.AudioHelper;
 import ru.nikidzawa.golink.services.sound.SongPlayer;
 import ru.nikidzawa.networkAPI.network.ServerListener;
@@ -166,8 +165,10 @@ public class GoLink implements ServerListener {
 
     private SendMessageConfig sendMessageConfig;
 
+    private NotificationScene notificationScene;
+
     @Setter
-    private boolean trayIconIsActive = false;
+    GoLinkTrayIcon goLinkTrayIcon;
 
     @FXML
     @SneakyThrows
@@ -179,9 +180,14 @@ public class GoLink implements ServerListener {
                 Platform.exit();
                 throw new RuntimeException(ex);
             }
+            Platform.setImplicitExit(false);
+            scene.getWindow().setOnHidden(windowEvent -> Platform.runLater(() -> notificationScene = new NotificationScene()));
 
-            scene.getWindow().setOnHidden(windowEvent -> trayIconIsActive = true);
-            scene.getWindow().setOnShowing(windowEvent -> trayIconIsActive = false);
+            scene.getWindow().setOnShowing(windowEvent -> {
+                goLinkTrayIcon.hide();
+                Platform.runLater(notificationScene::close);
+                notificationScene = null;
+            });
 
             GUIPatterns.setGoLinkBaseTitleCommands(this);
             scrollConfig = new ScrollConfig(scrollPane, chatField);
@@ -237,7 +243,7 @@ public class GoLink implements ServerListener {
         editProfile.setGoLink(this);
         editProfile.setScene(scene);
 
-        EmptyStage.getEmptyStage(scene).show();
+        EmptyStage.getEmptyStageAndSetScene(scene).show();
     }
 
     private void loadChatRooms() {
@@ -324,8 +330,7 @@ public class GoLink implements ServerListener {
     }
 
     @Override
-    public void onConnectionReady(TCPConnection tcpConnection) {
-    }
+    public void onConnectionReady(TCPConnection tcpConnection) {}
 
     @Override
     public void onReceiveMessage(TCPConnection tcpConnection, String string) {
@@ -358,6 +363,11 @@ public class GoLink implements ServerListener {
                 Platform.runLater(() -> createContact(interlocutor, chatEntity, personalChatEntity));
             }
             case "CHANGE_USER_STATUS" -> status.setText(Boolean.parseBoolean(value) ? "В сети" : "Не в сети");
+
+            case "WRITE_MESSAGE" -> {
+                long chatID = Long.parseLong(value);
+                ContactCash contactCash = contacts.get(chatID);
+            }
         }
     }
 
@@ -438,12 +448,23 @@ public class GoLink implements ServerListener {
         } else {
             contactCash.addNotification(message);
             SongPlayer.notification();
+            if (notificationScene != null) {
+                Notification notification = new Notification.Builder()
+                        .setMessage(message.getText())
+                        .setTitle(message.getSender().getName())
+                        .setImage(new Image(new ByteArrayInputStream(message.getSender().getAvatar())))
+                        .build();
+                notification.setOnMouseClicked(mouseEvent -> {
+                    Platform.runLater(() -> {
+                        Stage stage = (Stage) scene.getWindow();
+                        stage.show();
+                        openChat(message.getChat(), contactCash.getPersonalChatEntity(), contactCash.getInterlocutor(), contactCash);
+                    });
+                });
+                notificationScene.addNotification(notification);
+            }
         }
     }
-
     @Override
-    public void onDisconnect(TCPConnection tcpConnection) {
-        Platform.exit();
-    }
-
+    public void onDisconnect(TCPConnection tcpConnection) {Platform.exit();}
 }

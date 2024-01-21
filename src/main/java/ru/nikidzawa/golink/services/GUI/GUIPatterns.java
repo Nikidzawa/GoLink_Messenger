@@ -38,7 +38,6 @@ import ru.nikidzawa.golink.FXControllers.cash.MessageCash;
 import ru.nikidzawa.golink.FXControllers.cash.MessageStage;
 import ru.nikidzawa.golink.services.GUI.TrayIcon.GoLinkTrayIcon;
 import ru.nikidzawa.golink.services.sound.AudioPlayer;
-import ru.nikidzawa.networkAPI.network.TCPConnection;
 import ru.nikidzawa.networkAPI.store.entities.MessageEntity;
 import ru.nikidzawa.networkAPI.store.entities.PersonalChatEntity;
 import ru.nikidzawa.networkAPI.store.entities.UserEntity;
@@ -46,16 +45,15 @@ import ru.nikidzawa.networkAPI.store.entities.UserEntity;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 @Setter
 @Component
 public class GUIPatterns {
     private double xOffset = 0;
     private double yOffset = 0;
-    @Setter
-    private MessageStage messageStage;
 
     public void setBaseWindowTitleCommands(Pane titleBar, Button minimizeButton, Button scaleButton, Button closeButton, ConfigurableApplicationContext context) {
         setWindowTitleButtons(titleBar, minimizeButton, scaleButton, closeButton);
@@ -70,7 +68,7 @@ public class GUIPatterns {
     public void setGoLinkBaseTitleCommands(GoLink goLink) {
         setWindowTitleButtons(goLink.getTitleBar(), goLink.getMinimizeButton(), goLink.getScaleButton(), goLink.getCloseButton());
         goLink.getCloseButton().setOnAction(actionEvent -> {
-            new GoLinkTrayIcon(goLink.getScene(), goLink.getUserEntity(), goLink.getTCPConnection());
+            goLink.setGoLinkTrayIcon(new GoLinkTrayIcon(goLink.getScene(), goLink.getUserEntity(), goLink.getTCPConnection()));
             goLink.exitChat();
         });
     }
@@ -97,34 +95,6 @@ public class GUIPatterns {
             (window).setX(event.getScreenX() - xOffset);
             (window).setY(event.getScreenY() - yOffset);
         });
-    }
-
-    public void createExceptionMessage(Image image, String message, VBox menuItem) {
-        if (menuItem.getChildren().stream().toList().size() < 4) {
-            HBox hBox = new HBox();
-            BorderPane borderPane = new BorderPane();
-            ImageView imageView = new ImageView(image);
-            imageView.setFitHeight(30);
-            imageView.setFitWidth(30);
-            borderPane.setLeft(imageView);
-            borderPane.setStyle("-fx-background-color: white;" + "-fx-background-radius: 20px;");
-
-            Text text = new Text(message);
-            text.setFill(Paint.valueOf("black"));
-            text.setFont(Font.font(18));
-
-            TextFlow textFlow = new TextFlow(text);
-            borderPane.setCenter(textFlow);
-            hBox.getChildren().add(borderPane);
-            menuItem.getChildren().add(hBox);
-            Timer destructionTimer = new Timer();
-            destructionTimer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    Platform.runLater(() -> menuItem.getChildren().remove(hBox));
-                }
-            }, 4000);
-        }
     }
 
     public void setConfig(TextField phone) {
@@ -360,37 +330,6 @@ public class GUIPatterns {
         edit.setCenter(editImage);
         edit.setRight(buttonEdit);
         return edit;
-    }
-
-    public void openMessageWindow(MessageEntity message, MouseEvent mouseEvent, Stage messageStage, BorderPane copy, BorderPane edit, BorderPane delete) {
-        double mouseX = mouseEvent.getScreenX();
-        double mouseY = mouseEvent.getScreenY();
-
-        if (checkMessageWindowStatusBeforeOpen(message.getId(), messageStage)) {
-            return;
-        }
-
-        messageStage.initStyle(StageStyle.UNDECORATED);
-        checkMessageWindowStatusBeforeOpen(message.getId(), messageStage);
-
-        VBox vBox = new VBox();
-        vBox.setStyle("-fx-background-color:  #18314D; -fx-border-color: black; -fx-spacing: 5");
-
-        double finalHeight = delete.getPrefHeight();
-        if (edit != null && copy != null) {
-            finalHeight += copy.getPrefHeight();
-            finalHeight += edit.getPrefHeight();
-            vBox.getChildren().add(copy);
-            vBox.getChildren().add(edit);
-        }
-        vBox.getChildren().add(delete);
-        Scene scene = new Scene(vBox, 154, finalHeight);
-        messageStage.setScene(scene);
-
-
-        messageStage.setX(mouseX);
-        messageStage.setY(mouseY);
-        messageStage.show();
     }
 
     @SneakyThrows
@@ -667,20 +606,20 @@ public class GUIPatterns {
         chat.getChildren().add(textField);
     }
 
-    private boolean checkMessageWindowStatusBeforeOpen(Long messageId, Stage stage) {
-        if (messageStage == null) {
-            messageStage = new MessageStage();
-            messageStage.setMessageId(messageId);
-            messageStage.setMessagesStage(stage);
-        } else {
-            if (!Objects.equals(messageId, messageStage.getMessageId())) {
-                messageStage.getMessagesStage().close();
-                messageStage.setMessagesStage(stage);
-                messageStage.setMessageId(messageId);
-            } else {
-                return true;
-            }
-        }
-        return false;
-    }
+//    private boolean checkMessageWindowStatusBeforeOpen(Long messageId, Stage stage) {
+//        if (messageStage == null) {
+//            messageStage = new MessageStage();
+//            messageStage.setMessageId(messageId);
+//            messageStage.setMessagesStage(stage);
+//        } else {
+//            if (!Objects.equals(messageId, messageStage.getMessageId())) {
+//                messageStage.getMessagesStage().close();
+//                messageStage.setMessagesStage(stage);
+//                messageStage.setMessageId(messageId);
+//            } else {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 }

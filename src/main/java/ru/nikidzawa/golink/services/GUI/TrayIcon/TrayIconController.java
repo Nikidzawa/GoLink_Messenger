@@ -2,17 +2,12 @@ package ru.nikidzawa.golink.services.GUI.TrayIcon;
 
 import io.github.gleidson28.GNAvatarView;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Text;
-import javafx.stage.Stage;
 import lombok.Setter;
-import org.springframework.stereotype.Component;
 import ru.nikidzawa.networkAPI.network.TCPConnection;
 import ru.nikidzawa.networkAPI.store.entities.UserEntity;
 
@@ -38,8 +33,6 @@ public class TrayIconController {
     @FXML
     private Text notificationText;
 
-    private Scene thisScene;
-
     @Setter
     private UserEntity userEntity;
 
@@ -55,8 +48,6 @@ public class TrayIconController {
     void initialize() {
         Platform.runLater(() -> {
             setBIO();
-            thisScene = avatar.getScene();
-
             openGoLink.setOnMouseClicked(mouseEvent -> openGoLink());
             notifications.setOnMouseClicked(mouseEvent -> setNotificationStatus());
             closeGoLink.setOnMouseClicked(mouseEvent -> closeGoLink());
@@ -95,4 +86,5 @@ public class TrayIconController {
         closeGoLink.setOnMouseEntered(mouseEvent -> closeGoLink.setStyle("-fx-background-color: #18314D"));
         closeGoLink.setOnMouseExited(mouseEvent -> closeGoLink.setStyle("-fx-background-color: #001933"));
     }
+
 }

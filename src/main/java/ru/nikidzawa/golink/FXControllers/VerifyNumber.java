@@ -13,13 +13,13 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import lombok.Setter;
 import lombok.SneakyThrows;
+import org.controlsfx.control.Notifications;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
@@ -50,9 +50,6 @@ public class VerifyNumber {
 
     @FXML
     private Text goBack;
-
-    @FXML
-    private VBox menuItem;
 
     @FXML
     private Button minimizeButton;
@@ -117,11 +114,19 @@ public class VerifyNumber {
                 if (code.contentEquals(stringBuilder)) {
                     fxAvatar();
                 } else {
-                    GUIPatterns.createExceptionMessage(new Image(Objects.requireNonNull(getClass().getResource("/img/exception.png")).toExternalForm()),
-                            "Ошибка, неверный код", menuItem);
+                    exception();
                 }
             }
         }
+    }
+
+    private void exception() {
+        Notifications.create()
+                .owner(area.getScene().getWindow())
+                .position(Pos.TOP_RIGHT)
+                .title("Ошибка")
+                .text("Неверный код")
+                .showError();
     }
 
     @SneakyThrows

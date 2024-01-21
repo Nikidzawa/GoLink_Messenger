@@ -3,6 +3,7 @@ package ru.nikidzawa.golink.FXControllers;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -11,12 +12,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import lombok.Setter;
 import lombok.SneakyThrows;
+import org.controlsfx.control.Notifications;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
@@ -37,9 +38,6 @@ public class Login {
 
     @FXML
     private Button enter;
-
-    @FXML
-    private VBox menuItem;
 
     @FXML
     private Button minimizeButton;
@@ -132,7 +130,11 @@ public class Login {
     }
 
     private void exception() {
-        GUIPatterns.createExceptionMessage(new Image(Objects.requireNonNull(getClass().getResource("/img/exception.png")).toExternalForm()),
-                " Неверный никнейм или пароль. Попробуйте ещё раз   ", menuItem);
+        Notifications.create()
+                .owner(enter.getScene().getWindow())
+                .position(Pos.TOP_RIGHT)
+                .title("Ошибка")
+                .text("Неверный логин или пароль, попробуйте ещё раз")
+                .showError();
     }
 }

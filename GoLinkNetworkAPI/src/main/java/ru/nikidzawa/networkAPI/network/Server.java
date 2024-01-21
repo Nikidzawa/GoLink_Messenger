@@ -78,7 +78,7 @@ public class Server implements ServerListener {
                     try {
                         connections.get(userId).sendFile(command + ":" + strings2[1], content);
                     } catch (NullPointerException ex) {
-                        sendNotificationAsync(strings[0]).thenAccept(responseStatus -> {
+                        sendNotificationAsync(strings2[0]).thenAccept(responseStatus -> {
                             if (responseStatus.isStatus()) System.out.println ("Пользователь не в сети, уведомление успешно отправлено");
                             else throw new RuntimeException ("Пользователь не в сети, ошибка при отправке уведомления " + responseStatus.getException());
                         });

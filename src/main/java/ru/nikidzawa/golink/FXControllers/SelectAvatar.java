@@ -4,6 +4,7 @@ import io.github.gleidson28.GNAvatarView;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -12,13 +13,13 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import lombok.Setter;
 import lombok.SneakyThrows;
+import org.controlsfx.control.Notifications;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
@@ -51,9 +52,6 @@ public class SelectAvatar {
 
     @FXML
     private GNAvatarView image;
-
-    @FXML
-    private VBox menuItem;
 
     @FXML
     private Button minimizeButton;
@@ -191,7 +189,11 @@ public class SelectAvatar {
     }
 
     private void exception(String message) {
-        GUIPatterns.createExceptionMessage(new Image(Objects.requireNonNull(getClass().getResource("/img/exception.png")).toExternalForm()),
-                message, menuItem);
+        Notifications.create()
+                .owner(enter.getScene().getWindow())
+                .position(Pos.TOP_RIGHT)
+                .title("Ошибка")
+                .text(message)
+                .showError();
     }
 }

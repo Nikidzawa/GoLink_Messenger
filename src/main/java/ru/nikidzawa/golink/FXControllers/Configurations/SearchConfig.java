@@ -10,7 +10,6 @@ import ru.nikidzawa.golink.FXControllers.cash.ContactCash;
 import ru.nikidzawa.networkAPI.store.entities.ChatEntity;
 import ru.nikidzawa.networkAPI.store.entities.PersonalChatEntity;
 import ru.nikidzawa.networkAPI.store.entities.UserEntity;
-import ru.nikidzawa.networkAPI.store.repositories.ChatRepository;
 
 import java.util.List;
 import java.util.Objects;

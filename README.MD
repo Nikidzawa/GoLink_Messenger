@@ -3,13 +3,20 @@
 
 
 ## О мессенджере
+
+![main.gif](src%2Fmain%2Fresources%2Freadme%2Fmain.gif)
+
+Уведомления 
+
+![notifications.gif](src%2Fmain%2Fresources%2Freadme%2Fnotifications.gif)
+
 ### Стек:
 
 Language: Java
 
 Framework: Spring
 
-GUI: JavaFx
+GUI: JavaFX, JavaAWT
 
 Database: PostgresSQL
 
@@ -26,6 +33,8 @@ Cashing: Enable (custom)
 - обмен изображениями (с текстом и без)
 - обмен аудиофайлами, встроенный аудио плеер
 - возможность изменять и удалять сообщения
+- сворачивание приложения в трей (своя реализация трея javaAWT + javaFX)
+- интеграция своей системы оповещений на рабочем столе, построена на JavaFX
 - уведомления
 
 ### Структура

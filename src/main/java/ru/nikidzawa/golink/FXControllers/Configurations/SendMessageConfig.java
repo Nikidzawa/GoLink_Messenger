@@ -19,6 +19,7 @@ import javafx.util.Pair;
 import ru.nikidzawa.golink.FXControllers.GoLink;
 import ru.nikidzawa.golink.FXControllers.cash.ContactCash;
 import ru.nikidzawa.golink.FXControllers.cash.MessageCash;
+import ru.nikidzawa.golink.services.GUI.EmptyStage;
 import ru.nikidzawa.golink.services.GUI.GUIPatterns;
 import ru.nikidzawa.golink.services.sound.AudioHelper;
 import ru.nikidzawa.networkAPI.network.TCPConnection;
@@ -60,6 +61,8 @@ public class SendMessageConfig {
 
     private byte[] selectedImage;
     private ImageView imageView;
+
+    private Stage messageContextOption;
 
     public SendMessageConfig(GoLink goLink) {
         this.messageRepository = goLink.messageRepository;
@@ -225,20 +228,12 @@ public class SendMessageConfig {
     }
 
     public void setMessageFunctions(MessageCash messageCash, MouseEvent clickOnMessage) {
-        Stage messageStage = new Stage();
         this.messageCash = messageCash;
-        scene.setOnMouseClicked(mouseEvent -> {
-            if (messageStage.isShowing()) {
-                messageStage.close();
-                GUIPatterns.setMessageStage(null);
-            }
-        });
 
         BorderPane deleteButton = GUIPatterns.deleteMessageButton();
         deleteButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             deleteMessageFunction(messageCash.getMessage());
-            messageStage.close();
-            GUIPatterns.setMessageStage(null);
+            messageContextOption.close();
         });
 
         switch (messageCash.getMessage().getMessageType()) {
@@ -246,22 +241,49 @@ public class SendMessageConfig {
                 BorderPane editButton = GUIPatterns.editeMessageButton();
                 editButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
                     editFunction(messageCash);
-                    input.setText(messageCash.getMessage().getText());
-                    messageStage.close();
-                    GUIPatterns.setMessageStage(null);
+                    messageContextOption.close();
                 });
 
                 BorderPane copyButton = GUIPatterns.copyMessageButton();
                 copyButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
                     copyMessageFunction(messageCash.getMessage().getText());
-                    messageStage.close();
-                    GUIPatterns.setMessageStage(null);
+                    messageContextOption.close();
                 });
-                Platform.runLater(() -> GUIPatterns.openMessageWindow(messageCash.getMessage(), clickOnMessage, messageStage, copyButton, editButton, deleteButton));
+
+                openMessageWindow(clickOnMessage, copyButton, editButton, deleteButton);
             }
-            case AUDIO, DOCUMENT ->
-                    Platform.runLater(() -> GUIPatterns.openMessageWindow(messageCash.getMessage(), clickOnMessage, messageStage, null, null, deleteButton));
+            case AUDIO, DOCUMENT -> openMessageWindow(clickOnMessage,null, null, deleteButton);
         }
+    }
+
+    public void openMessageWindow(MouseEvent mouseEvent, BorderPane copy, BorderPane edit, BorderPane delete) {
+        VBox vBox = new VBox();
+        vBox.setStyle("-fx-background-color:  #18314D; -fx-border-color: black; -fx-spacing: 5");
+
+        double finalHeight = delete.getPrefHeight();
+        if (edit != null && copy != null) {
+            finalHeight += copy.getPrefHeight();
+            finalHeight += edit.getPrefHeight();
+            vBox.getChildren().add(copy);
+            vBox.getChildren().add(edit);
+        }
+        vBox.getChildren().add(delete);
+
+        Scene scene = new Scene(vBox, 150, finalHeight);
+
+        if (messageContextOption == null) {
+            messageContextOption = EmptyStage.getEmptyStageAndSetScene(scene);
+        }
+        messageContextOption.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
+            if (!isNowFocused) {
+                messageContextOption.close();
+            }
+        });
+
+        messageContextOption.setX(mouseEvent.getScreenX());
+        messageContextOption.setY(mouseEvent.getScreenY());
+        messageContextOption.toFront();
+        Platform.runLater(() -> messageContextOption.show());
     }
 
     private void copyMessageFunction(String messageText) {
@@ -283,6 +305,7 @@ public class SendMessageConfig {
     private void editFunction(MessageCash messageCash) {
         isEditMessageStage = true;
         microphoneButton.setVisible(false);
+        input.setText(messageCash.getMessage().getText());
         ImageView cancelButton = GUIPatterns.getCancelButton();
         Pair<BorderPane, ImageView> pair = GUIPatterns.getBackgroundEditInterface(messageCash);
         BorderPane backgroundEditeInterface = pair.getKey();

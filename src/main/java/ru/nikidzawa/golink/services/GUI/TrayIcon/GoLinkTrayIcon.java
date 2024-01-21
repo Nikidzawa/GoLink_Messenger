@@ -7,7 +7,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import lombok.SneakyThrows;
-import ru.nikidzawa.golink.FXControllers.helpers.EmptyStage;
+import ru.nikidzawa.golink.services.GUI.EmptyStage;
 import ru.nikidzawa.networkAPI.network.TCPConnection;
 import ru.nikidzawa.networkAPI.store.entities.UserEntity;
 
@@ -29,7 +29,6 @@ public class GoLinkTrayIcon {
         trayIcon.setImageAutoSize(true);
         trayIcon.setToolTip("GoLink messenger");
         stage = (Stage) scene.getWindow();
-        Platform.setImplicitExit(false);
         stage.hide();
         show();
         setCommands(userEntity, tcpConnection);
@@ -42,8 +41,8 @@ public class GoLinkTrayIcon {
             public void mouseClicked(MouseEvent event) {
                 if (event.getButton() == MouseEvent.BUTTON3) {
                     if (trayIconStage == null) {
-                        Platform.runLater(() -> showTrayScene(userEntity, tcpConnection, event));
-                    }
+                        Platform.runLater(() -> createTrayScene(userEntity, tcpConnection, event));
+                    } else Platform.runLater(trayIconStage::show);
                 } else if (event.getButton() == MouseEvent.BUTTON1) {
                     showStage();
                 }
@@ -52,7 +51,7 @@ public class GoLinkTrayIcon {
     }
 
     @SneakyThrows
-    private void showTrayScene (UserEntity userEntity, TCPConnection tcpConnection, MouseEvent event) {
+    private void createTrayScene(UserEntity userEntity, TCPConnection tcpConnection, MouseEvent event) {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/ru/nikidzawa/goLink/goLinkTrayIcon.fxml"));
         Parent root = loader.load();
         Scene scene = new Scene(root);
@@ -62,8 +61,12 @@ public class GoLinkTrayIcon {
         trayIconController.setUserEntity(userEntity);
         trayIconController.setTcpConnection(tcpConnection);
 
-        Stage stage = EmptyStage.getEmptyStage(scene);
-
+        Stage stage = EmptyStage.getEmptyStageAndSetScene(scene);
+        stage.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
+            if (!isNowFocused) {
+                stage.hide();
+            }
+        });
         Point2D cursorLocation = new Point2D(event.getX(), event.getY());
         stage.setX(cursorLocation.getX() - 150);
         stage.setY(cursorLocation.getY() - 205);
@@ -75,9 +78,6 @@ public class GoLinkTrayIcon {
     @SneakyThrows
     public void showStage() {
         systemTray.remove(trayIcon);
-        if (trayIconStage != null) {
-            Platform.runLater(trayIconStage::close);
-        }
         Platform.runLater(stage::show);
     }
 
