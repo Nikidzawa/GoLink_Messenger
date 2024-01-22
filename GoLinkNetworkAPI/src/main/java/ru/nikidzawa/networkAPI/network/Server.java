@@ -11,6 +11,7 @@ import ru.nikidzawa.networkAPI.store.repositories.PersonalChatRepository;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
@@ -26,13 +27,13 @@ public class Server implements ServerListener {
 
     @PostConstruct
     public void init() {
-        System.out.println("Сервер запущен");
         new Thread(this::startServer).start();
+        System.out.println("Сервер запущен");
     }
 
     @SneakyThrows
     private void startServer() {
-        serverSocket = new ServerSocket(8080);
+        serverSocket = new ServerSocket(8081);
         while (true) {
             try {
                 Socket socket = serverSocket.accept();
@@ -58,7 +59,7 @@ public class Server implements ServerListener {
         int userId = Integer.parseInt(strings[1]);
         try {
             switch (command) {
-                case "DELETE", "CREATE_NEW_CHAT_ROOM" -> connections.get(userId).sendMessage(command + ":" + strings[2]);
+                case "DELETE", "CREATE_NEW_CHAT_ROOM", "WRITING_STATUS" -> connections.get(userId).sendMessage(command + ":" + strings[2]);
                 case "CHANGE_USER_STATUS" -> tcpConnection.sendMessage(command + ":" + connections.containsKey(userId));
             }
         } catch (NullPointerException ex) {

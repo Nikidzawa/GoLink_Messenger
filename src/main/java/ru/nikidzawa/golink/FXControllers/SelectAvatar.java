@@ -88,10 +88,10 @@ public class SelectAvatar {
     @FXML
     void initialize() {
         Platform.runLater(() -> GUIPatterns.setBaseWindowTitleCommands(titleBar, minimizeButton, scaleButton, closeButton, context));
-        image.setOnMouseClicked(mouseEvent -> selectImage());
-        firstNameSymbol.setOnMouseClicked(mouseEvent -> selectImage());
+        image.setOnMouseClicked(_ -> selectImage());
+        firstNameSymbol.setOnMouseClicked(_ -> selectImage());
 
-        name.textProperty().addListener((observable, oldValue, newValue) -> {
+        name.textProperty().addListener((_, _, newValue) -> {
             if (newValue.isEmpty()) {
                 camera.setVisible(true);
                 firstNameSymbol.setText("");
@@ -118,7 +118,7 @@ public class SelectAvatar {
             }
         });
 
-        enter.setOnAction(actionEvent -> registration());
+        enter.setOnAction(_ -> registration());
     }
 
     private void selectImage() {

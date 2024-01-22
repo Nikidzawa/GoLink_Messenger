@@ -77,10 +77,10 @@ public class SendMessageConfig {
         this.input = goLink.getInput();
         this.scrollConfig = goLink.getScrollConfig();
         this.sendZone = goLink.getSendZone();
-        microphoneButton.setOnMousePressed(mouseEvent -> AudioHelper.startRecording());
-        microphoneButton.setOnMouseReleased(mouseEvent -> sendAudi0Configuration());
-        sendImageButton.setOnMouseClicked(mouseEvent -> sendImageConfig());
-        goLink.getSendButton().setOnMouseClicked(mouseEvent -> sendMessageConfiguration());
+        microphoneButton.setOnMousePressed(_ -> AudioHelper.startRecording());
+        microphoneButton.setOnMouseReleased(_ -> sendAudi0Configuration());
+        sendImageButton.setOnMouseClicked(_ -> sendImageConfig());
+        goLink.getSendButton().setOnMouseClicked(_ -> sendMessageConfiguration());
     }
 
     public void setSelectedContact(ContactCash contactCash) {
@@ -89,37 +89,31 @@ public class SendMessageConfig {
     }
 
     public void sendAudi0Configuration() {
-        if (selectedContact != null) {
-            AudioHelper.stopRecording();
-            try {
-                byte[] metadata = AudioHelper.convertAudioToBytes(AudioHelper.getFile());
-                MessageEntity messageEntity = MessageEntity.builder()
-                        .messageType(MessageType.AUDIO)
-                        .metadata(metadata)
-                        .sender(userEntity)
-                        .date(LocalDateTime.now())
-                        .chat(selectedContact.getChat())
-                        .build();
-                MessageCash messageCash = GUIPatterns.printMyAudioGUIAndGetCash(messageEntity, AudioHelper.getFile());
-                messageRepository.save(messageEntity);
-                TCPConnection.POST(selectedContact.getInterlocutor().getId(), interlocutorPersonalChatEntity.getId(), selectedContact.getChat().getId(), messageEntity.getId(), MessageType.AUDIO, null, metadata);
-                selectedContact.addMessageOnCashAndPutLastMessage(messageCash);
-                chatField.getChildren().add(messageCash.getMessageBackground());
+        if (selectedContact != null) {AudioHelper.stopRecording();
+            byte[] metadata = AudioHelper.convertAudioToBytes(AudioHelper.getFile());
+            MessageEntity messageEntity = MessageEntity.builder()
+                    .messageType(MessageType.AUDIO)
+                    .metadata(metadata)
+                    .sender(userEntity)
+                    .date(LocalDateTime.now())
+                    .chat(selectedContact.getChat())
+                    .build();
 
-                scrollConfig.scrolling();
+            MessageCash messageCash = GUIPatterns.printMyAudioGUIAndGetCash(messageEntity, AudioHelper.getFile());
+            messageRepository.save(messageEntity);
 
-                contactsField.getChildren().remove(selectedContact.getGUI());
-                contactsField.getChildren().add(0, selectedContact.getGUI());
+            TCPConnection.POST(selectedContact.getInterlocutor().getId(), interlocutorPersonalChatEntity.getId(), selectedContact.getChat().getId(), messageEntity.getId(), MessageType.AUDIO, null, metadata);
+            selectedContact.addMessageOnCashAndPutLastMessage(messageCash);
+            chatField.getChildren().add(messageCash.getMessageBackground());
 
-                messageCash.getMessageBackground().setOnMouseClicked(mouseEvent -> {
-                    if (mouseEvent.getButton() == MouseButton.SECONDARY) {
-                        setMessageFunctions(messageCash, mouseEvent);
-                    }
-                });
+            contactsField.getChildren().remove(selectedContact.getGUI());
+            contactsField.getChildren().addFirst(selectedContact.getGUI());
 
-            } catch (IOException | UnsupportedAudioFileException e) {
-                throw new RuntimeException(e);
-            }
+            messageCash.getMessageBackground().setOnMouseClicked(mouseEvent -> {
+                if (mouseEvent.getButton() == MouseButton.SECONDARY) {
+                    setMessageFunctions(messageCash, mouseEvent);
+                }
+            });
         }
     }
 
@@ -167,10 +161,8 @@ public class SendMessageConfig {
                 MessageCash messageCash = GUIPatterns.makeMyMessageGUIAndGetCash(messageEntity);
                 chatField.getChildren().add(addMessageToGlobalCash(messageCash));
 
-                scrollConfig.scrolling();
-
                 contactsField.getChildren().remove(selectedContact.getGUI());
-                contactsField.getChildren().add(0, selectedContact.getGUI());
+                contactsField.getChildren().addFirst(selectedContact.getGUI());
                 disable();
                 microphoneButton.setVisible(true);
             }
@@ -199,7 +191,7 @@ public class SendMessageConfig {
                         BorderPane borderPane = pair.getKey();
                         ImageView cancelButton = GUIPatterns.getCancelButton();
                         BorderPane.setMargin(cancelButton, new Insets(10, 10, 0, 0));
-                        cancelButton.setOnMouseClicked(mouseEvent -> {
+                        cancelButton.setOnMouseClicked(_ -> {
                             disable();
                             microphoneButton.setVisible(true);
                         });
@@ -231,7 +223,7 @@ public class SendMessageConfig {
         this.messageCash = messageCash;
 
         BorderPane deleteButton = GUIPatterns.deleteMessageButton();
-        deleteButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+        deleteButton.addEventFilter(MouseEvent.MOUSE_CLICKED, _ -> {
             deleteMessageFunction(messageCash.getMessage());
             messageContextOption.close();
         });
@@ -239,13 +231,13 @@ public class SendMessageConfig {
         switch (messageCash.getMessage().getMessageType()) {
             case MESSAGE -> {
                 BorderPane editButton = GUIPatterns.editeMessageButton();
-                editButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+                editButton.addEventFilter(MouseEvent.MOUSE_CLICKED, _ -> {
                     editFunction(messageCash);
                     messageContextOption.close();
                 });
 
                 BorderPane copyButton = GUIPatterns.copyMessageButton();
-                copyButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+                copyButton.addEventFilter(MouseEvent.MOUSE_CLICKED, _ -> {
                     copyMessageFunction(messageCash.getMessage().getText());
                     messageContextOption.close();
                 });
@@ -274,7 +266,7 @@ public class SendMessageConfig {
         if (messageContextOption == null) {
             messageContextOption = EmptyStage.getEmptyStageAndSetScene(scene);
         }
-        messageContextOption.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
+        messageContextOption.focusedProperty().addListener((_, _, isNowFocused) -> {
             if (!isNowFocused) {
                 messageContextOption.close();
             }
@@ -342,7 +334,7 @@ public class SendMessageConfig {
         backgroundEditeInterface.setRight(cancelButton);
         sendZone.setTop(backgroundEditeInterface);
         BorderPane.setMargin(cancelButton, new Insets(10, 10, 0, 0));
-        cancelButton.setOnMouseClicked(mouseEvent -> {
+        cancelButton.setOnMouseClicked(_ -> {
             disable();
             microphoneButton.setVisible(true);
         });

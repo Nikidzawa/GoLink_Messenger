@@ -175,15 +175,15 @@ public class GoLink implements ServerListener {
     void initialize() {
         Platform.runLater(() -> {
             try {
-                TCPConnection = new TCPConnection(new Socket("localhost", 8080), this, userEntity.getId().toString());
+                TCPConnection = new TCPConnection(new Socket("localhost", 8081), this, userEntity.getId().toString());
             } catch (IOException ex) {
                 Platform.exit();
                 throw new RuntimeException(ex);
             }
             Platform.setImplicitExit(false);
-            scene.getWindow().setOnHidden(windowEvent -> Platform.runLater(() -> notificationScene = new NotificationScene()));
+            scene.getWindow().setOnHidden(_ -> Platform.runLater(() -> notificationScene = new NotificationScene()));
 
-            scene.getWindow().setOnShowing(windowEvent -> {
+            scene.getWindow().setOnShowing(_ -> {
                 goLinkTrayIcon.hide();
                 Platform.runLater(notificationScene::close);
                 notificationScene = null;
@@ -203,7 +203,9 @@ public class GoLink implements ServerListener {
                 if (keyEvent.getCode() == KeyCode.ESCAPE) exitChat();
             });
 
-            settingsButton.setOnMouseClicked(mouseEvent -> openSettings());
+            settingsButton.setOnMouseClicked(_ -> openSettings());
+
+            input.textProperty().addListener((_, _, _) -> TCPConnection.WRITING_STATUS(selectedContact.getInterlocutor().getId(), selectedContact.getChat().getId()));
 
             loadChatRooms();
         });
@@ -260,8 +262,8 @@ public class GoLink implements ServerListener {
         List<ContactCash> GUI = contacts.values()
                 .stream()
                 .sorted(Comparator.comparing(contactCash ->
-                        contactCash.getLastMessage() != null ?
-                                contactCash.getLastMessage().getDate() :
+                        contactCash.getChat().getMessages() != null ?
+                                contactCash.getChat().getMessages().getLast().getDate() :
                                 null, Comparator.nullsLast(Comparator.reverseOrder())))
                 .toList();
         GUI.forEach(contactCash -> contactsField.getChildren().add(contactCash.getGUI()));
@@ -270,7 +272,7 @@ public class GoLink implements ServerListener {
     public ContactCash createContact(UserEntity interlocutor, ChatEntity chat, PersonalChatEntity personalChatEntity) {
         ContactCash contactCash = new ContactCash(interlocutor, chat, personalChatEntity, personalChatRepository);
         BorderPane GUIContact = GUIPatterns.newChatBuilder(userEntity, contactCash, personalChatEntity);
-        GUIContact.setOnMouseClicked(e -> openChat(chat, personalChatEntity, interlocutor, contactCash));
+        GUIContact.setOnMouseClicked(_ -> openChat(chat, personalChatEntity, interlocutor, contactCash));
         contactCash.setGUI(GUIContact);
         contacts.put(chat.getId(), contactCash);
         return contactCash;
@@ -294,7 +296,6 @@ public class GoLink implements ServerListener {
 
             chatRoomName.setText(interlocutor.getName());
             printMessages();
-            scrollConfig.scrolling();
         }
     }
 
@@ -363,11 +364,6 @@ public class GoLink implements ServerListener {
                 Platform.runLater(() -> createContact(interlocutor, chatEntity, personalChatEntity));
             }
             case "CHANGE_USER_STATUS" -> status.setText(Boolean.parseBoolean(value) ? "В сети" : "Не в сети");
-
-            case "WRITE_MESSAGE" -> {
-                long chatID = Long.parseLong(value);
-                ContactCash contactCash = contacts.get(chatID);
-            }
         }
     }
 
@@ -407,7 +403,7 @@ public class GoLink implements ServerListener {
                 }
                 Platform.runLater(() -> {
                     contactsField.getChildren().remove(contactCash.getGUI());
-                    contactsField.getChildren().add(0, contactCash.getGUI());
+                    contactsField.getChildren().addFirst(contactCash.getGUI());
                 });
             }
             case "EDIT" -> {
@@ -423,48 +419,45 @@ public class GoLink implements ServerListener {
         MessageCash messageCash = GUIPatterns.printForeignAudioGUIAndGetCash(message, AudioHelper.convertBytesToAudio(message.getMetadata()));
         contactCash.addMessageOnCashAndPutLastMessage(messageCash);
         if (selectedContact != null && Objects.equals(selectedContact.getChat().getId(), chatId)) {
-            Platform.runLater(() -> {
-                if (scrollPane.getVvalue() >= 0.95) {
-                    chatField.getChildren().add(messageCash.getMessageBackground());
-                    scrollConfig.scrolling();
-                } else chatField.getChildren().add(messageCash.getMessageBackground());
-            });
-        } else {
-            contactCash.addNotification(message);
-            SongPlayer.notification();
-        }
+            Platform.runLater(() -> chatField.getChildren().add(messageCash.getMessageBackground()));
+        } else {pushNotification(message, contactCash);}
     }
 
     private void writeReceivedMessage(MessageEntity message, ContactCash contactCash, Long chatId) {
         MessageCash messageCash = GUIPatterns.makeForeignMessageGUIAndGetCash(message);
         contactCash.addMessageOnCashAndPutLastMessage(messageCash);
         if (selectedContact != null && Objects.equals(selectedContact.getChat().getId(), chatId)) {
-            Platform.runLater(() -> {
-                if (scrollPane.getVvalue() >= 0.95) {
-                    chatField.getChildren().add(messageCash.getMessageBackground());
-                    scrollConfig.scrolling();
-                } else chatField.getChildren().add(messageCash.getMessageBackground());
-            });
-        } else {
-            contactCash.addNotification(message);
-            SongPlayer.notification();
-            if (notificationScene != null) {
-                Notification notification = new Notification.Builder()
-                        .setMessage(message.getText())
-                        .setTitle(message.getSender().getName())
-                        .setImage(new Image(new ByteArrayInputStream(message.getSender().getAvatar())))
-                        .build();
-                notification.setOnMouseClicked(mouseEvent -> {
-                    Platform.runLater(() -> {
-                        Stage stage = (Stage) scene.getWindow();
-                        stage.show();
-                        openChat(message.getChat(), contactCash.getPersonalChatEntity(), contactCash.getInterlocutor(), contactCash);
-                    });
-                });
-                notificationScene.addNotification(notification);
+            Platform.runLater(() -> chatField.getChildren().add(messageCash.getMessageBackground()));
+        } else {pushNotification(message, contactCash);}
+    }
+
+    private void pushNotification(MessageEntity message, ContactCash contactCash) {
+        contactCash.addNotification(message);
+        SongPlayer.notification();
+        if (notificationScene != null) {
+            String messageNotification = null;
+            switch (message.getMessageType()) {
+                case MESSAGE -> messageNotification = message.getText();
+                case AUDIO -> messageNotification = "Голосовое сообщение";
+                case DOCUMENT -> messageNotification = "Документ";
             }
+
+            Notification notification = new Notification.Builder()
+                    .setMessage(messageNotification)
+                    .setTitle(message.getSender().getName())
+                    .setImage(new Image(new ByteArrayInputStream(message.getSender().getAvatar())))
+                    .build();
+            notification.setOnMouseClicked(_ -> {
+                Platform.runLater(() -> {
+                    Stage stage = (Stage) scene.getWindow();
+                    stage.show();
+                    openChat(message.getChat(), contactCash.getPersonalChatEntity(), contactCash.getInterlocutor(), contactCash);
+                });
+            });
+            notificationScene.addNotification(notification);
         }
     }
+
     @Override
     public void onDisconnect(TCPConnection tcpConnection) {Platform.exit();}
 }

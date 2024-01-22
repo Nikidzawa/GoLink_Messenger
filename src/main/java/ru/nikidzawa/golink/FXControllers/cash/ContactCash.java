@@ -41,7 +41,7 @@ public class ContactCash {
     private PersonalChatEntity personalChatEntity;
     private UserEntity interlocutor;
     private ChatEntity chat;
-    private MessageEntity lastMessage;
+
 
     public ContactCash(UserEntity interlocutor, ChatEntity chat, PersonalChatEntity personalChatEntity, PersonalChatRepository personalChatRepository) {
         this.interlocutor = interlocutor;
@@ -92,7 +92,7 @@ public class ContactCash {
                 if (message.getText().isEmpty()) {
                     lastMessageText.setText(Objects.equals(message.getSender().getId(), interlocutor.getId()) ? "Фотография" : "Вы: " + "фотография");
                 } else {
-                    lastMessageText.setText(Objects.equals(message.getSender().getId(), interlocutor.getId()) ? message.getText() : "Вы: " + message.getText());
+                    lastMessageText.setText(Objects.equals(message.getSender().getId(), interlocutor.getId()) ? message.getText() : STR."Вы: \{message.getText()}");
                 }
             }
             case AUDIO ->

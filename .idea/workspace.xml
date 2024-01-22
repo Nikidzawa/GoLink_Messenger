@@ -4,20 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="39e914f0-8438-4975-ae5e-804deeb44919" name="Changes" comment="create trayIcon">
-      <change afterPath="$PROJECT_DIR$/audio_0.wav" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/audio_1.wav" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/GUI/TrayIcon/notifications/Notification.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/GUI/TrayIcon/notifications/NotificationScene.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/readme/main.gif" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/readme/notifications.gif" afterDir="false" />
+    <list default="true" id="39e914f0-8438-4975-ae5e-804deeb44919" name="Changes" comment="create custom notification system on desktop, update trayIcon, optimization, update readme">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GoLinkNetworkAPI/src/main/java/ru/nikidzawa/networkAPI/network/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/GoLinkNetworkAPI/src/main/java/ru/nikidzawa/networkAPI/network/Server.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.MD" beforeDir="false" afterPath="$PROJECT_DIR$/README.MD" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/audio.wav" beforeDir="false" afterPath="$PROJECT_DIR$/audio.wav" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GoLinkNetworkAPI/src/main/java/ru/nikidzawa/networkAPI/network/TCPConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/GoLinkNetworkAPI/src/main/java/ru/nikidzawa/networkAPI/network/TCPConnection.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/Configurations/ScrollConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/Configurations/ScrollConfig.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/Configurations/SearchConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/Configurations/SearchConfig.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/Configurations/SendMessageConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/Configurations/SendMessageConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/EditProfile.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/EditProfile.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/GoLink.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/GoLink.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/Login.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/Login.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/Register.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/Register.java" afterDir="false" />
@@ -25,14 +21,17 @@
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/VerifyNumber.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/VerifyNumber.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/cash/ContactCash.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/cash/ContactCash.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/cash/MessageCash.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/cash/MessageCash.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/helpers/EmptyStage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/GUI/EmptyStage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/Starter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/Starter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/cash/MessageStage.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/FXControllers/helpers/ExitListener.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/GUI/GUIPatterns.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/GUI/GUIPatterns.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/GUI/TrayIcon/GoLinkTrayIcon.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/GUI/TrayIcon/GoLinkTrayIcon.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/GUI/TrayIcon/TrayIconController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/GUI/TrayIcon/TrayIconController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/ru/nikidzawa/golink/FXControllers/login.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/ru/nikidzawa/golink/FXControllers/login.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/ru/nikidzawa/golink/FXControllers/verify.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/ru/nikidzawa/golink/FXControllers/verify.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/ru/nikidzawa/golink/register.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/ru/nikidzawa/golink/register.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/GUI/TrayIcon/notifications/Notification.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/GUI/TrayIcon/notifications/Notification.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/GUI/TrayIcon/notifications/NotificationScene.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/GUI/TrayIcon/notifications/NotificationScene.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/sound/AudioHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/sound/AudioHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/sound/AudioPlayer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/nikidzawa/golink/services/sound/AudioPlayer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/ru/nikidzawa/golink/FXControllers/avatar.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/ru/nikidzawa/golink/FXControllers/avatar.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/ru/nikidzawa/golink/FXControllers/editProfile.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/ru/nikidzawa/golink/FXControllers/editProfile.fxml" afterDir="false" />
     </list>
     <list id="4cc47031-8ec7-43a8-bbd2-4836398b378c" name="Changes by Nikidzawa" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -110,58 +109,58 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "Application.GoLinkTryIcon.executor": "Run",
-    "Application.MessageBroker.executor": "Run",
-    "Application.MultipleStageStyles.executor": "Run",
-    "Application.NotificationScene.executor": "Run",
-    "Application.RecordingTest.executor": "Run",
-    "Application.SOCS.executor": "Run",
-    "Application.Server.executor": "Run",
-    "Application.Sounds.executor": "Run",
-    "Application.TransparentSceneExample.executor": "Run",
-    "Application.ru.nikidzawa.golink.FXControllers.network.Server.executor": "Run",
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "Spring Boot.Client.executor": "Run",
-    "Spring Boot.GoLinkNetworkAPIStarter.executor": "Run",
-    "Spring Boot.GoLinkNetworkApiApplication.executor": "Run",
-    "Spring Boot.Server.executor": "Run",
-    "Spring Boot.Starter (1).executor": "Run",
-    "Spring Boot.Starter.executor": "Run",
-    "WebServerToolWindowFactoryState": "false",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "database.data.extractors.current.export.id": "Comma-separated (CSV)_id",
-    "deletionFromPopupRequiresConfirmation": "false",
-    "extract.method.default.visibility": "private",
-    "git-widget-placeholder": "master",
-    "jdk.selected.JAVA_MODULE": "openjdk-21",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/Nikidzawa/IdeaProjects/goLink/src/main/resources/ru/nikidzawa/golink/FXControllers",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Problems",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.49425286",
-    "settings.editor.selected.configurable": "preferences.JavaFX",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;Application.GoLinkTryIcon.executor&quot;: &quot;Run&quot;,
+    &quot;Application.MessageBroker.executor&quot;: &quot;Run&quot;,
+    &quot;Application.MultipleStageStyles.executor&quot;: &quot;Run&quot;,
+    &quot;Application.NotificationScene.executor&quot;: &quot;Run&quot;,
+    &quot;Application.RecordingTest.executor&quot;: &quot;Run&quot;,
+    &quot;Application.SOCS.executor&quot;: &quot;Run&quot;,
+    &quot;Application.Server.executor&quot;: &quot;Run&quot;,
+    &quot;Application.Sounds.executor&quot;: &quot;Run&quot;,
+    &quot;Application.TransparentSceneExample.executor&quot;: &quot;Run&quot;,
+    &quot;Application.ru.nikidzawa.golink.FXControllers.network.Server.executor&quot;: &quot;Run&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Spring Boot.Client.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.GoLinkNetworkAPIStarter.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.GoLinkNetworkApiApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.Server.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.Starter (1).executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.Starter.executor&quot;: &quot;Run&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;database.data.extractors.current.export.id&quot;: &quot;Comma-separated (CSV)_id&quot;,
+    &quot;deletionFromPopupRequiresConfirmation&quot;: &quot;false&quot;,
+    &quot;extract.method.default.visibility&quot;: &quot;private&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;jdk.selected.JAVA_MODULE&quot;: &quot;openjdk-21&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Nikidzawa/IdeaProjects/goLink/src/main/resources/ru/nikidzawa/golink/FXControllers&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Problems&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.49425286&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.JavaFX&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "postgresql"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;postgresql&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\Nikidzawa\IdeaProjects\goLink\src\main\resources\ru\nikidzawa\golink\FXControllers" />
@@ -171,8 +170,8 @@
       <recent name="C:\Users\Nikidzawa\IdeaProjects\goLink\src\main\java\ru\nikidzawa\golink\FXControllers\network" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\Nikidzawa\IdeaProjects\goLink\src\main\resources\readme" />
       <recent name="C:\Users\Nikidzawa\IdeaProjects\goLink\src\main\resources\ru\nikidzawa\golink\FXControllers" />
+      <recent name="C:\Users\Nikidzawa\IdeaProjects\goLink\src\main\resources\readme" />
       <recent name="C:\Users\Nikidzawa\IdeaProjects\goLink\src\main\resources\ru\nikidzawa\golink" />
       <recent name="C:\Users\Nikidzawa\IdeaProjects\goLink\src\main\resources\img" />
       <recent name="C:\Users\Nikidzawa\IdeaProjects\goLink\src\main\resources\styles" />
@@ -202,8 +201,8 @@
       </method>
     </configuration>
     <list>
-      <item itemvalue="Spring Boot.Server" />
       <item itemvalue="Spring Boot.Client" />
+      <item itemvalue="Spring Boot.Server" />
     </list>
   </component>
   <component name="SharedIndexes">
@@ -257,7 +256,10 @@
       <workItem from="1704118704631" duration="218987000" />
       <workItem from="1704884034955" duration="65229000" />
       <workItem from="1705108552700" duration="138638000" />
-      <workItem from="1705569094431" duration="115967000" />
+      <workItem from="1705569094431" duration="116151000" />
+      <workItem from="1705831350530" duration="7920000" />
+      <workItem from="1705849254390" duration="1000" />
+      <workItem from="1705849268024" duration="8861000" />
     </task>
     <task id="LOCAL-00001" summary="Create messenger">
       <option name="closed" value="true" />
@@ -459,7 +461,15 @@
       <option name="project" value="LOCAL" />
       <updated>1705680405480</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="create custom notification system on desktop, update trayIcon, optimization, update readme">
+      <option name="closed" value="true" />
+      <created>1705831304703</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1705831304703</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -478,7 +488,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Create messenger" />
     <MESSAGE value="small refactoring, bugs fix" />
     <MESSAGE value="visualize time of message, create dynamic port migration" />
     <MESSAGE value="update gui, refactoring, save users id's in servers" />
@@ -502,7 +511,9 @@
     <MESSAGE value="add edit all type messages, change gui" />
     <MESSAGE value="separated server and database" />
     <MESSAGE value="create trayIcon" />
-    <option name="LAST_COMMIT_MESSAGE" value="create trayIcon" />
+    <MESSAGE value="add custom notification system on desktop, update trayIcon, optimization, update readme" />
+    <MESSAGE value="create custom notification system on desktop, update trayIcon, optimization, update readme" />
+    <option name="LAST_COMMIT_MESSAGE" value="create custom notification system on desktop, update trayIcon, optimization, update readme" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -66,7 +66,7 @@ public class Login {
     @FXML
     void initialize() {
         Platform.runLater(() -> GUIPatterns.setBaseWindowTitleCommands(titleBar, minimizeButton, scaleButton, closeButton, context));
-        enter.setOnAction(e -> enterEvent());
+        enter.setOnAction(_ -> enterEvent());
 
         password.setOnKeyPressed(keyEvent -> {
             if (keyEvent.getCode() == KeyCode.ENTER) enterEvent();
@@ -79,7 +79,7 @@ public class Login {
                 } else enterEvent();
         });
 
-        register.setOnMouseClicked(MouseEvent -> fxRegister());
+        register.setOnMouseClicked(_ -> fxRegister());
     }
 
     private void enterEvent() {

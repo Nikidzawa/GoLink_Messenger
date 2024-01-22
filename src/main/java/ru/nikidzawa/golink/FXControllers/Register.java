@@ -71,7 +71,7 @@ public class Register {
         Platform.runLater(() -> GUIPatterns.setBaseWindowTitleCommands(titleBar, minimizeButton, scaleButton, closeButton, context));
 
         GUIPatterns.setConfig(phone);
-        login.setOnMouseClicked(e -> fxLogin());
+        login.setOnMouseClicked(_ -> fxLogin());
 
         password.setOnKeyPressed(keyEvent -> {
             if (keyEvent.getCode() == KeyCode.ENTER) enterEvent();
@@ -83,7 +83,7 @@ public class Register {
                 } else enterEvent();
         });
 
-        enter.setOnAction(e -> enterEvent());
+        enter.setOnAction(_ -> enterEvent());
     }
 
 

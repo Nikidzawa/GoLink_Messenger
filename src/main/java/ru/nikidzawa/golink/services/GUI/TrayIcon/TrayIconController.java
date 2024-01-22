@@ -48,9 +48,9 @@ public class TrayIconController {
     void initialize() {
         Platform.runLater(() -> {
             setBIO();
-            openGoLink.setOnMouseClicked(mouseEvent -> openGoLink());
-            notifications.setOnMouseClicked(mouseEvent -> setNotificationStatus());
-            closeGoLink.setOnMouseClicked(mouseEvent -> closeGoLink());
+            openGoLink.setOnMouseClicked(_ -> openGoLink());
+            notifications.setOnMouseClicked(_ -> setNotificationStatus());
+            closeGoLink.setOnMouseClicked(_ -> closeGoLink());
 
             setGUI();
         });
@@ -77,14 +77,14 @@ public class TrayIconController {
     }
 
     private void setGUI () {
-        openGoLink.setOnMouseEntered(mouseEvent -> openGoLink.setStyle("-fx-background-color: #18314D"));
-        openGoLink.setOnMouseExited(mouseEvent -> openGoLink.setStyle("-fx-background-color: #001933"));
+        openGoLink.setOnMouseEntered(_ -> openGoLink.setStyle("-fx-background-color: #18314D"));
+        openGoLink.setOnMouseExited(_ -> openGoLink.setStyle("-fx-background-color: #001933"));
 
-        notifications.setOnMouseEntered(mouseEvent -> notifications.setStyle("-fx-background-color: #18314D"));
-        notifications.setOnMouseExited(mouseEvent -> notifications.setStyle("-fx-background-color: #001933"));
+        notifications.setOnMouseEntered(_ -> notifications.setStyle("-fx-background-color: #18314D"));
+        notifications.setOnMouseExited(_ -> notifications.setStyle("-fx-background-color: #001933"));
 
-        closeGoLink.setOnMouseEntered(mouseEvent -> closeGoLink.setStyle("-fx-background-color: #18314D"));
-        closeGoLink.setOnMouseExited(mouseEvent -> closeGoLink.setStyle("-fx-background-color: #001933"));
+        closeGoLink.setOnMouseEntered(_ -> closeGoLink.setStyle("-fx-background-color: #18314D"));
+        closeGoLink.setOnMouseExited(_ -> closeGoLink.setStyle("-fx-background-color: #001933"));
     }
 
 }

@@ -108,6 +108,9 @@ public class TCPConnection {
     public void CREATE_NEW_CHAT_ROOM(long receiverID, long participantPersonalChatId) {
         sendMessage(String.format("CREATE_NEW_CHAT_ROOM:%d:%d", receiverID, participantPersonalChatId));
     }
+    public void WRITING_STATUS (long receiverID, long chatID) {
+        sendMessage(String.format("WRITING_STATUS:%d:%d", receiverID, chatID));
+    }
 
     public void DELETE(long receiverID, long chatID, long messageID) {
         sendMessage(String.format("DELETE:%d:%d:%d", receiverID, chatID, messageID));

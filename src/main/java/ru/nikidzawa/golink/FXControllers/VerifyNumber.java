@@ -70,7 +70,7 @@ public class VerifyNumber {
     void initialize() {
         Platform.runLater(() -> GUIPatterns.setBaseWindowTitleCommands(titleBar, minimizeButton, scaleButton, closeButton, context));
 
-        goBack.setOnMouseClicked(mouseEvent -> goBack());
+        goBack.setOnMouseClicked(_ -> goBack());
         final int maxLength = 1;
 
         for (int i = 0; i < 6; i++) {
@@ -81,7 +81,7 @@ public class VerifyNumber {
             textField.setAlignment(Pos.CENTER);
             textField.setFont(Font.font(20));
             int finalI = i;
-            textField.textProperty().addListener((observable, oldValue, newValue) -> {
+            textField.textProperty().addListener((_, _, newValue) -> {
                 if (newValue.length() > maxLength) {
                     textField.setText(newValue.substring(newValue.length() - 1));
                 }
@@ -95,7 +95,7 @@ public class VerifyNumber {
             });
             area.getChildren().add(textField);
         }
-        Platform.runLater(() -> area.getChildren().get(0).requestFocus());
+        Platform.runLater(() -> area.getChildren().getFirst().requestFocus());
     }
 
     private void handleInput(TextField currentTextField, int index, KeyEvent event) {

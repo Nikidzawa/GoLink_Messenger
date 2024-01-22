@@ -41,12 +41,10 @@ module ru.nikidzawa.golink {
 
     opens ru.nikidzawa.golink to javafx.fxml, spring.core, org.hibernate.orm.core;
     exports ru.nikidzawa.golink;
-    exports ru.nikidzawa.golink.FXControllers.helpers;
     opens ru.nikidzawa.golink.services.GUI.TrayIcon to javafx.fxml;
     exports ru.nikidzawa.golink.FXControllers;
     opens ru.nikidzawa.golink.FXControllers to javafx.fxml, org.hibernate.orm.core, spring.core;
     opens img;
-    opens ru.nikidzawa.golink.FXControllers.helpers to javafx.fxml, org.hibernate.orm.core, spring.core;
     exports ru.nikidzawa.golink.FXControllers.Configurations;
     opens ru.nikidzawa.golink.FXControllers.Configurations to javafx.fxml, org.hibernate.orm.core, spring.core;
     exports ru.nikidzawa.golink.FXControllers.cash;

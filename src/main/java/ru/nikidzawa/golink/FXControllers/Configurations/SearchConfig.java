@@ -23,18 +23,18 @@ public class SearchConfig {
         this.searchPanel = goLink.getSearchPanel();
         this.contactsField = goLink.getContactsField();
         this.goLink = goLink;
-        searchPanel.textProperty().addListener((observable, oldValue, newValue) -> setSearchConfig(newValue, new PauseTransition(Duration.millis(1000))));
+        searchPanel.textProperty().addListener((_, _, newValue) -> setSearchConfig(newValue, new PauseTransition(Duration.millis(1000))));
     }
 
     private void setSearchConfig(String newValue, PauseTransition pause) {
         pause.stop();
         pause.playFromStart();
-        pause.setOnFinished(event -> {
+        pause.setOnFinished(_ -> {
             contactsField.getChildren().clear();
             goLink.userRepository.findFirstByNickname(newValue).ifPresent(interlocutor -> {
                 BorderPane contact = goLink.GUIPatterns.newChatBuilder(interlocutor);
                 contactsField.getChildren().add(contact);
-                contact.setOnMouseClicked(mouseEvent -> {
+                contact.setOnMouseClicked(_ -> {
                     searchPanel.clear();
                     goLink.contacts.values().stream()
                             .filter(contactCash1 -> Objects.equals(contactCash1.getInterlocutor().getId(), interlocutor.getId()))

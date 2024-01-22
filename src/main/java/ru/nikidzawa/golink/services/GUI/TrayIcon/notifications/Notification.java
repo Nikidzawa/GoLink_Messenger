@@ -82,7 +82,7 @@ public class Notification extends BorderPane {
         String finalString = builder.message;
         if (finalString.length() > 160) {
             finalString = finalString.substring(0, 160);
-            finalString = finalString + "...";
+            finalString = STR."\{finalString}...";
         }
         message.setText(finalString);
         TextFlow textFlow = new TextFlow(message);

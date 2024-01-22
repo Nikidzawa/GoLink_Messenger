@@ -62,7 +62,7 @@ public class GoLinkTrayIcon {
         trayIconController.setTcpConnection(tcpConnection);
 
         Stage stage = EmptyStage.getEmptyStageAndSetScene(scene);
-        stage.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
+        stage.focusedProperty().addListener((_, _, isNowFocused) -> {
             if (!isNowFocused) {
                 stage.hide();
             }

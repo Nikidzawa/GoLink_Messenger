@@ -1,6 +1,8 @@
 package ru.nikidzawa.golink.FXControllers.Configurations;
 
 import javafx.animation.PauseTransition;
+import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.control.ScrollPane;
@@ -22,27 +24,31 @@ public class ScrollConfig {
     private final Node thumb;
     private boolean wait;
 
+    private final int spacing;
+
     public ScrollConfig(ScrollPane scrollPane, VBox chatField) {
         this.chatField = chatField;
         this.scrollPane = scrollPane;
         scrollPane.getStylesheets().add(Objects.requireNonNull(GoLink.class.getResource("/styles/scroll.css")).toExternalForm());
         vBar = (ScrollBar) scrollPane.lookup(".scroll-bar:vertical");
         thumb = scrollPane.lookup(".scroll-bar:vertical .thumb");
+        spacing = (int) chatField.getSpacing();
+        setScrollEventListener();
         initializeTimer();
         setConfig();
     }
 
     private void setConfig() {
-        scrollPane.addEventFilter(ScrollEvent.SCROLL, event -> {
+        scrollPane.addEventFilter(ScrollEvent.SCROLL, _ -> {
             showVBar();
             startTimer();
         });
-        vBar.setOnDragDetected(mouseEvent -> showVBar());
-        vBar.setOnMouseEntered(mouseEvent -> {
+        vBar.setOnDragDetected(_ -> showVBar());
+        vBar.setOnMouseEntered(_ -> {
             wait = true;
             showVBar();
         });
-        vBar.setOnMouseExited(mouseEvent -> {
+        vBar.setOnMouseExited(_ -> {
             wait = false;
             startTimer();
         });
@@ -75,7 +81,6 @@ public class ScrollConfig {
 
     public void showElement(int elementIndex) {
         double totalHeight = 0;
-        double spacing = chatField.getSpacing();
 
         for (int i = 0; i < elementIndex; i++) {
             Node child = chatField.getChildren().get(i);
@@ -97,9 +102,19 @@ public class ScrollConfig {
         thumb.setStyle("-fx-background-color: transparent;");
     }
 
-    public void scrolling() {
-        PauseTransition pauseTransition = new PauseTransition(Duration.millis(20));
-        pauseTransition.setOnFinished(event -> scrollPane.setVvalue(1));
-        pauseTransition.play();
+    private void setScrollEventListener() {
+        chatField.getChildren().addListener((ListChangeListener<Node>) change -> {
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    if (scrollPane.getVvalue() >= 0.95) {
+                        Platform.runLater(() -> {
+                            PauseTransition pauseTransition = new PauseTransition(Duration.millis(20));
+                            pauseTransition.setOnFinished(_ -> scrollPane.setVvalue(1));
+                            pauseTransition.play();
+                        });
+                    }
+                }
+            }
+        });
     }
 }

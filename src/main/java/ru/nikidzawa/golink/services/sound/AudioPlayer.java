@@ -29,7 +29,7 @@ public class AudioPlayer {
         Media media = new Media(audioFile.toURI().toString());
         mediaPlayer = new MediaPlayer(media);
 
-        mediaPlayer.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
+        mediaPlayer.currentTimeProperty().addListener((_, _, newValue) -> {
             if (newValue != null) {
                 double progress = newValue.toMillis() / media.getDuration().toMillis();
                 progressBar.setProgress(progress);
@@ -59,7 +59,7 @@ public class AudioPlayer {
 
         setGUI(isMyMessage);
         imageView.setImage(new Image(Objects.requireNonNull(playingImage)));
-        imageView.setOnMouseClicked(mouseEvent -> {
+        imageView.setOnMouseClicked(_ -> {
             if (isPaused) {
                 imageView.setImage(new Image(Objects.requireNonNull(pauseImage)));
                 mediaPlayer.play();

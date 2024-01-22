@@ -14,7 +14,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -25,7 +24,6 @@ import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import javafx.scene.transform.Translate;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import javafx.util.Pair;
 import lombok.Setter;
@@ -35,7 +33,6 @@ import org.springframework.stereotype.Component;
 import ru.nikidzawa.golink.FXControllers.GoLink;
 import ru.nikidzawa.golink.FXControllers.cash.ContactCash;
 import ru.nikidzawa.golink.FXControllers.cash.MessageCash;
-import ru.nikidzawa.golink.FXControllers.cash.MessageStage;
 import ru.nikidzawa.golink.services.GUI.TrayIcon.GoLinkTrayIcon;
 import ru.nikidzawa.golink.services.sound.AudioPlayer;
 import ru.nikidzawa.networkAPI.store.entities.MessageEntity;
@@ -57,7 +54,7 @@ public class GUIPatterns {
 
     public void setBaseWindowTitleCommands(Pane titleBar, Button minimizeButton, Button scaleButton, Button closeButton, ConfigurableApplicationContext context) {
         setWindowTitleButtons(titleBar, minimizeButton, scaleButton, closeButton);
-        closeButton.setOnAction(actionEvent -> {
+        closeButton.setOnAction(_ -> {
             if (context != null) {
                 context.close();
             }
@@ -67,20 +64,20 @@ public class GUIPatterns {
 
     public void setGoLinkBaseTitleCommands(GoLink goLink) {
         setWindowTitleButtons(goLink.getTitleBar(), goLink.getMinimizeButton(), goLink.getScaleButton(), goLink.getCloseButton());
-        goLink.getCloseButton().setOnAction(actionEvent -> {
+        goLink.getCloseButton().setOnAction(_ -> {
             goLink.setGoLinkTrayIcon(new GoLinkTrayIcon(goLink.getScene(), goLink.getUserEntity(), goLink.getTCPConnection()));
             goLink.exitChat();
         });
     }
 
     private void setWindowTitleButtons(Pane titleBar, Button minimizeButton, Button scaleButton, Button closeButton) {
-        minimizeButton.setOnMouseEntered(mouseEvent -> minimizeButton.setStyle("-fx-background-color: GRAY; -fx-text-fill: white"));
-        minimizeButton.setOnMouseExited(mouseEvent -> minimizeButton.setStyle("-fx-background-color: #18314D; -fx-text-fill: #C0C0C0"));
-        scaleButton.setOnMouseEntered(mouseEvent -> scaleButton.setStyle("-fx-background-color: GRAY; -fx-text-fill: white"));
-        scaleButton.setOnMouseExited(mouseEvent -> scaleButton.setStyle("-fx-background-color: #18314D; -fx-text-fill: #C0C0C0"));
-        closeButton.setOnMouseEntered(mouseEvent -> closeButton.setStyle("-fx-background-color: red; -fx-text-fill: white"));
-        closeButton.setOnMouseExited(mouseEvent -> closeButton.setStyle("-fx-background-color: #18314D; -fx-text-fill: #C0C0C0"));
-        minimizeButton.setOnAction(actionEvent -> {
+        minimizeButton.setOnMouseEntered(_ -> minimizeButton.setStyle("-fx-background-color: GRAY; -fx-text-fill: white"));
+        minimizeButton.setOnMouseExited(_ -> minimizeButton.setStyle("-fx-background-color: #18314D; -fx-text-fill: #C0C0C0"));
+        scaleButton.setOnMouseEntered(_ -> scaleButton.setStyle("-fx-background-color: GRAY; -fx-text-fill: white"));
+        scaleButton.setOnMouseExited(_ -> scaleButton.setStyle("-fx-background-color: #18314D; -fx-text-fill: #C0C0C0"));
+        closeButton.setOnMouseEntered(_ -> closeButton.setStyle("-fx-background-color: red; -fx-text-fill: white"));
+        closeButton.setOnMouseExited(_ -> closeButton.setStyle("-fx-background-color: #18314D; -fx-text-fill: #C0C0C0"));
+        minimizeButton.setOnAction(_ -> {
             Window window = minimizeButton.getScene().getWindow();
             ((Stage) window).setIconified(true);
         });
@@ -100,7 +97,7 @@ public class GUIPatterns {
     public void setConfig(TextField phone) {
         final int maxLength = 12;
 
-        phone.textProperty().addListener((observable, oldValue, newValue) -> {
+        phone.textProperty().addListener((_, oldValue, newValue) -> {
             if (newValue.length() > maxLength) {
                 phone.setText(oldValue);
             }
@@ -154,7 +151,7 @@ public class GUIPatterns {
         if (messages != null && !messages.isEmpty()) {
             messages = messages.stream().sorted(Comparator.comparing(MessageEntity::getDate).reversed()).toList();
 
-            MessageEntity lastMessage = messages.get(0);
+            MessageEntity lastMessage = messages.getFirst();
 
             switch (lastMessage.getMessageType()) {
                 case MESSAGE -> {
@@ -170,8 +167,6 @@ public class GUIPatterns {
                         lastMessageInfo.setText(lastMessage.getSender().getId().equals(myAccount.getId()) ? "Вы: документ" : "Документ");
             }
             date.setText(lastMessage.getDate().format(DateTimeFormatter.ofPattern("HH:mm")));
-            contactCash.setLastMessage(lastMessage);
-
         } else {
             lastMessageInfo.setText("Чат пуст");
         }
@@ -197,11 +192,11 @@ public class GUIPatterns {
         }
         borderPane.setRight(vBox);
 
-        borderPane.setOnMouseEntered(mouseEvent -> {
+        borderPane.setOnMouseEntered(_ -> {
             lastMessageInfo.setStyle("-fx-background-color: #34577F; -fx-text-fill: white");
             borderPane.setStyle("-fx-background-color: #34577F;");
         });
-        borderPane.setOnMouseExited(mouseEvent -> {
+        borderPane.setOnMouseExited(_ -> {
             lastMessageInfo.setStyle("-fx-background-color: #001933; -fx-text-fill: white");
             borderPane.setStyle("-fx-background-color: #001933;");
         });
@@ -217,10 +212,10 @@ public class GUIPatterns {
 
     public BorderPane newChatBuilder(UserEntity user) {
         BorderPane borderPane = new BorderPane();
-        borderPane.setOnMouseEntered(mouseEvent -> {
+        borderPane.setOnMouseEntered(_ -> {
             borderPane.setStyle("-fx-background-color: #34577F;");
         });
-        borderPane.setOnMouseExited(mouseEvent -> {
+        borderPane.setOnMouseExited(_ -> {
             borderPane.setStyle("-fx-background-color: #001933;");
         });
         StackPane stackImg = new StackPane();
@@ -249,11 +244,11 @@ public class GUIPatterns {
         delete.setPrefWidth(143);
         delete.setPrefHeight(31);
         Button buttonDelete = new Button("Удалить");
-        delete.setOnMouseEntered(mouseEvent1 -> {
+        delete.setOnMouseEntered(_ -> {
             delete.setStyle("-fx-background-color: silver");
             buttonDelete.setStyle("-fx-background-color: silver; -fx-text-fill: white");
         });
-        delete.setOnMouseExited(mouseEvent1 -> {
+        delete.setOnMouseExited(_ -> {
             delete.setStyle("-fx-background-color: #18314D");
             buttonDelete.setStyle("-fx-background-color: #18314D; -fx-text-fill: white");
         });
@@ -277,11 +272,11 @@ public class GUIPatterns {
         copy.setPrefWidth(143);
         copy.setPrefHeight(31);
         Button buttonCopy = new Button("Копировать");
-        copy.setOnMouseEntered(mouseEvent1 -> {
+        copy.setOnMouseEntered(_ -> {
             copy.setStyle("-fx-background-color: silver");
             buttonCopy.setStyle("-fx-background-color: silver; -fx-text-fill: white");
         });
-        copy.setOnMouseExited(mouseEvent1 -> {
+        copy.setOnMouseExited(_ -> {
             copy.setStyle("-fx-background-color: #18314D");
             buttonCopy.setStyle("-fx-background-color: #18314D; -fx-text-fill: white");
         });
@@ -307,11 +302,11 @@ public class GUIPatterns {
         Button buttonEdit = new Button("Изменить");
 
         buttonEdit.setTextFill(Color.WHITE);
-        edit.setOnMouseEntered(mouseEvent1 -> {
+        edit.setOnMouseEntered(_ -> {
             edit.setStyle("-fx-background-color: silver");
             buttonEdit.setStyle("-fx-background-color: silver;");
         });
-        edit.setOnMouseExited(mouseEvent1 -> {
+        edit.setOnMouseExited(_ -> {
             edit.setStyle("-fx-background-color: #18314D");
             buttonEdit.setStyle("-fx-background-color: #18314D; -fx-text-fill: white");
         });
@@ -605,21 +600,4 @@ public class GUIPatterns {
         chat.getChildren().add(anchorPane);
         chat.getChildren().add(textField);
     }
-
-//    private boolean checkMessageWindowStatusBeforeOpen(Long messageId, Stage stage) {
-//        if (messageStage == null) {
-//            messageStage = new MessageStage();
-//            messageStage.setMessageId(messageId);
-//            messageStage.setMessagesStage(stage);
-//        } else {
-//            if (!Objects.equals(messageId, messageStage.getMessageId())) {
-//                messageStage.getMessagesStage().close();
-//                messageStage.setMessagesStage(stage);
-//                messageStage.setMessageId(messageId);
-//            } else {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
 }

@@ -34,7 +34,7 @@ public class NotificationScene {
         int positionY = (int) rectangle2D.getMaxY() - 85;
 
         button = new Button("Убрать уведомления");
-        button.setOnMouseClicked(mouseEvent -> removeNotifications(positionX, positionY));
+        button.setOnMouseClicked(_ -> removeNotifications(positionX, positionY));
         button.setPrefWidth(sceneWidth);
         button.setPrefHeight(sceneHeight);
         button.setStyle("-fx-background-color: #001933; -fx-text-fill: white;");
@@ -78,12 +78,12 @@ public class NotificationScene {
 
             if (notificationField.getChildren().size() >= maxMessageCount) {
                 notificationField.getChildren().remove(maxMessageCount - 1);
-                notificationField.getChildren().add(0, notification);
+                notificationField.getChildren().addFirst(notification);
                 transitionIn.play();
             } else {
                 stage.setY(stage.getY() - maxNotificationHeight - spacing);
                 stage.setHeight(stage.getY() + maxNotificationHeight + spacing);
-                notificationField.getChildren().add(0, notification);
+                notificationField.getChildren().addFirst(notification);
                 transitionIn.play();
             }
         });

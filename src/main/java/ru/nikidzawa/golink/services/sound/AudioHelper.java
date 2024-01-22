@@ -22,14 +22,14 @@ public class AudioHelper {
             AudioFormat.Encoding.PCM_SIGNED, 48000, 16, MONO, 2, 48000, true);
     private static TargetDataLine mike;
 
+    @SneakyThrows
     public static void startRecording() {
         createNewFile();
         new Thread() {
             public void run() {
                 DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
                 if (!AudioSystem.isLineSupported(info)) {
-                    JOptionPane.showMessageDialog(null, "Line not supported" +
-                                    info, "Line not supported",
+                    JOptionPane.showMessageDialog(null, STR."Line not supported\{info}", "Line not supported",
                             JOptionPane.ERROR_MESSAGE);
                 }
                 try {
@@ -39,26 +39,22 @@ public class AudioHelper {
                     mike.start();
                     AudioSystem.write(sound, fileType, file);
                 } catch (LineUnavailableException ex) {
-                    JOptionPane.showMessageDialog(null, "Line not available" +
-                                    ex, "Line not available",
+                    JOptionPane.showMessageDialog(null, STR."Line not available\{ex}", "Line not available",
                             JOptionPane.ERROR_MESSAGE);
                 } catch (IOException ex) {
-                    JOptionPane.showMessageDialog(null, "I/O Error " + ex,
+                    JOptionPane.showMessageDialog(null, STR."I/O Error \{ex}",
                             "I/O Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         }.start();
     }
 
-    private static void createNewFile() {
-        try {
-            do {
-                String soundFileName = filename + (suffix++) + "." + fileType.getExtension();
-                file = new File(soundFileName);
-            } while (!file.createNewFile());
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+    @SneakyThrows
+    private static void createNewFile(){
+        do {
+            String soundFileName = STR."\{filename}\{suffix++}.\{fileType.getExtension()}";
+            file = new File(soundFileName);
+        } while (!file.createNewFile());
     }
 
     public static void stopRecording() {
@@ -66,7 +62,8 @@ public class AudioHelper {
         mike.close();
     }
 
-    public static byte[] convertAudioToBytes(File audioFile) throws IOException, UnsupportedAudioFileException {
+    @SneakyThrows
+    public static byte[] convertAudioToBytes(File audioFile) {
         AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(audioFile);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
