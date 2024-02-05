@@ -4,9 +4,13 @@
 
 ## О мессенджере
 
+(придётся подождать загрузку видео)
+
 ![main.gif](src%2Fmain%2Fresources%2Freadme%2Fmain.gif)
 
-Уведомления 
+Система оповещений на рабочем столе, при сворачивании приложения в трей 
+
+(придётся подождать загрузку видео)
 
 ![notifications.gif](src%2Fmain%2Fresources%2Freadme%2Fnotifications.gif)
 
