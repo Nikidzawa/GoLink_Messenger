@@ -18,14 +18,14 @@ GoLink - это мой десктопный аналог популярного 
 - интеграция своей системы оповещений на рабочем столе, построена на JavaFX
 - уведомления
 
-## Стек:
+## Стек
 
-Java 21
-Spring boot
-PostgreSQL
-TCP/IP
-JavaFX
-JavaAWT
+* Java 21
+* Spring boot
+* PostgreSQL
+* TCP/IP
+* JavaFX
+* JavaAWT
 
 ## Медиа
 
